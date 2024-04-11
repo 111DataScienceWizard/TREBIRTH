@@ -1,5 +1,5 @@
-                                                                      TREBIRTH - AI & ML 
+                                                                 TREBIRTH - AI & ML 
                                                                       
-                                                                       Protecting Crops
-                                                                      Empowering Farmers 
-                                                                      One Scan at a time
+                                                                  Protecting Crops
+                                                                 Empowering Farmers 
+                                                                 One Scan at a time
