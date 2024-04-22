@@ -57,13 +57,15 @@ csv_combined = convert_df_to_csv(df_combined)
 st.download_button("Download Combined Radar and ADXL Data", csv_combined, "Combined_Data.csv", "text/csv", key='download-csvcombined')
 
 # Metadata extraction
-df_metadata = pd.DataFrame(columns=['Key', 'Value'])
+metadata_list = []
 
 # Iterate over documents and extract metadata
 for doc in query:
     metadata = doc.to_dict()
-    for key, value in metadata.items():
-        df_metadata = df_metadata.append({'Key': key, 'Value': value}, ignore_index=True)
+    metadata_list.append(metadata)
+
+# Convert list of dictionaries to DataFrame
+df_metadata = pd.DataFrame(metadata_list)
 
 # Convert DataFrame to Excel format
 excel_data = BytesIO()
