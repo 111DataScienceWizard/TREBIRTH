@@ -1,19 +1,9 @@
-pip install xlsxwrite
 import streamlit as st
-import numpy as np
 from google.cloud import firestore
 import pandas as pd
 from google.cloud.firestore import FieldFilter
 from io import BytesIO
-from datetime import datetime
-from pathlib import Path
 import sys
-
-# Add the path to the xlsxwriter module to the sys path
-xlsxwriter_path = Path("c:/users/home/anaconda3/lib/site-packages")
-sys.path.append(str(xlsxwriter_path))
-
-# Import xlsxwriter
 import xlsxwriter
 
 # Set page configuration
@@ -22,9 +12,9 @@ st.title('Data Analytics')
 st.markdown(
     """
     <style>
-    .reportview-container {{
+    .reportview-container {
         background-color: white;
-    }}
+    }
     </style>
     """,
     unsafe_allow_html=True,
@@ -74,7 +64,7 @@ df_metadata = pd.DataFrame(columns=['Key', 'Value'])
 for doc in query:
     metadata = doc.to_dict()
     for key, value in metadata.items():
-        df_metadata = pd.concat([df_metadata, pd.DataFrame({'Key': [key], 'Value': [value]})], ignore_index=True)
+        df_metadata = df_metadata.append({'Key': key, 'Value': value}, ignore_index=True)
 
 # Convert DataFrame to Excel format
 excel_data = BytesIO()
@@ -85,5 +75,4 @@ with pd.ExcelWriter(excel_data, engine='xlsxwriter', mode='w') as writer:
 excel_bytes = excel_data.getvalue()
 
 # Download button for metadata
-st.download_button("Download Metadata", excel_bytes, "Metadata.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excelmetadata')
 st.download_button("Download Metadata", excel_bytes, "Metadata.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excelmetadata')
