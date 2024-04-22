@@ -57,17 +57,13 @@ csv_combined = convert_df_to_csv(df_combined)
 st.download_button("Download Combined Radar and ADXL Data", csv_combined, "Combined_Data.csv", "text/csv", key='download-csvcombined')
 
 
-# Metadata extraction
 df_metadata = pd.DataFrame(columns=['Key', 'Value'])
 
 # Iterate over documents and extract metadata
 for doc in query:
     metadata = doc.to_dict()
     for key, value in metadata.items():
-        if key == 'timestamp':
-            # Convert timestamp to a readable format
-            value = datetime.utcfromtimestamp(value.seconds).strftime('%Y-%m-%d %H:%M:%S')
-        df_metadata = pd.concat([df_metadata, pd.DataFrame({'Key': [key], 'Value': [str(value)]})])
+        df_metadata = df_metadata.append({'Key': key, 'Value': value}, ignore_index=True)
 
 # Convert DataFrame to Excel format
 excel_data = BytesIO()
