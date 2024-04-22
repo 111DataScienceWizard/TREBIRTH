@@ -36,26 +36,30 @@ number = st.text_input('Enter Tree number', '1')
 #doc_ref = db.collection("T1R1").select("ADXL Raw", "Radar Raw").stream()
 
 
-df_combined = pd.DataFrame(columns=['Radar', 'ADXL'])
 query = db.collection('DevOps').where(filter=FieldFilter("RowNo", "==", int(number_row))).where(filter=FieldFilter("TreeNo", "==", int(number))).get()
+
+df_combined = pd.DataFrame()
 
 for doc in query:
     radar_raw = doc.to_dict()['RadarRaw']
     adxl_raw = doc.to_dict()['ADXLRaw']
     
-    df_combined['Radar'] = pd.Series(radar_raw)
-    df_combined['ADXL'] = pd.Series(adxl_raw)
+    for i in range(1, 11):
+        radar_key = f'Radar{i}'
+        adxl_key = f'ADXL{i}'
+        
+        df_combined[f'{radar_key}'] = radar_raw
+        df_combined[f'{adxl_key}'] = adxl_raw
     
 df_combined = df_combined.dropna()
-
 df_combined = df_combined[100:1800]
 
 st.write(df_combined)
 
 @st.cache
 def convert_df(df):
- return df.to_csv().encode('utf-8')
+    return df.to_csv().encode('utf-8')
+
 csv_combined = convert_df(df_combined)
 
 st.download_button("Download Combined Radar and ADXL Data", csv_combined, "Combined_Data.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-csvcombined')
-
