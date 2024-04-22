@@ -64,10 +64,7 @@ df_metadata = pd.DataFrame(columns=['Key', 'Value'])
 for doc in query:
     metadata = doc.to_dict()
     for key, value in metadata.items():
-        if key == 'timestamp':
-            # Convert timestamp to a readable format
-            value = value.to_datetime().strftime('%Y-%m-%d %H:%M:%S')
-        df_metadata = pd.concat([df_metadata, pd.DataFrame({'Key': [key], 'Value': [str(value)]})])
+        df_metadata = pd.concat([df_metadata, pd.DataFrame({'Key': [key], 'Value': [value]})], ignore_index=True)
 
 # Convert DataFrame to Excel format
 excel_data = BytesIO()
@@ -78,4 +75,5 @@ with pd.ExcelWriter(excel_data, engine='xlsxwriter', mode='w') as writer:
 excel_bytes = excel_data.getvalue()
 
 # Download button for metadata
+st.download_button("Download Metadata", excel_bytes, "Metadata.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excelmetadata')
 st.download_button("Download Metadata", excel_bytes, "Metadata.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excelmetadata')
