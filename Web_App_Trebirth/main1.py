@@ -38,20 +38,21 @@ number = st.text_input('Enter Tree number', '1')
 
 query = db.collection('DevOps').where(filter=FieldFilter("RowNo", "==", int(number_row))).where(filter=FieldFilter("TreeNo", "==", int(number))).get()
 
-df_combined = pd.DataFrame()
+radar_data = []
+adxl_data = []
 
 for doc in query:
-    radar_raw = doc.to_dict()['RadarRaw']
-    adxl_raw = doc.to_dict()['ADXLRaw']
-    
-    for i in range(1, 11):
-        radar_key = f'Radar{i}'
-        adxl_key = f'ADXL{i}'
-        
-        df_combined[f'{radar_key}'] = radar_raw
-        df_combined[f'{adxl_key}'] = adxl_raw
-    
-df_combined = df_combined.dropna()
+    radar_data.append(doc.to_dict()['RadarRaw'])
+    adxl_data.append(doc.to_dict()['ADXLRaw'])
+
+# Create separate DataFrames for Radar and ADXL data
+df_radar = pd.DataFrame(radar_data).transpose().add_prefix('Radar ')
+df_adxl = pd.DataFrame(adxl_data).transpose().add_prefix('ADXL ')
+
+# Concatenate the DataFrames column-wise
+df_combined = pd.concat([df_radar, df_adxl], axis=1)
+
+# Slice the DataFrame to the desired range
 df_combined = df_combined[100:1800]
 
 st.write(df_combined)
