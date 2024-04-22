@@ -63,4 +63,4 @@ def convert_df(df):
 
 csv_combined = convert_df(df_combined)
 
-st.download_button("Download Combined Radar and ADXL Data", csv_combined, "Combined_Data.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-csvcombined')
+st.download_button("Download Combined Radar and ADXL Data", csv_combined, "Combined_Data.csv", "text/csv", key='download-csvcombined')
