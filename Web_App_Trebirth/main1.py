@@ -72,10 +72,14 @@ for doc in query:
 # Convert list of dictionaries to DataFrame
 df_metadata = pd.DataFrame(metadata_list)
 
+# Select only the desired columns
+desired_columns = ['TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
+df_metadata_filtered = df_metadata[desired_columns]
+
 # Convert DataFrame to Excel format
 excel_data = BytesIO()
 with pd.ExcelWriter(excel_data, engine='xlsxwriter', mode='w') as writer:
-    df_metadata.to_excel(writer, index=False)
+    df_metadata_filtered.to_excel(writer, index=False)
 
 # Get the bytes of the Excel data
 excel_bytes = excel_data.getvalue()
