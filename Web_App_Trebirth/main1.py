@@ -4,6 +4,7 @@ from google.cloud import firestore
 import pandas as pd
 from google.cloud.firestore import FieldFilter
 from io import BytesIO
+from datetime import datetime
 
 # Set page configuration
 st.set_page_config(layout="wide")
@@ -63,7 +64,10 @@ df_metadata = pd.DataFrame(columns=['Key', 'Value'])
 for doc in query:
     metadata = doc.to_dict()
     for key, value in metadata.items():
-        df_metadata = df_metadata.append({'Key': key, 'Value': str(value)}, ignore_index=True)
+        if key == 'timestamp':
+            # Convert timestamp to a readable format
+            value = datetime.utcfromtimestamp(value.seconds).strftime('%Y-%m-%d %H:%M:%S')
+        df_metadata = pd.concat([df_metadata, pd.DataFrame({'Key': [key], 'Value': [str(value)]})])
 
 # Convert DataFrame to Excel format
 excel_data = BytesIO()
