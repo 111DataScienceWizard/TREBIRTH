@@ -27,7 +27,7 @@ st.markdown(
   )
 
 # Authenticate to Firestore with the JSON account key.
-db = firestore.Client.from_service_account_json("testdata1-20ec5-firebase-adminsdk-an9r6-d15c118c96.json")
+db = firestore.Client.from_service_account_json("Web_App_Trebirth/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
 
 number_row = st.text_input('Enter Row number', '1')
 number = st.text_input('Enter Tree number', '1')
