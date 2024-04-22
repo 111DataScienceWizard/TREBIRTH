@@ -62,6 +62,10 @@ metadata_list = []
 # Iterate over documents and extract metadata
 for doc in query:
     metadata = doc.to_dict()
+    # Convert datetime values to timezone-unaware
+    for key, value in metadata.items():
+        if isinstance(value, datetime):
+            metadata[key] = value.replace(tzinfo=None)
     metadata_list.append(metadata)
 
 # Convert list of dictionaries to DataFrame
