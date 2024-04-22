@@ -64,3 +64,24 @@ def convert_df(df):
 csv_combined = convert_df(df_combined)
 
 st.download_button("Download Combined Radar and ADXL Data", csv_combined, "Combined_Data.csv", "text/csv", key='download-csvcombined')
+
+
+
+df_metadata = pd.DataFrame(columns=['Key', 'Value'])
+
+# Iterate over documents and extract metadata
+for doc in query:
+    metadata = doc.to_dict()
+    for key, value in metadata.items():
+        df_metadata = df_metadata.append({'Key': key, 'Value': value}, ignore_index=True)
+
+# Convert DataFrame to Excel format
+excel_data = BytesIO()
+with pd.ExcelWriter(excel_data, engine='xlsxwriter', mode='w') as writer:
+    df_metadata.to_excel(writer, index=False)
+
+# Get the bytes of the Excel data
+excel_bytes = excel_data.getvalue()
+
+# Download button for metadata
+st.download_button("Download Metadata", excel_bytes, "Metadata.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excelmetadata')
