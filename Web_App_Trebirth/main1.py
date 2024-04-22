@@ -11,6 +11,7 @@ from google.cloud.firestore import FieldFilter
 from sklearn.metrics import accuracy_score, classification_report
 from scipy import signal
 from sklearn.preprocessing import MinMaxScaler
+from io import BytesIO
 
 
 st.set_page_config(layout="wide")
