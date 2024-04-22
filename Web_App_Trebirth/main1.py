@@ -37,6 +37,7 @@ number = st.text_input('Enter Tree number', '1')
 
 
 df_combined = pd.DataFrame(columns=['Radar', 'ADXL'])
+query = db.collection('DevOps').where(filter=FieldFilter("RowNo", "==", int(number_row))).where(filter=FieldFilter("TreeNo", "==", int(number))).get()
 
 for doc in query:
     radar_raw = doc.to_dict()['RadarRaw']
