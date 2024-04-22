@@ -5,6 +5,15 @@ import pandas as pd
 from google.cloud.firestore import FieldFilter
 from io import BytesIO
 from datetime import datetime
+from pathlib import Path
+import sys
+
+# Add the path to the xlsxwriter module to the sys path
+xlsxwriter_path = Path("c:\users\home\anaconda3\lib\site-packages")
+sys.path.append(str(xlsxwriter_path))
+
+# Import xlsxwriter
+import xlsxwriter
 
 # Set page configuration
 st.set_page_config(layout="wide")
