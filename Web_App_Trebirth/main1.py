@@ -66,7 +66,7 @@ for doc in query:
     for key, value in metadata.items():
         if key == 'timestamp':
             # Convert timestamp to a readable format
-            value = datetime.utcfromtimestamp(value.seconds).strftime('%Y-%m-%d %H:%M:%S')
+            value = value.to_datetime().strftime('%Y-%m-%d %H:%M:%S')
         df_metadata = pd.concat([df_metadata, pd.DataFrame({'Key': [key], 'Value': [str(value)]})])
 
 # Convert DataFrame to Excel format
