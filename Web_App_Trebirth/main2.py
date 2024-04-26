@@ -25,6 +25,7 @@ db = firestore.Client.from_service_account_json("Web_App_Trebirth/testdata1-20ec
 row_number = st.text_input('Enter Row number', 'All')
 tree_number = st.text_input('Enter Tree number', 'All')
 scan_number = st.text_input('Enter Scan number', 'All')
+label_infstat = st.text_input('Enter InfStat label', 'All')
 
 # Create a reference to the Google post.
 query = db.collection('DevOps')
@@ -36,6 +37,8 @@ if tree_number != 'All':
     query = query.where('TreeNo', '==', int(tree_number))
 if scan_number != 'All':
     query = query.where('ScanNo', '==', int(scan_number))
+if label_infstat != 'All':
+    query = query.where('InfStat', '==', label_infstat)
 
 # Get documents based on the query
 query = query.get()
