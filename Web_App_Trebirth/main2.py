@@ -99,6 +99,22 @@ else:
     desired_columns = ['TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
     df_metadata_filtered = df_metadata[desired_columns]
 
+    # Construct file name based on user inputs
+    file_name_parts = []
+    if row_number != 'All':
+        file_name_parts.append(f'R{row_number}')
+    if tree_number != 'All':
+        file_name_parts.append(f'T{tree_number}')
+    if scan_number != 'All':
+        file_name_parts.append(f'S{scan_number}')
+
+    # Join file name parts with underscore
+    file_name = '_'.join(file_name_parts)
+
+    # Append timestamp to ensure uniqueness
+    timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
+    file_name = f"{file_name}_{timestamp_str}.xlsx"
+
     # Convert DataFrame to Excel format
     excel_data = BytesIO()
     with pd.ExcelWriter(excel_data, engine='xlsxwriter') as writer:
@@ -107,4 +123,4 @@ else:
     excel_data.seek(0)
 
     # Download button for combined data and metadata
-    st.download_button("Download Combined Data and Metadata", excel_data, file_name="Combined_Data_Metadata.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
+    st.download_button("Download Combined Data and Metadata", excel_data, file_name=file_name, mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
