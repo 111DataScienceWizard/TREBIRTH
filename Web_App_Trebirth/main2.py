@@ -40,18 +40,25 @@ if tree_number != 'All':
 if scan_number != 'All':
     query = query.where('ScanNo', '==', int(scan_number))
 if label != 'All':
-    query = query.where('Label', '==', label)
+    query = query.where('InfStat', '==', label)
 
 # Get documents based on the query
 query = query.get()
 
+# Create empty lists to store data
 radar_data = []
 adxl_data = []
+ax_data = []
+ay_data = []
+az_data = []
 metadata_list = []
 
 for doc in query:
     radar_data.append(doc.to_dict()['RadarRaw'])
     adxl_data.append(doc.to_dict()['ADXLRaw'])
+    ax_data.append(doc.to_dict()['Ax'])
+    ay_data.append(doc.to_dict()['Ay'])
+    az_data.append(doc.to_dict()['Az'])
     metadata = doc.to_dict()
     # Convert datetime values to timezone-unaware
     for key, value in metadata.items():
@@ -59,12 +66,15 @@ for doc in query:
             metadata[key] = value.replace(tzinfo=None)
     metadata_list.append(metadata)
 
-# Create separate DataFrames for Radar and ADXL data
+# Create DataFrame for radar, ADXL, Ax, Ay, Az data
 df_radar = pd.DataFrame(radar_data).transpose().add_prefix('Radar ')
 df_adxl = pd.DataFrame(adxl_data).transpose().add_prefix('ADXL ')
+df_ax = pd.DataFrame(ax_data).transpose().add_prefix('Ax ')
+df_ay = pd.DataFrame(ay_data).transpose().add_prefix('Ay ')
+df_az = pd.DataFrame(az_data).transpose().add_prefix('Az ')
 
 # Concatenate the DataFrames column-wise
-df_combined = pd.concat([df_radar, df_adxl], axis=1)
+df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
 
 # Create DataFrame for metadata
 df_metadata = pd.DataFrame(metadata_list)
@@ -74,7 +84,7 @@ excel_data = BytesIO()
 
 # Write data to Excel file
 with pd.ExcelWriter(excel_data, engine='xlsxwriter', mode='w') as writer:
-    # Write radar and ADXL data to first sheet
+    # Write combined data to first sheet
     df_combined.to_excel(writer, sheet_name='Raw Data', index=False)
     # Write metadata to second sheet
     df_metadata.to_excel(writer, sheet_name='Metadata', index=False)
