@@ -1,6 +1,8 @@
 import streamlit as st
 from google.cloud import firestore
 import pandas as pd
+from google.cloud.firestore import FieldFilter
+from io import BytesIO
 from datetime import datetime
 
 # Set page configuration
@@ -97,10 +99,11 @@ else:
     desired_columns = ['TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
     df_metadata_filtered = df_metadata[desired_columns]
 
-    # Write data to Excel file with default engine
+    # Convert DataFrame to Excel format
     excel_file_path = "Combined_Data_Metadata.xlsx"
-    df_combined.to_excel(excel_file_path, sheet_name='Raw Data', index=False)
-    df_metadata_filtered.to_excel(excel_file_path, sheet_name='Metadata', index=False, startrow=len(df_combined) + 2)
+    with pd.ExcelWriter(excel_file_path, engine='xlsxwriter', mode='w') as writer:
+        df_combined.to_excel(writer, sheet_name='Raw Data', index=False)
+        df_metadata_filtered.to_excel(writer, sheet_name='Metadata', index=False)
 
     # Download button for combined data and metadata
     st.download_button("Download Combined Data and Metadata", excel_file_path, "Combined_Data_Metadata.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
