@@ -2,6 +2,7 @@ import streamlit as st
 from google.cloud import firestore
 import pandas as pd
 import xlsxwriter
+import tempfile
 from datetime import datetime
 
 # Set page configuration
@@ -82,35 +83,33 @@ else:
 
     st.write(df_combined)
 
-    # Excel file creation
-    excel_data = BytesIO()
+    # Create a temporary file for Excel
+    with tempfile.NamedTemporaryFile(suffix='.xlsx', delete=False) as temp_file:
+        temp_file_name = temp_file.name
 
-    # Write data to Excel file
-    with pd.ExcelWriter(excel_data, engine='xlsxwriter', mode='w') as writer:
-        # Write combined data to first sheet
-        df_combined.to_excel(writer, sheet_name='Raw Data', index=False)
+        # Write data to Excel file
+        with pd.ExcelWriter(temp_file_name, engine='xlsxwriter') as writer:
+            # Write combined data to first sheet
+            df_combined.to_excel(writer, sheet_name='Raw Data', index=False)
 
-        # Metadata extraction
-        for doc in query:
-            metadata = doc.to_dict()
-            # Convert datetime values to timezone-unaware
-            for key, value in metadata.items():
-                if isinstance(value, datetime):
-                    metadata[key] = value.replace(tzinfo=None)
-            metadata_list.append(metadata)
+            # Metadata extraction
+            for doc in query:
+                metadata = doc.to_dict()
+                # Convert datetime values to timezone-unaware
+                for key, value in metadata.items():
+                    if isinstance(value, datetime):
+                        metadata[key] = value.replace(tzinfo=None)
+                metadata_list.append(metadata)
 
-        # Convert list of dictionaries to DataFrame
-        df_metadata = pd.DataFrame(metadata_list)
+            # Convert list of dictionaries to DataFrame
+            df_metadata = pd.DataFrame(metadata_list)
 
-        # Select only the desired columns
-        desired_columns = ['TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
-        df_metadata_filtered = df_metadata[desired_columns]
+            # Select only the desired columns
+            desired_columns = ['TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
+            df_metadata_filtered = df_metadata[desired_columns]
 
-        # Write metadata to second sheet
-        df_metadata_filtered.to_excel(writer, sheet_name='Metadata', index=False)
-
-    # Get the bytes of the Excel data
-    excel_bytes = excel_data.getvalue()
+            # Write metadata to second sheet
+            df_metadata_filtered.to_excel(writer, sheet_name='Metadata', index=False)
 
     # Download button for combined data and metadata
-    st.download_button("Download Combined Data and Metadata", excel_bytes, "Combined_Data_Metadata.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
+    st.download_button("Download Combined Data and Metadata", temp_file_name, "Combined_Data_Metadata.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
