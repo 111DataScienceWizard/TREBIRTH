@@ -97,16 +97,10 @@ else:
     desired_columns = ['TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
     df_metadata_filtered = df_metadata[desired_columns]
 
-    # Write data to Excel file
-   # Write data to Excel file with explicit file format
-excel_file_path = "Combined_Data_Metadata.xlsx"
-with pd.ExcelWriter(excel_file_path, engine='openpyxl') as writer:
-    # Write combined data to first sheet
-    df_combined.to_excel(writer, sheet_name='Raw Data', index=False)
+    # Write data to Excel file with default engine
+    excel_file_path = "Combined_Data_Metadata.xlsx"
+    df_combined.to_excel(excel_file_path, sheet_name='Raw Data', index=False)
+    df_metadata_filtered.to_excel(excel_file_path, sheet_name='Metadata', index=False, startrow=len(df_combined) + 2)
 
-    # Write metadata to second sheet
-    df_metadata_filtered.to_excel(writer, sheet_name='Metadata', index=False)
-
-# Download button for combined data and metadata
-st.download_button("Download Combined Data and Metadata", excel_file_path, "Combined_Data_Metadata.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
-
+    # Download button for combined data and metadata
+    st.download_button("Download Combined Data and Metadata", excel_file_path, "Combined_Data_Metadata.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
