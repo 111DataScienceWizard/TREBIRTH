@@ -1,6 +1,8 @@
 import streamlit as st
 from google.cloud import firestore
 import pandas as pd
+from google.cloud.firestore_v1 import FieldPath
+from io import BytesIO  # Import BytesIO class from io module
 import xlsxwriter
 from datetime import datetime
 
@@ -32,7 +34,7 @@ query = db.collection('DevOps')
 
 # Filter based on user input
 if row_number != 'All':
-    query = query.where('RowNo', '==', int(row_number))
+    query = query.where(FieldPath.document_id(), '==', row_number)
 if tree_number != 'All':
     query = query.where('TreeNo', '==', int(tree_number))
 if scan_number != 'All':
