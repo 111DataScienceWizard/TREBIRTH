@@ -63,10 +63,10 @@ else:
         az_data.append(doc.to_dict().get('Az', []))
         metadata = doc.to_dict()
         # Convert datetime values to timezone-unaware
-        for key, value in metadata.items():
-            if isinstance(value, datetime):
-                metadata[key] = value.replace(tzinfo=None)
-        metadata_list.append(metadata)
+        #for key, value in metadata.items():
+            #if isinstance(value, datetime):
+                #metadata[key] = value.replace(tzinfo=None)
+        #metadata_list.append(metadata)
 
     # Create separate DataFrames for Radar, ADXL, Ax, Ay, Az data
     df_radar = pd.DataFrame(radar_data).transpose().add_prefix('Radar ')
