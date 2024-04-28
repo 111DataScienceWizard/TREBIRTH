@@ -103,8 +103,8 @@ else:
     # Normalize all the columns
     df_combined_normalized = (df_combined_detrended - df_combined_detrended.min()) / (df_combined_detrended.max() - df_combined_detrended.min())
 
-    # Change column names according to the scan number
-    scan_suffix = f" {scan_number}" if scan_number != 'All' else ""  # Adding scan number suffix if it's specified
+    # Add scan number to column names
+    scan_suffix = f" {scan_number}" if scan_number != 'All' else ""
     df_combined.columns = [f"{col}{scan_suffix}" for col in df_combined.columns]
 
     # Convert list of dictionaries to DataFrame
@@ -123,13 +123,11 @@ else:
     if scan_number != 'All':
         file_name_parts.append(f'S{scan_number}')
 
-
     # Join file name parts with underscore
     file_name = '_'.join(file_name_parts)
 
     # Append timestamp to ensure uniqueness
     timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
-    file_name = f"{file_name}_{timestamp_str}.xlsx"
 
     # Convert DataFrame to Excel format
     excel_data = BytesIO()
@@ -150,4 +148,4 @@ else:
     excel_data.seek(0)
 
     # Download button for selected sheets and metadata
-    st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=file_name, mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
+    st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}_{timestamp_str}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
