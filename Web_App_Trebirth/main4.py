@@ -103,10 +103,6 @@ else:
     # Normalize all the columns
     df_combined_normalized = (df_combined_detrended - df_combined_detrended.min()) / (df_combined_detrended.max() - df_combined_detrended.min())
 
-    # Add scan number to column names
-    scan_suffix = f" {scan_number}" if scan_number != 'All' else ""
-    df_combined.columns = [f"{col}{scan_suffix}" for col in df_combined.columns]
-
     # Convert list of dictionaries to DataFrame
     df_metadata = pd.DataFrame(metadata_list)
 
@@ -125,9 +121,6 @@ else:
 
     # Join file name parts with underscore
     file_name = '_'.join(file_name_parts)
-
-    # Append timestamp to ensure uniqueness
-    timestamp_str = datetime.now().strftime("%Y%m%d%H%M%S")
 
     # Convert DataFrame to Excel format
     excel_data = BytesIO()
