@@ -120,7 +120,7 @@ else:
     if tree_number != 'All':
         file_name_parts.append(f'T{tree_number}')
     if scan_number != 'All':
-        file_name_parts.append(f'S{scan_number}")
+        file_name_parts.append(f'S{scan_number}')
 
     # Join file name parts with underscore
     file_name = '_'.join(file_name_parts)
