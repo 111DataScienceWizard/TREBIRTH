@@ -36,7 +36,7 @@ scan_number = st.text_input('Enter Scan number', 'All')
 label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], index=0)
 
 # Dropdown for selecting sheets in Excel
-selected_sheets = st.multiselect('Select Sheets', ['Detrended Data', 'Normalized Data', 'Detrended & Normalized Data'], default=['Detrended Data', 'Normalized Data', 'Detrended & Normalized Data'])
+selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata'], default=['Raw Data', 'Metadata'])
 
 # Create a reference to the Google post.
 query = db.collection('DevOps')
@@ -132,6 +132,8 @@ else:
     # Convert DataFrame to Excel format
     excel_data = BytesIO()
     with pd.ExcelWriter(excel_data, engine='xlsxwriter') as writer:
+        if 'Raw Data' in selected_sheets:
+            df_combined.to_excel(writer, sheet_name='Raw Data', index=False)
         if 'Detrended Data' in selected_sheets:
             df_combined_detrended.to_excel(writer, sheet_name='Detrended Data', index=False)
         if 'Normalized Data' in selected_sheets:
@@ -140,7 +142,8 @@ else:
             # Combine detrended and normalized data
             df_combined_detrended_normalized = (df_combined_detrended - df_combined_detrended.min()) / (df_combined_detrended.max() - df_combined_detrended.min())
             df_combined_detrended_normalized.to_excel(writer, sheet_name='Detrended & Normalized Data', index=False)
-        df_metadata_filtered.to_excel(writer, sheet_name='Metadata', index=False)
+        if 'Metadata' in selected_sheets:
+            df_metadata_filtered.to_excel(writer, sheet_name='Metadata', index=False)
 
     excel_data.seek(0)
 
