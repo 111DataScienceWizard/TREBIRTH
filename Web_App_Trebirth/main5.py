@@ -191,4 +191,4 @@ else:
     excel_data.seek(0)
 
     # Download button for selected sheets and metadata
-    st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}_{timestamp_str}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
+    st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
