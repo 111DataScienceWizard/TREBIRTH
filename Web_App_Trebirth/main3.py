@@ -104,7 +104,7 @@ else:
     df_combined_normalized = (df_combined_detrended - df_combined_detrended.min()) / (df_combined_detrended.max() - df_combined_detrended.min())
 
     # Change column names according to the scan number
-    df_combined_normalized.columns = [f"{col}{scan_number}" for col in df_combined_normalized.columns]
+    df_combined_normalized.columns = [f"{col} {scan_number}" for col in df_combined_normalized.columns]
 
     # Convert list of dictionaries to DataFrame
     df_metadata = pd.DataFrame(metadata_list)
@@ -120,7 +120,7 @@ else:
     if tree_number != 'All':
         file_name_parts.append(f'T{tree_number}')
     if scan_number != 'All':
-        file_name_parts.append(f'S{scan_number}')
+        file_name_parts.append(f'S{scan_number}")
 
     # Join file name parts with underscore
     file_name = '_'.join(file_name_parts)
