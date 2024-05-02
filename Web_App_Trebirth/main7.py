@@ -237,7 +237,3 @@ else:
 
     # Plot signals based on user selections
     plot_signals(df_combined_detrended, domain=selected_domain, columns=selected_columns)
-
-# Run the Streamlit app
-if __name__ == "__main__":
-    main()
