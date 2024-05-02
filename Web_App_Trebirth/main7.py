@@ -119,6 +119,10 @@ label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], ind
 # Dropdown for selecting sheets in Excel
 selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features'], default=['Raw Data', 'Metadata'])
 
+# User input for plotting
+selected_domain = st.selectbox('Select Domain', ['All', 'Time Domain', 'Frequency Domain'], index=0)
+selected_columns = st.multiselect('Select Columns to Plot', ['Radar', 'ADXL', 'Ax', 'Ay', 'Az'], default=['Radar', 'ADXL', 'Ax', 'Ay', 'Az'])
+
 # Create a reference to the Google post.
 query = db.collection('DevOps')
 
@@ -231,9 +235,9 @@ else:
     # Download button for selected sheets and metadata
     st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
 
-# User input for plotting
-selected_domain = st.selectbox('Select Domain', ['All', 'Time Domain', 'Frequency Domain'], index=0)
-selected_columns = st.multiselect('Select Columns to Plot', ['Radar', 'ADXL', 'Ax', 'Ay', 'Az'], default=['Radar', 'ADXL', 'Ax', 'Ay', 'Az'])
+    # Plot signals based on user selections
+    plot_signals(df_combined_detrended, domain=selected_domain, columns=selected_columns)
 
-# Plot signals based on user selections
-plot_signals(df_combined_detrended, domain=selected_domain, columns=selected_columns)
+# Run the Streamlit app
+if __name__ == "__main__":
+    main()
