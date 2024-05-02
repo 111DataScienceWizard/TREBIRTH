@@ -26,34 +26,20 @@ def fq(df):
     powers = pd.DataFrame(powers)
     return frequencies, powers
 
-def stats_radar(df, row_names=None):
+def stats_radar(df, row_name=None):
     result_df = pd.DataFrame()
 
     for column in df.columns:
-        std_list, ptp_list, mean_list, rms_list = [], [], [], []
-
         std_value = np.std(df[column])
         ptp_value = np.ptp(df[column])
         mean_value = np.mean(df[column])
         rms_value = np.sqrt(np.mean(df[column]**2))
 
-        std_list.append(std_value)
-        ptp_list.append(ptp_value)
-        mean_list.append(mean_value)
-        rms_list.append(rms_value)
-
         column_result_df = pd.DataFrame({
-            "STD": std_list,
-            "PTP": ptp_list,
-            "Mean": mean_list,
-            "RMS": rms_list
+            f"{row_name} {column}": [std_value, ptp_value, mean_value, rms_value]
         })
 
-        # Concatenate row name with column names
-        if row_names:
-            column_result_df.index = [f"{row_name} {column}" for row_name in row_names]
-
-        result_df = pd.concat([result_df, column_result_df])
+        result_df = pd.concat([result_df, column_result_df], axis=1)
 
     return result_df.T
 
@@ -150,14 +136,12 @@ else:
     # Normalize all the columns
     df_combined_normalized = (df_combined_detrended - df_combined_detrended.min()) / (df_combined_detrended.max() - df_combined_detrended.min())
 
-    # Get row names
-    row_names = ['Radar', 'ADXL', 'Ax', 'Ay', 'Az']
+    # Convert list of dictionaries to DataFrame
+    df_metadata = pd.DataFrame(metadata_list)
 
-    # Calculate time domain features
-    time_domain_features = stats_radar(df_combined_detrended, row_names=row_names)
-
-    # Calculate frequency domain features
-    frequencies, powers = fq(df_combined_detrended)
+    # Select only the desired columns
+    desired_columns = ['TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
+    df_metadata_filtered = df_metadata[desired_columns]
 
     # Construct file name based on user inputs
     file_name_parts = []
@@ -184,15 +168,4 @@ else:
             # Combine detrended and normalized data
             df_combined_detrended_normalized = (df_combined_detrended - df_combined_detrended.min()) / (df_combined_detrended.max() - df_combined_detrended.min())
             df_combined_detrended_normalized.to_excel(writer, sheet_name='Detrended & Normalized Data', index=False)
-        if 'Metadata' in selected_sheets:
-            df_metadata_filtered.to_excel(writer, sheet_name='Metadata', index=False)
-        if 'Time Domain Features' in selected_sheets:
-            time_domain_features.to_excel(writer, sheet_name='Time Domain Features', index=True)
-        if 'Frequency Domain Features' in selected_sheets:
-            frequencies.to_excel(writer, sheet_name='Frequencies', index=True)
-            powers.to_excel(writer, sheet_name='Powers', index=True)
-
-    excel_data.seek(0)
-
-    # Download button for selected sheets and metadata
-    st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
+        if
