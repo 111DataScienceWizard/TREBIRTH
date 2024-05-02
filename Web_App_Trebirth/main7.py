@@ -31,6 +31,8 @@ def plot_time_domain(data, columns):
         st.write(f"## {column} - Time Domain")
         fig, ax = plt.subplots()
         ax.plot(data.index, data[column])
+        ax.set_xlabel('Time (s)')
+        ax.set_ylabel('Signal')
         st.pyplot(fig)
         save_button(fig, f"{column}_time_domain.png")
 
@@ -44,6 +46,8 @@ def plot_frequency_domain(data, columns):
         frequencies, powers = fq(data[column])
         fig, ax = plt.subplots()
         ax.plot(frequencies, powers)
+        ax.set_xlabel('Frequency (Hz)')
+        ax.set_ylabel('Power Spectrum (dB)')
         st.pyplot(fig)
         save_button(fig, f"{column}_frequency_domain.png")
 
@@ -66,39 +70,23 @@ def detrend(dataframe):
 
 # Define feature extraction functions
 def fq(df):
-    frequencies = []
-    powers = []
-
-    for i in df:
-        f, p = signal.welch(df[i], 100, 'flattop', 1024, scaling='spectrum')
-        frequencies.append(f)
-        powers.append(p)
-
-    frequencies = pd.DataFrame(frequencies)
-    powers = pd.DataFrame(powers)
+    frequencies, powers = signal.welch(df, 100, 'flattop', 1024, scaling='spectrum')
     return frequencies, powers
 
 def stats_radar(df):
     result_df = pd.DataFrame()
 
     for column in df.columns:
-        std_list, ptp_list, mean_list, rms_list = [], [], [], []
-
         std_value = np.std(df[column])
         ptp_value = np.ptp(df[column])
         mean_value = np.mean(df[column])
         rms_value = np.sqrt(np.mean(df[column]**2))
 
-        std_list.append(std_value)
-        ptp_list.append(ptp_value)
-        mean_list.append(mean_value)
-        rms_list.append(rms_value)
-
         column_result_df = pd.DataFrame({
-            "STD": std_list,
-            "PTP": ptp_list,
-            "Mean": mean_list,
-            "RMS": rms_list
+            "STD": [std_value],
+            "PTP": [ptp_value],
+            "Mean": [mean_value],
+            "RMS": [rms_value]
         })
         result_df = pd.concat([result_df, column_result_df], axis=0)
     return result_df
