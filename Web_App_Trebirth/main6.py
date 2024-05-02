@@ -51,10 +51,11 @@ def stats_radar(df, row_names=None):
 
         # Concatenate row name with column names
         if row_names:
-            column_result_df.columns = [f"{row_name} {column}" for row_name in row_names]
+            column_result_df.index = [f"{row_name} {column}" for row_name in row_names]
 
-        result_df = pd.concat([result_df, column_result_df], axis=1)
-    return result_df
+        result_df = pd.concat([result_df, column_result_df])
+
+    return result_df.T
 
 # Set page configuration
 st.set_page_config(layout="wide")
@@ -186,10 +187,10 @@ else:
         if 'Metadata' in selected_sheets:
             df_metadata_filtered.to_excel(writer, sheet_name='Metadata', index=False)
         if 'Time Domain Features' in selected_sheets:
-            time_domain_features.to_excel(writer, sheet_name='Time Domain Features', index=False)
+            time_domain_features.to_excel(writer, sheet_name='Time Domain Features', index=True)
         if 'Frequency Domain Features' in selected_sheets:
-            frequencies.to_excel(writer, sheet_name='Frequencies', index=False)
-            powers.to_excel(writer, sheet_name='Powers', index=False)
+            frequencies.to_excel(writer, sheet_name='Frequencies', index=True)
+            powers.to_excel(writer, sheet_name='Powers', index=True)
 
     excel_data.seek(0)
 
