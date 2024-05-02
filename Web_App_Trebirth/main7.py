@@ -27,29 +27,29 @@ def plot_time_domain(data, columns):
     if columns == 'all':
         columns = data.columns
     
+    fig, ax = plt.subplots()
     for column in columns:
-        st.write(f"## {column} - Time Domain")
-        fig, ax = plt.subplots()
-        ax.plot(data.index, data[column])
-        ax.set_xlabel('Time (s)')
-        ax.set_ylabel('Signal')
-        st.pyplot(fig)
-        save_button(fig, f"{column}_time_domain.png")
+        ax.plot(data.index, data[column], label=column)
+    ax.set_xlabel('Time (s)')
+    ax.set_ylabel('Signal')
+    ax.legend()
+    st.pyplot(fig)
+    save_button(fig, "time_domain_plot.png")
 
 # Function to plot signals in frequency domain
 def plot_frequency_domain(data, columns):
     if columns == 'all':
         columns = data.columns
     
+    fig, ax = plt.subplots()
     for column in columns:
-        st.write(f"## {column} - Frequency Domain")
         frequencies, powers = fq(data[column])
-        fig, ax = plt.subplots()
-        ax.plot(frequencies, powers)
-        ax.set_xlabel('Frequency (Hz)')
-        ax.set_ylabel('Power Spectrum (dB)')
-        st.pyplot(fig)
-        save_button(fig, f"{column}_frequency_domain.png")
+        ax.plot(frequencies, powers, label=column)
+    ax.set_xlabel('Frequency (Hz)')
+    ax.set_ylabel('Power Spectrum (dB)')
+    ax.legend()
+    st.pyplot(fig)
+    save_button(fig, "frequency_domain_plot.png")
 
 # Function to save plotted graphs as PNG
 def save_button(fig, filename):
