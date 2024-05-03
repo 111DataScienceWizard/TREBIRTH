@@ -23,16 +23,18 @@ def plot_signals(data, domain='all'):
             plot_frequency_domain(data)
 
 # Function to plot signals in time domain
+# Function to plot signals in time domain
 def plot_time_domain(data):
     columns = data.columns
     for column in columns:
         st.write(f"## {column} - Time Domain")
         fig, ax = plt.subplots()
-        ax.plot(data.index, data[column])
+        ax.plot(data.index, data[column].to_numpy())  # Convert to NumPy array
         ax.set_xlabel('Time (s)')
         ax.set_ylabel('Signal')
         st.pyplot(fig)
         save_button(fig, f"{column}_time_domain.png")
+
 
 # Function to plot signals in frequency domain
 def plot_frequency_domain(data):
