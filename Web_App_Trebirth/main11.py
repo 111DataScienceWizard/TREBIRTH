@@ -11,27 +11,20 @@ from datetime import datetime
 # Function to plot signals in spectrogram
 # Function to plot signals in spectrogram
 # Function to plot signals in frequency domain
-def plot_spectrogram(data):
+def plot_frequency_domain(data):
     columns = data.columns
     for column in columns:
-        st.write(f"## {column} - Spectrogram")
+        st.write(f"## {column} - Frequency Domain")
         # Remove the prefix from the column name
         sensor_name = column.split()[0]  # Get the sensor name (e.g., 'Radar', 'ADXL', etc.)
-        f, t, Sxx = spectrogram(data[column], fs=100, window='hamming', nperseg=256, noverlap=128, scaling='density')
-        
-        # Clear the current plot
-        plt.clf()
-        
-        # Create a new figure for the spectrogram plot
-        plt.figure()
-        plt.pcolormesh(t, f, 10 * np.log10(Sxx), shading='gouraud')  # Applying logarithmic scale
-        plt.ylabel('Frequency [Hz]')
-        plt.xlabel('Time [s]')
-        plt.colorbar(label='Intensity [dB]')
-        plt.title(f'Spectrogram of {column}')
-        
-        # Display the plot using streamlit
-        st.pyplot()
+        frequencies, powers = fq(data[column])
+        fig, ax = plt.subplots()
+        ax.plot(frequencies, powers)
+        ax.set_xlabel('Frequency (Hz)')
+        ax.set_ylabel('Power Spectrum (dB)')
+        st.pyplot(fig)
+        save_button(fig, f"{sensor_name}_frequency_domain.png")
+
 
 
 # Function to plot signals
