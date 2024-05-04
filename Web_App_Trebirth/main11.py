@@ -30,7 +30,7 @@ def plot_frequency_domain(data):
 # Function to plot signals
 def plot_signals(data, domain='all'):
     if domain == 'all':
-        domains = ['Time Domain', 'Spectrogram']
+        domains = ['Time Domain', 'Frequency Domain']
     else:
         domains = [domain]
     
@@ -38,8 +38,8 @@ def plot_signals(data, domain='all'):
         if domain == 'Time Domain':
             st.subheader('Time Domain Plots')
             plot_time_domain(data)
-        elif domain == 'Spectrogram':
-            st.subheader('Spectrogram Plots')
+        elif domain == 'Frequency Domain':
+            st.subheader('Frequency Domain Plots')
             spectrogram_plot(data)
 
 # Function to plot signals in time domain
@@ -125,7 +125,7 @@ label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], ind
 selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features'], default=['Raw Data', 'Metadata'])
 
 # User input for plotting
-selected_domain = st.selectbox('Select Domain', ['All', 'Time Domain', 'Spectrogram'], index=0)
+selected_domain = st.selectbox('Select Domain', ['All', 'Time Domain', 'Frequency Domain'], index=0)
 
 # Create a reference to the Google post.
 query = db.collection('DevOps')
