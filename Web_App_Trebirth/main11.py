@@ -40,7 +40,7 @@ def plot_signals(data, domain='all'):
             plot_time_domain(data)
         elif domain == 'Frequency Domain':
             st.subheader('Frequency Domain Plots')
-            spectrogram_plot(data)
+            plot_frequency_domain(data)
 
 # Function to plot signals in time domain
 def plot_time_domain(data):
