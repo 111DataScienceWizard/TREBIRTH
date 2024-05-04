@@ -132,7 +132,7 @@ label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], ind
 selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features'], default=['Raw Data', 'Metadata'])
 
 # User input for plotting
-selected_domain = st.selectbox('Select Domain', ['All', 'Time Domain', 'Frequency Domain'], index=0)
+selected_domain = st.selectbox('Select Domain', ['All', 'Time Domain', 'Spectrogram'], index=0)
 
 # Create a reference to the Google post.
 query = db.collection('DevOps')
