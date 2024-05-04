@@ -10,10 +10,13 @@ from datetime import datetime
 
 # Function to plot signals in spectrogram
 # Function to plot signals in spectrogram
-def spectrogram_plot(data):
+# Function to plot signals in frequency domain
+def plot_spectrogram(data):
     columns = data.columns
     for column in columns:
         st.write(f"## {column} - Spectrogram")
+        # Remove the prefix from the column name
+        sensor_name = column.split()[0]  # Get the sensor name (e.g., 'Radar', 'ADXL', etc.)
         f, t, Sxx = spectrogram(data[column], fs=100, window='hamming', nperseg=256, noverlap=128, scaling='density')
         
         # Clear the current plot
