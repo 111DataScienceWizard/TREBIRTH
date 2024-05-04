@@ -13,6 +13,7 @@ def spectrogram_plot(data):
     columns = data.columns
     for column in columns:
         st.write(f"## {column} - Spectrogram")
+        sensor_name = column.split()[0]
         f, t, Sxx = spectrogram(data[column], fs=100, window='hamming', nperseg=256, noverlap=128, scaling='density')
         plt.pcolormesh(t, f, 10 * np.log10(Sxx), shading='gouraud')  # Applying logarithmic scale
         plt.ylabel('Frequency [Hz]')
@@ -20,6 +21,7 @@ def spectrogram_plot(data):
         plt.colorbar(label='Intensity [dB]')
         plt.title(f'Spectrogram of {column}')
         st.pyplot(plt.gcf())
+        save_button(fig, f"{sensor_name}_frequency_domain.png")
 
 # Function to plot signals
 def plot_signals(data, domain='all'):
@@ -44,7 +46,7 @@ def plot_time_domain(data):
         fig, ax = plt.subplots()
         # Calculate time in seconds based on sampling rate
         time_seconds = np.arange(len(data[column])) / 100
-        ax.plot(time_seconds, data[column])
+        ax.plot(time_seconds, data[column].values)
         ax.set_xlabel('Time (s)')
         ax.set_ylabel('Signal')
         st.pyplot(fig)
