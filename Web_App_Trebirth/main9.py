@@ -44,7 +44,7 @@ def plot_time_domain(data):
         fig, ax = plt.subplots()
         # Calculate time in seconds based on sampling rate
         time_seconds = np.arange(len(data[column])) / 100
-        ax.plot(time_seconds, data[column].values)
+        ax.plot(time_seconds, data[column])
         ax.set_xlabel('Time (s)')
         ax.set_ylabel('Signal')
         st.pyplot(fig)
