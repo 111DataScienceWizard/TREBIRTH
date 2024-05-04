@@ -234,4 +234,4 @@ else:
     st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
 
     # Plot signals based on user selections
-    plot_signals(df_combined, domain=selected_domain)
+    plot_signals(df_combined_normalized, domain=selected_domain)
