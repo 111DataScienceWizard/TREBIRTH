@@ -8,6 +8,23 @@ from google.cloud import firestore
 from io import BytesIO
 from datetime import datetime
 
+
+# Function to plot signals in frequency domain
+def plot_frequency_domain(data):
+    columns = data.columns
+    for column in columns:
+        st.write(f"## {column} - Frequency Domain")
+        # Remove the prefix from the column name
+        sensor_name = column.split()[0]  # Get the sensor name (e.g., 'Radar', 'ADXL', etc.)
+        frequencies, powers = fq(data[column])
+        powers_db = 10 * np.log10(powers)  # Convert power to dB scale
+        fig, ax = plt.subplots()
+        ax.plot(frequencies, powers_db)
+        ax.set_xlabel('Frequency (Hz)')
+        ax.set_ylabel('Power Spectrum (dB)')
+        st.pyplot(fig)
+        save_button(fig, f"{sensor_name}_frequency_domain.png")
+
 def spectrogram_plot(data):
     columns = data.columns
     for column in columns:
@@ -25,7 +42,7 @@ def spectrogram_plot(data):
 # Function to plot signals
 def plot_signals(data, domain='all'):
     if domain == 'all':
-        domains = ['Time Domain', 'Spectrogram']
+        domains = ['Time Domain', 'Spectrogram', 'Frequency Domain']
     else:
         domains = [domain]
     
@@ -36,6 +53,10 @@ def plot_signals(data, domain='all'):
         elif domain == 'Spectrogram':
             st.subheader('Spectrogram Plots')
             spectrogram_plot(data)
+        elif domain == 'Frequency Domain':
+            st.subheader('Frequency Domain Plots')
+            plot_frequency_domain(data)
+                         
 
 # Function to plot signals in time domain
 def plot_time_domain(data):
@@ -120,7 +141,7 @@ label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], ind
 selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features'], default=['Raw Data', 'Metadata'])
 
 # User input for plotting
-selected_domain = st.selectbox('Select Domain', ['All', 'Time Domain', 'Spectrogram'], index=0)
+selected_domain = st.selectbox('Select Domain', ['All', 'Time Domain', 'Spectrogram', 'Frequency Domain'], index=0)
 
 # Create a reference to the Google post.
 query = db.collection('DevOps')
