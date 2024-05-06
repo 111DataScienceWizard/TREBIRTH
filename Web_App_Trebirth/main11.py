@@ -24,7 +24,7 @@ def plot_frequency_domain(data):
         ax.set_ylabel('Power Spectrum (dB)')
         st.pyplot(fig)
         save_button(fig, f"{sensor_name}_frequency_domain.png")
-
+        
 def spectrogram_plot(data):
     columns = data.columns
     for column in columns:
@@ -36,8 +36,10 @@ def spectrogram_plot(data):
         plt.xlabel('Time [s]')
         plt.colorbar(label='Intensity [dB]')
         plt.title(f'Spectrogram of {column}')
-        st.pyplot(plt.gcf())
+        fig = plt.gcf()  # Define fig here
+        st.pyplot(fig)
         save_button(fig, f"{sensor_name}_Spectrogram.png")
+
 
 # Function to plot signals
 def plot_signals(data, domain='all'):
