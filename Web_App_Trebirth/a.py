@@ -11,17 +11,19 @@ from datetime import datetime
 # Function to apply filter
 def apply_filter(data, filter_type, cutoff_freq):
     nyquist_freq = 0.5 * sampling_rate
-    normalized_cutoff_freq = cutoff_freq / nyquist_freq
     
-    if filter_type == 'LPF':
-        b = signal.firwin(order, cutoff_freq, window='hamming', fs=sampling_rate, pass_zero=True)
-    elif filter_type == 'HPF':
-        b = signal.firwin(order, cutoff_freq, window='hamming', fs=sampling_rate, pass_zero=False)
+    if filter_type == 'LPF' or filter_type == 'HPF':
+        # For LPF and HPF, cutoff_freq should be a single float
+        normalized_cutoff_freq = cutoff_freq / nyquist_freq
+        b = signal.firwin(order, cutoff_freq, window='hamming', fs=sampling_rate, pass_zero=(filter_type == 'LPF'))
     elif filter_type == 'BPF':
-        b = signal.firwin(order, [cutoff_freq[0], cutoff_freq[1]], window='hamming', fs=sampling_rate, pass_zero=False)
+        # For BPF, cutoff_freq should be a list containing two floats
+        normalized_cutoff_freq = [freq / nyquist_freq for freq in cutoff_freq]
+        b = signal.firwin(order, cutoff_freq, window='hamming', fs=sampling_rate, pass_zero=False)
     
     filtered_data = signal.lfilter(b, 1, data)
     return filtered_data
+
 
 # Function to plot signals in time domain with filter
 def plot_time_domain_with_filter(data, filter_type, cutoff_freq):
