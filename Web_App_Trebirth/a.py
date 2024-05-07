@@ -15,7 +15,8 @@ def apply_filter(data, filter_type, cutoff_freq):
     if filter_type == 'LPF' or filter_type == 'HPF':
         # For LPF and HPF, cutoff_freq should be a single float
         normalized_cutoff_freq = cutoff_freq / nyquist_freq
-        b = signal.firwin(order, cutoff_freq, window='hamming', fs=sampling_rate, pass_zero=(filter_type == 'LPF'))
+        pass_zero = (filter_type == 'LPF') if filter_type in ['LPF', 'HPF'] else False
+        b = signal.firwin(order, cutoff_freq, window='hamming', fs=sampling_rate, pass_zero=pass_zero)
     elif filter_type == 'BPF':
         # For BPF, cutoff_freq should be a tuple containing two floats
         normalized_cutoff_freq = (cutoff_freq[0] / nyquist_freq, cutoff_freq[1] / nyquist_freq)
