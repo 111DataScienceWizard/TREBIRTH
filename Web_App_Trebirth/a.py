@@ -21,7 +21,7 @@ def apply_filter(data, filter_type, cutoff_freq):
         normalized_cutoff_freq = (cutoff_freq[0] / nyquist_freq, cutoff_freq[1] / nyquist_freq)
         b = signal.firwin(order, cutoff_freq, window='hamming', fs=sampling_rate, pass_zero=False)
     
-    filtered_data = signal.lfilter(b, 1, data)
+    filtered_data = signal.lfilter(b, 1, data) #The function signal.lfilter() applies a linear filter to a signal, b = coefficients, 1 = denominator of coefficients
     return filtered_data
 
 
