@@ -10,7 +10,7 @@ from datetime import datetime
 
 # Function to apply filter
 def apply_filter(data, filter_type, cutoff_freq):
-    nyquist_freq = 0.5 * sampling_rate
+    nyquist_freq = 0.5 * sampling_rate  #ensures that the cutoff frequency is specified in a consistent and standardized manner.
     
     if filter_type == 'LPF' or filter_type == 'HPF':
         # For LPF and HPF, cutoff_freq should be a single float
