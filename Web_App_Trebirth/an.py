@@ -205,7 +205,7 @@ if filter_type != 'None':
 
 # Set sampling rate and filter order
 sampling_rate = 100
-order = 50
+order = 51
 
 # Create a reference to the Google post.
 query = db.collection('DevOps')
