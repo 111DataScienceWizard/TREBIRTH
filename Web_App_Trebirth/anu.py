@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from google.cloud import firestore
 from io import BytesIO
 from datetime import datetime
+from scipy.fft import fftfreq
+
 
 # Function to apply filter
 def apply_filter(data, filter_type, cutoff_freq, sampling_rate=100):
