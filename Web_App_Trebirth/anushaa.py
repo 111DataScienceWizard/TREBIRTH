@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-from scipy.fft import fft
+from scipy.fft import fft, fftfreq
 from scipy import signal
 from scipy.signal import spectrogram
 import matplotlib.pyplot as plt
@@ -224,8 +224,10 @@ selected_domain = st.selectbox('Select Domain', ['All', 'Time Domain', 'Spectrog
 # Add user input for filter type and cutoff frequency
 filter_type = st.selectbox('Select Filter Type', ['None', 'LPF', 'HPF', 'BPF'])
 if filter_type != 'None':
-    cutoff_freq = st.slider('Select Cutoff Frequency (Hz)', min_value=1, max_value=20, value=(1, 2) if filter_type == 'BPF' else 1)
-
+    cutoff_freq = st.slider('Select Cutoff Frequency (Hz)', min_value=1, max_value=50, value=(1, 2) if filter_type == 'BPF' else 1)
+else:
+    cutoff_freq = None
+    
 # Set sampling rate and filter order
 sampling_rate = 100
 order = 51
