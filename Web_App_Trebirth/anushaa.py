@@ -1,13 +1,13 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+from scipy.fft import fft
 from scipy import signal
 from scipy.signal import spectrogram
 import matplotlib.pyplot as plt
 from google.cloud import firestore
 from io import BytesIO
 from datetime import datetime
-from scipy.fft import fftfreq
 
 
 # Function to apply filter
