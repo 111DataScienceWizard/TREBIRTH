@@ -10,5 +10,4 @@ protobuf==3.20.*
 xlsxwriter==3.0.1
 openpyxl
 matplotlib
-#matplotlib==3.5.1
-scipy==1.6.0
+scipy==1.7.1
