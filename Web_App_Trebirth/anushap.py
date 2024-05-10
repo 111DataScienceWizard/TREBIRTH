@@ -30,7 +30,7 @@ def plot_frequency_domain_with_filter(data, filter_type, cutoff_freq, sampling_r
     columns = data.columns
     for column in columns:
         st.write(f"## {column} - Frequency Domain with {filter_type} Filter (Cutoff Frequency: {cutoff_freq} Hz)")
-        filtered_data = apply_filter(data[column], filter_type, cutoff_freq, sampling_rate)
+        filtered_data = apply_filter(data[column], filter_type, cutoff_freq, sampling_rate=sampling_rate, stopband_attenuation=stopband_attenuation, steepness=steepness)
         N = len(filtered_data)
         frequencies = fftfreq(N, 1 / sampling_rate)
         fft_values = fft(filtered_data)
@@ -47,7 +47,7 @@ def plot_time_domain_with_filter(data, filter_type, cutoff_freq, sampling_rate=1
     columns = data.columns
     for column in columns:
         st.write(f"## {column} - Time Domain with {filter_type} Filter (Cutoff Frequency: {cutoff_freq} Hz)")
-        filtered_data = apply_filter(data[column], filter_type, cutoff_freq, sampling_rate)
+        filtered_data = apply_filter(data[column], filter_type, cutoff_freq, sampling_rate=sampling_rate, stopband_attenuation=stopband_attenuation, steepness=steepness)
         fig, ax = plt.subplots()
         time_seconds = np.arange(len(filtered_data)) / sampling_rate
         ax.plot(time_seconds, filtered_data)
