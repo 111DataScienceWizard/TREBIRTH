@@ -11,6 +11,7 @@ from datetime import datetime
 
 
 # Function to apply filter
+# Function to apply filter
 def apply_filter(data, filter_type, cutoff_freq, sampling_rate=100, stopband_attenuation=60, steepness=0.9999):
     nyquist_freq = 0.5 * sampling_rate
     
@@ -18,11 +19,11 @@ def apply_filter(data, filter_type, cutoff_freq, sampling_rate=100, stopband_att
         normalized_cutoff_freq = cutoff_freq / nyquist_freq
         pass_zero = (filter_type == 'LPF')
         # Corrected the call to firwin function
-        b = signal.firwin(order, cutoff_freq, window='hamming', fs=sampling_rate, pass_zero=pass_zero, nyq=nyquist_freq, cutoff=normalized_cutoff_freq)
+        b = signal.firwin(order, cutoff_freq, window='hamming', fs=sampling_rate, pass_zero=pass_zero)
     elif filter_type == 'BPF':
         normalized_cutoff_freq = (cutoff_freq[0] / nyquist_freq, cutoff_freq[1] / nyquist_freq)
         # Corrected the call to firwin function
-        b = signal.firwin(order, cutoff_freq, window='hamming', fs=sampling_rate, pass_zero=False, nyq=nyquist_freq, cutoff=normalized_cutoff_freq)
+        b = signal.firwin(order, cutoff_freq, window='hamming', fs=sampling_rate, pass_zero=False)
     
     filtered_data = signal.lfilter(b, 1, data)
     return filtered_data
