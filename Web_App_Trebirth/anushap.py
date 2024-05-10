@@ -17,7 +17,7 @@ def apply_filter(data, filter_type, cutoff_freq, sampling_rate=100, stopband_att
     if filter_type == 'LPF' or filter_type == 'HPF':
         normalized_cutoff_freq = cutoff_freq / nyquist_freq
         pass_zero = (filter_type == 'LPF') if filter_type in ['LPF', 'HPF'] else False
-        b = signal.firwin(order, cutoff_freq, window='hamming', fs=sampling_rate, pass_zero=pass_zero, nyq=nyquist_freq, cutoff=normalized_cutoff_freq, fs=sampling_rate, width=steepness)
+        b = signal.firwin(order, cutoff_freq, window='hamming', pass_zero=pass_zero, nyq=nyquist_freq, cutoff=normalized_cutoff_freq, width=steepness)
     elif filter_type == 'BPF':
         normalized_cutoff_freq = (cutoff_freq[0] / nyquist_freq, cutoff_freq[1] / nyquist_freq)
         b = signal.firwin(order, cutoff_freq, window='hamming', fs=sampling_rate, pass_zero=False, nyq=nyquist_freq, cutoff=normalized_cutoff_freq, fs=sampling_rate, width=steepness)
