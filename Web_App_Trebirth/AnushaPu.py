@@ -18,12 +18,12 @@ def apply_filter(data, filter_type, cutoff_freq, sampling_rate=100, stopband_att
         pass_zero = (filter_type == 'LPF')
         # Design the filter using remez
         numtaps = 2 * int(sampling_rate / cutoff_freq) + 1  # Adjust filter length based on cutoff frequency
-        b = signal.remez(numtaps, [0, normalized_cutoff_freq - steepness / 2, normalized_cutoff_freq + steepness / 2, 1], [1, 0], fs=sampling_rate, weight=[1, stopband_attenuation])
+        b = signal.remez(numtaps, [0, normalized_cutoff_freq - steepness / 2, normalized_cutoff_freq + steepness / 2, 0.5], [1, 0], fs=sampling_rate, weight=[1, stopband_attenuation])
     elif filter_type == 'BPF':
         normalized_cutoff_freq = (cutoff_freq[0] / nyquist_freq, cutoff_freq[1] / nyquist_freq)
         # Design the filter using remez
         numtaps = 2 * int(sampling_rate / min(cutoff_freq)) + 1  # Adjust filter length based on minimum cutoff frequency
-        b = signal.remez(numtaps, [0, normalized_cutoff_freq[0] - steepness / 2, normalized_cutoff_freq[0] + steepness / 2, normalized_cutoff_freq[1] - steepness / 2, normalized_cutoff_freq[1] + steepness / 2, 1], [0, 1, 0], fs=sampling_rate, weight=[stopband_attenuation, 1, stopband_attenuation])
+        b = signal.remez(numtaps, [0, normalized_cutoff_freq[0] - steepness / 2, normalized_cutoff_freq[0] + steepness / 2, normalized_cutoff_freq[1] - steepness / 2, normalized_cutoff_freq[1] + steepness / 2, 0.5], [0, 1, 0], fs=sampling_rate, weight=[stopband_attenuation, 1, stopband_attenuation])
     
     # Apply the filter
     filtered_data = signal.lfilter(b, 1, data)
