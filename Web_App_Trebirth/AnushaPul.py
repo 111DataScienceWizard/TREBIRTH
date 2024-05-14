@@ -18,6 +18,9 @@ def apply_filter(data, filter_type, cutoff_freq, sampling_rate=100, stopband_att
     elif filter_type == 'BPF':
         numtaps = 2 * int(sampling_rate / min(cutoff_freq)) + 1
         b = signal.remez(numtaps, [0, cutoff_freq[0] - steepness / 2, cutoff_freq[0] + steepness / 2, cutoff_freq[1] - steepness / 2, cutoff_freq[1] + steepness / 2, sampling_rate / 2], [0, 1, 0], fs=sampling_rate, weight=[stopband_attenuation, 1, stopband_attenuation])
+    
+    window = get_window('hamming', numtaps)
+    b *= window
     filtered_data = signal.lfilter(b, 1, data)
     return filtered_data
 
