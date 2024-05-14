@@ -8,32 +8,23 @@ import matplotlib.pyplot as plt
 from google.cloud import firestore
 from io import BytesIO
 from datetime import datetime
+from scipy.signal import remez, get_window
 
 # Function to apply filter
 def apply_filter(data, filter_type, cutoff_freq, sampling_rate=100, stopband_attenuation=60, steepness=0.9999):
-    nyquist_freq = 0.5 * sampling_rate
-    
     if filter_type == 'LPF' or filter_type == 'HPF':
-        normalized_cutoff_freq = cutoff_freq / nyquist_freq
-        pass_zero = (filter_type == 'LPF')
-        # Design the filter using remez
-        numtaps = 2 * int(sampling_rate / cutoff_freq) + 1  # Adjust filter length based on cutoff frequency
-        b = signal.remez(numtaps, [0, normalized_cutoff_freq - steepness / 2, normalized_cutoff_freq + steepness / 2, 1], [1, 0], fs=sampling_rate, weight=[1, stopband_attenuation])
+        numtaps = 2 * int(sampling_rate / cutoff_freq) + 1
+        b = signal.remez(numtaps, [0, cutoff_freq - steepness / 2, cutoff_freq + steepness / 2, sampling_rate / 2], [1, 0], fs=sampling_rate, weight=[1, stopband_attenuation])
     elif filter_type == 'BPF':
-        normalized_cutoff_freq = (cutoff_freq[0] / nyquist_freq, cutoff_freq[1] / nyquist_freq)
-        # Design the filter using remez
-        numtaps = 2 * int(sampling_rate / min(cutoff_freq)) + 1  # Adjust filter length based on minimum cutoff frequency
-        b = signal.remez(numtaps, [0, normalized_cutoff_freq[0] - steepness / 2, normalized_cutoff_freq[0] + steepness / 2, normalized_cutoff_freq[1] - steepness / 2, normalized_cutoff_freq[1] + steepness / 2, 1], [0, 1, 0], fs=sampling_rate, weight=[stopband_attenuation, 1, stopband_attenuation])
-    
-    # Apply the filter
+        numtaps = 2 * int(sampling_rate / min(cutoff_freq)) + 1
+        b = signal.remez(numtaps, [0, cutoff_freq[0] - steepness / 2, cutoff_freq[0] + steepness / 2, cutoff_freq[1] - steepness / 2, cutoff_freq[1] + steepness / 2, sampling_rate / 2], [0, 1, 0], fs=sampling_rate, weight=[stopband_attenuation, 1, stopband_attenuation])
     filtered_data = signal.lfilter(b, 1, data)
     return filtered_data
 
 def plot_frequency_domain_with_filter(data, filter_type, cutoff_freq, sampling_rate=100):
-    columns = data.columns
-    for column in columns:
+    for column in data.columns:
         st.write(f"## {column} - Frequency Domain with {filter_type} Filter (Cutoff Frequency: {cutoff_freq} Hz)")
-        filtered_data = apply_filter(data[column], filter_type, cutoff_freq, sampling_rate=sampling_rate, stopband_attenuation=stopband_attenuation, steepness=steepness)
+        filtered_data = apply_filter(data[column], filter_type, cutoff_freq, sampling_rate=sampling_rate)
         N = len(filtered_data)
         frequencies = fftfreq(N, 1 / sampling_rate)
         fft_values = fft(filtered_data)
@@ -47,10 +38,9 @@ def plot_frequency_domain_with_filter(data, filter_type, cutoff_freq, sampling_r
         save_button(fig, f"{column}_frequency_domain_{filter_type.lower()}_{cutoff_freq}hz.png")
 
 def plot_time_domain_with_filter(data, filter_type, cutoff_freq, sampling_rate=100):
-    columns = data.columns
-    for column in columns:
+    for column in data.columns:
         st.write(f"## {column} - Time Domain with {filter_type} Filter (Cutoff Frequency: {cutoff_freq} Hz)")
-        filtered_data = apply_filter(data[column], filter_type, cutoff_freq, sampling_rate=sampling_rate, stopband_attenuation=stopband_attenuation, steepness=steepness)
+        filtered_data = apply_filter(data[column], filter_type, cutoff_freq, sampling_rate=sampling_rate)
         fig, ax = plt.subplots()
         time_seconds = np.arange(len(filtered_data)) / sampling_rate
         ax.plot(time_seconds, filtered_data)
