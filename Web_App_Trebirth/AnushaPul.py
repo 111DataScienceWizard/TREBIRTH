@@ -148,7 +148,16 @@ def detrend(dataframe):
 
 # Define feature extraction functions
 def fq(df):
-    frequencies, powers = signal.welch(df, 100, 'flattop', 1024, scaling='spectrum')
+    frequencies = []
+    powers = []
+
+    for i in df:
+        f, p = signal.welch(df[i], 100, 'flattop', 1024, scaling='spectrum')
+        frequencies.append(f)
+        powers.append(p)
+
+    frequencies = pd.DataFrame(frequencies)
+    powers = pd.DataFrame(powers)
     return frequencies, powers
 
 # Define statistics calculation function for radar data
