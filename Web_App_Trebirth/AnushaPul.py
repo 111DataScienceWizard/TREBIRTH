@@ -320,10 +320,8 @@ else:
             time_domain_features.to_excel(writer, sheet_name='Time Domain Features', index=False)
         if 'Frequency Domain Features' in selected_sheets:
             frequencies, powers = fq(df_combined_detrended)
-            df_frequencies = pd.DataFrame({'Frequencies': frequencies})
-            df_powers = pd.DataFrame({'Powers': powers})
-            df_frequencies.to_excel(writer, sheet_name='Frequencies', index=False)
-            df_powers.to_excel(writer, sheet_name='Powers', index=False)
+            frequencies.to_excel(writer, sheet_name='Frequencies', index=False)
+            powers.to_excel(writer, sheet_name='Powers', index=False)
 
     excel_data.seek(0)
 
