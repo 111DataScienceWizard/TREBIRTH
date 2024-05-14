@@ -118,30 +118,6 @@ def plot_signals(data, domain='all', filter_type=None, cutoff_freq=None):
             else:
                 plot_frequency_domain(data)
 
-# Update plot_signals function to include filter options
-def plot_signals(data, domain='all', filter_type=None, cutoff_freq=None):
-    if domain == 'all':
-        domains = ['Time Domain', 'Spectrogram', 'Frequency Domain']
-    else:
-        domains = [domain]
-    
-    for domain in domains:
-        if domain == 'Time Domain':
-            st.subheader('Time Domain Plots')
-            if filter_type and cutoff_freq:
-                plot_time_domain_with_filter(data, filter_type, cutoff_freq)
-            else:
-                plot_time_domain(data)
-        elif domain == 'Spectrogram':
-            st.subheader('Spectrogram Plots')
-            spectrogram_plot(data)
-        elif domain == 'Frequency Domain':
-            st.subheader('Frequency Domain Plots')
-            if filter_type and cutoff_freq:
-                plot_frequency_domain_with_filter(data, filter_type, cutoff_freq)
-            else:
-                plot_frequency_domain(data)
-
 # Function to plot spectrogram
 def spectrogram_plot(data):
     columns = data.columns
