@@ -78,17 +78,18 @@ def plot_frequency_domain(data):
     columns = data.columns
     for column in columns:
         st.write(f"## {column} - Frequency Domain")
-        # Remove the prefix from the column name
         sensor_name = column.split()[0]  # Get the sensor name (e.g., 'Radar', 'ADXL', etc.)
-        frequencies, powers = fq(data[column])
-        powers_db = 10 * np.log10(powers)  # Convert power to dB scale
+        frequencies = np.fft.fftfreq(len(data[column]), d=1/100)
+        fft_values = np.fft.fft(data[column])
+        powers = np.abs(fft_values) / len(data[column])
+        powers_db = 20 * np.log10(powers)  
         fig, ax = plt.subplots()
-        ax.plot(frequencies, powers_db)
+        ax.plot(frequencies[:len(frequencies)//2], powers_db[:len(frequencies)//2])  
         ax.set_xlabel('Frequency (Hz)')
         ax.set_ylabel('Power Spectrum (dB)')
         st.pyplot(fig)
         save_button(fig, f"{sensor_name}_frequency_domain.png")
-
+        
 # Function to plot signals based on user selections
 def plot_signals(data, domain='all', filter_type=None, cutoff_freq=None):
     if domain == 'none':
