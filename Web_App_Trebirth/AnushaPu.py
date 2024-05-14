@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from google.cloud import firestore
 from io import BytesIO
 from datetime import datetime
+from scipy.signal import remez, get_window
 
 # Function to apply filter
 def apply_filter(data, filter_type, cutoff_freq, sampling_rate=100, stopband_attenuation=60, steepness=0.9999):
@@ -26,6 +27,9 @@ def apply_filter(data, filter_type, cutoff_freq, sampling_rate=100, stopband_att
         b = signal.remez(numtaps, [0, normalized_cutoff_freq[0] - steepness / 2, normalized_cutoff_freq[0] + steepness / 2, normalized_cutoff_freq[1] - steepness / 2, normalized_cutoff_freq[1] + steepness / 2, 0.5], [0, 1, 0], fs=sampling_rate, weight=[stopband_attenuation, 1, stopband_attenuation])
     
     # Apply the filter
+    # Optionally, apply window function
+    window = get_window('hamming', numtaps)
+    b *= window
     filtered_data = signal.lfilter(b, 1, data)
     return filtered_data
 
