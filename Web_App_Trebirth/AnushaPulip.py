@@ -105,8 +105,9 @@ def plot_signals(data, domain='all', filter_type=None, cutoff_freq=None):
             st.subheader('Time Domain Plots')
             if filter_type and cutoff_freq:
                 filtered_data = apply_filter(data, filter_type, cutoff_freq)
+                filtered_df = pd.DataFrame(filtered_data, columns=data.columns)  # Convert filtered data to DataFrame
                 plot_time_domain_with_filter(data, filter_type, cutoff_freq)
-                export_filtered_data(filtered_data, "time_domain_filtered_data")
+                export_filtered_data(filtered_df, "time_domain_filtered_data")
             else:
                 plot_time_domain(data)
         elif domain == 'Spectrogram':
@@ -119,10 +120,12 @@ def plot_signals(data, domain='all', filter_type=None, cutoff_freq=None):
             st.subheader('Frequency Domain Plots')
             if filter_type and cutoff_freq:
                 filtered_data = apply_filter(data, filter_type, cutoff_freq)
+                filtered_df = pd.DataFrame(filtered_data, columns=data.columns)  # Convert filtered data to DataFrame
                 plot_frequency_domain_with_filter(data, filter_type, cutoff_freq)
-                export_filtered_data(filtered_data, "frequency_domain_filtered_data")
+                export_filtered_data(filtered_df, "frequency_domain_filtered_data")
             else:
                 plot_frequency_domain(data)
+
 
 # Function to plot spectrogram
 def spectrogram_plot(data):
