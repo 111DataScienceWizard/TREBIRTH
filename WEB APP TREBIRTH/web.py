@@ -52,8 +52,6 @@ def stats_radar(df):
         result_df = pd.concat([result_df, column_result_df], axis=0)
     return result_df
 
-# Add other stats functions (stats_adxl, stats_ax, stats_ay, stats_az)
-
 # Define function to compare columns
 def columns_reports_unique(df):
     report = []
@@ -79,7 +77,62 @@ def columns_reports_unique(df):
             })
     report_df = pd.DataFrame(report)
     return report_df
-    
+
+# Define filtering functions
+def process(coef, in_signal):
+    FILTERTAPS = len(coef)
+    values = in_signal[:FILTERTAPS].copy()
+    k = 0
+    out_signal = []
+    gain = 1.0
+    for in_value in in_signal:
+        out = 0.0
+        values[k] = in_value
+        for i in range(len(coef)):
+            out += coef[i] * values[(i + k) % FILTERTAPS]
+        out /= gain
+        k = (k + 1) % FILTERTAPS
+        out_signal.append(out)
+    return out_signal
+
+def allfiltering(input_signal):
+    LPF_outputs = {}
+    HPF_outputs = {}
+
+    LPF_outputs['LPF5Hz'] = process(coefLPF5Hz, input_signal)
+    LPF_outputs['LPF10Hz'] = process(coefLPF10Hz, input_signal)
+    LPF_outputs['LPF15Hz'] = process(coefLPF15Hz, input_signal)
+    LPF_outputs['LPF20Hz'] = process(coefLPF20Hz, input_signal)
+    LPF_outputs['LPF25Hz'] = process(coefLPF25Hz, input_signal)
+    LPF_outputs['LPF30Hz'] = process(coefLPF30Hz, input_signal)
+    LPF_outputs['LPF35Hz'] = process(coefLPF35Hz, input_signal)
+    LPF_outputs['LPF40Hz'] = process(coefLPF40Hz, input_signal)
+    LPF_outputs['LPF45Hz'] = process(coefLPF45Hz, input_signal)
+    LPF_outputs['LPF50Hz'] = process(coefLPF50Hz, input_signal)
+
+    HPF_outputs['HPF5Hz'] = process(coefHPF5Hz, input_signal)
+    HPF_outputs['HPF10Hz'] = process(coefHPF10Hz, input_signal)
+    HPF_outputs['HPF15Hz'] = process(coefHPF15Hz, input_signal)
+    HPF_outputs['HPF20Hz'] = process(coefHPF20Hz, input_signal)
+    HPF_outputs['HPF25Hz'] = process(coefHPF25Hz, input_signal)
+    HPF_outputs['HPF30Hz'] = process(coefHPF30Hz, input_signal)
+    HPF_outputs['HPF35Hz'] = process(coefHPF35Hz, input_signal)
+    HPF_outputs['HPF40Hz'] = process(coefHPF40Hz, input_signal)
+    HPF_outputs['HPF45Hz'] = process(coefHPF45Hz, input_signal)
+    HPF_outputs['HPF50Hz'] = process(coefHPF50Hz, input_signal)
+
+    all_outputs = pd.DataFrame({**LPF_outputs, **HPF_outputs})
+    return all_outputs
+
+def apply_allfiltering_to_columns(df):
+    output_dfs = []
+    for column in df.columns:
+        input_signal = df[column]
+        filtered_output = allfiltering(input_signal)
+        filtered_output.columns = [f"{column}_{col}" for col in filtered_output.columns]
+        output_dfs.append(filtered_output)
+    return pd.concat(output_dfs, axis=1)
+
 # Set page configuration
 st.set_page_config(layout="wide")
 st.title('Data Analytics')
@@ -106,7 +159,7 @@ scan_number = st.text_input('Enter Scan number', 'All')
 label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], index=0)
 
 # Dropdown for selecting sheets in Excel
-selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Columns Comparison'], default=['Raw Data', 'Metadata'])
+selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Filtered Data', 'Column Comparison'], default=['Raw Data', 'Metadata'])
 
 # Create a reference to the Google post.
 query = db.collection('DevOps')
@@ -173,6 +226,9 @@ else:
     # Normalize all the columns
     df_combined_normalized = (df_combined_detrended - df_combined_detrended.min()) / (df_combined_detrended.max() - df_combined_detrended.min())
 
+    # Apply filtering to detrended and normalized data
+    df_filtered = apply_allfiltering_to_columns(df_combined_normalized)
+
     # Convert list of dictionaries to DataFrame
     df_metadata = pd.DataFrame(metadata_list)
 
@@ -214,9 +270,11 @@ else:
             frequencies, powers = fq(df_combined_detrended)
             frequencies.to_excel(writer, sheet_name='Frequencies', index=False)
             powers.to_excel(writer, sheet_name='Powers', index=False)
-        if 'Columns Comparison' in selected_sheets:  # Add new sheet for columns comparison
-            columns_comparison = columns_reports_unique(df_combined)
-            columns_comparison.to_excel(writer, sheet_name='Columns Comparison', index=False)
+        if 'Filtered Data' in selected_sheets:  # Add new sheet for filtered data
+            df_filtered.to_excel(writer, sheet_name='Filtered Data', index=False)
+        if 'Column Comparison' in selected_sheets:  # Add new sheet for column comparison
+            df_comparison = columns_reports_unique(df_combined_detrended)
+            df_comparison.to_excel(writer, sheet_name='Column Comparison', index=False)
 
     excel_data.seek(0)
 
