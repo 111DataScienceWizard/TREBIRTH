@@ -272,7 +272,7 @@ else:
             frequencies.to_excel(writer, sheet_name='Frequencies', index=False)
             powers.to_excel(writer, sheet_name='Powers', index=False)
         if 'Filtered Data' in selected_sheets:  # Add new sheet for filtered data
-            df_filtered = apply_allfiltering_to_columns(df_combined_normalized)
+            df_filtered = apply_allfiltering_to_columns(df_combined_detrended)
             df_filtered.to_excel(writer, sheet_name='Filtered Data', index=False)
         if 'Column Comparison' in selected_sheets:  # Add new sheet for column comparison
             df_comparison = columns_reports_unique(df_combined_detrended)
