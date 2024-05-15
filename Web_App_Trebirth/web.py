@@ -106,7 +106,7 @@ scan_number = st.text_input('Enter Scan number', 'All')
 label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], index=0)
 
 # Dropdown for selecting sheets in Excel
-selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features'], default=['Raw Data', 'Metadata'])
+selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Columns Comparison'], default=['Raw Data', 'Metadata'])
 
 # Create a reference to the Google post.
 query = db.collection('DevOps')
