@@ -7,6 +7,7 @@ from datetime import datetime
 import numpy as np
 from scipy import signal
 from scipy.stats import skew, kurtosis
+from filters import coefLPF5Hz, coefLPF10Hz, coefLPF15Hz, coefLPF20Hz, coefLPF25Hz, coefLPF30Hz, coefLPF35Hz, coefLPF40Hz, coefLPF45Hz, coefLPF50Hz, coefHPF5Hz, coefHPF10Hz, coefHPF15Hz, coefHPF20Hz, coefHPF25Hz, coefHPF30Hz, coefHPF35Hz, coefHPF40Hz, coefHPF45Hz, coefHPF50Hz    
 
 # Define detrend function
 def detrend(dataframe):
