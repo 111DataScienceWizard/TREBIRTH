@@ -249,6 +249,16 @@ else:
 
     excel_data.seek(0)
 
+    print("Index values of df_combined_detrended:")
+    print(df_combined_detrended.index)
+
+    if '1' in df_combined_detrended.index:
+        print("'1' is present in the index.")
+    else:
+        print("'1' is not present in the index.")
+
+    print("DataFrame df_combined_detrended:")
+    print(df_combined_detrended)
     # Download button for selected sheets and metadata
     st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
 
