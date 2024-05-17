@@ -215,7 +215,7 @@ else:
             frequencies.to_excel(writer, sheet_name='Frequencies', index=False)
             powers.to_excel(writer, sheet_name='Powers', index=False)
         if 'Columns Comparison' in selected_sheets:  # Add new sheet for columns comparison
-            columns_comparison = columns_reports_unique(df_combined)
+            columns_comparison = columns_reports_unique(df_combined_detrended)
             columns_comparison.to_excel(writer, sheet_name='Columns Comparison', index=False)
 
     excel_data.seek(0)
