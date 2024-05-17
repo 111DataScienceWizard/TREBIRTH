@@ -108,7 +108,7 @@ def process(coef, in_signal):
         k = (k + 1) % FILTERTAPS
         out_signal.append(out)
     return out_signal
-
+  
 # Set page configuration
 st.set_page_config(layout="wide")
 st.title('Data Analytics')
