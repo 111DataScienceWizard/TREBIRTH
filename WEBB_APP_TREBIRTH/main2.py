@@ -7,11 +7,79 @@ from datetime import datetime
 import numpy as np
 from scipy import signal
 from scipy.stats import skew, kurtosis
-from filters import coefLPF5Hz, coefLPF10Hz, coefLPF15Hz, coefLPF20Hz, coefLPF25Hz, coefLPF30Hz, coefLPF35Hz, coefLPF40Hz, coefLPF45Hz, coefLPF50Hz, coefHPF5Hz, coefHPF10Hz, coefHPF15Hz, coefHPF20Hz, coefHPF25Hz, coefHPF30Hz, coefHPF35Hz, coefHPF40Hz, coefHPF45Hz, coefHPF50Hz    
-from Preprocessing import detrend, fq, stats_radar, columns_reports_unique, process, allfiltering, apply_allfiltering_to_columns
 
+# Define detrend function
+def detrend(dataframe):
+    detrended_data = dataframe - dataframe.mean()
+    return detrended_data
 
+# Define feature extraction functions
+def fq(df):
+    frequencies = []
+    powers = []
 
+    for i in df:
+        f, p = signal.welch(df[i], 100, 'flattop', 1024, scaling='spectrum')
+        frequencies.append(f)
+        powers.append(p)
+
+    frequencies = pd.DataFrame(frequencies)
+    powers = pd.DataFrame(powers)
+    return frequencies, powers
+
+def stats_radar(df):
+    result_df = pd.DataFrame()
+
+    for column in df.columns:
+        std_list, ptp_list, mean_list, rms_list = [], [], [], []
+
+        std_value = np.std(df[column])
+        ptp_value = np.ptp(df[column])
+        mean_value = np.mean(df[column])
+        rms_value = np.sqrt(np.mean(df[column]**2))
+
+        std_list.append(std_value)
+        ptp_list.append(ptp_value)
+        mean_list.append(mean_value)
+        rms_list.append(rms_value)
+
+        column_result_df = pd.DataFrame({
+            "STD": std_list,
+            "PTP": ptp_list,
+            "Mean": mean_list,
+            "RMS": rms_list
+        })
+        result_df = pd.concat([result_df, column_result_df], axis=0)
+    return result_df
+
+# Add other stats functions (stats_adxl, stats_ax, stats_ay, stats_az)
+
+# Define function to compare columns
+def columns_reports_unique(df):
+    report = []
+    num_columns = len(df.columns)
+    for i in range(num_columns):
+        for j in range(i + 1, num_columns):  # Start j from i + 1
+            column1 = df.columns[i]
+            column2 = df.columns[j]
+            diff = df[column1] - df[column2]
+            mean_diff = np.mean(diff)
+            deviation_diff = np.std(diff)
+            ptp_diff = np.ptp(diff)
+            skewness_diff = skew(diff)
+            correlation = df[[column1, column2]].corr().iloc[0, 1]
+            report.append({
+                'Column 1': column1,
+                'Column 2': column2,
+                'Mean Difference': mean_diff,
+                'Deviation Difference': deviation_diff,
+                'PTP Difference': ptp_diff,
+                'Skewness Difference': skewness_diff,
+                'Correlation': correlation,
+            })
+    report_df = pd.DataFrame(report)
+    return report_df
+    
 # Set page configuration
 st.set_page_config(layout="wide")
 st.title('Data Analytics')
@@ -38,7 +106,7 @@ scan_number = st.text_input('Enter Scan number', 'All')
 label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], index=0)
 
 # Dropdown for selecting sheets in Excel
-selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Column Comparison', 'Filtered Data'], default=['Raw Data', 'Metadata'])
+selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Columns Comparison'], default=['Raw Data', 'Metadata'])
 
 # Create a reference to the Google post.
 query = db.collection('DevOps')
@@ -146,12 +214,9 @@ else:
             frequencies, powers = fq(df_combined_detrended)
             frequencies.to_excel(writer, sheet_name='Frequencies', index=False)
             powers.to_excel(writer, sheet_name='Powers', index=False)
-        if 'Column Comparison' in selected_sheets:  # Add new sheet for column comparison
-            df_comparison = columns_reports_unique(df_combined_detrended)
-            df_comparison.to_excel(writer, sheet_name='Column Comparison', index=False)
-        if 'Filtered Data' in selected_sheets:  # Add new sheet for filtered data
-            df_filtered.to_excel(writer, sheet_name='Filtered Data', index=False)
-            df_filtered = apply_allfiltering_to_columns(df_combined_detrended)
+        if 'Columns Comparison' in selected_sheets:  # Add new sheet for columns comparison
+            columns_comparison = columns_reports_unique(df_combined_detrended)
+            columns_comparison.to_excel(writer, sheet_name='Columns Comparison', index=False)
 
     excel_data.seek(0)
 
