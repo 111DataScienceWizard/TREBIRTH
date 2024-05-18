@@ -118,7 +118,7 @@ except Exception as e:
     st.error(f"Failed to retrieve data: {e}")
     st.stop()
 
-if len(query) == 0:
+if len(query_results) == 0:
     st.write("No data found matching the specified criteria.")
 else:
     # Create empty lists to store data
@@ -129,7 +129,7 @@ else:
     az_data = []
     metadata_list = []
 
-    for doc in query:
+    for doc in query_results:
         radar_data.append(doc.to_dict().get('RadarRaw', []))
         adxl_data.append(doc.to_dict().get('ADXLRaw', []))
         ax_data.append(doc.to_dict().get('Ax', []))
