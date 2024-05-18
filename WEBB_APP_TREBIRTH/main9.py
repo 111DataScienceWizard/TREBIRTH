@@ -8,6 +8,9 @@ import numpy as np
 from scipy import signal
 from scipy.stats import skew, kurtosis
 from preprocess import detrend, fq, stats_radar, columns_reports_unique
+import time
+import random
+from google.api_core.exceptions import ResourceExhausted, RetryError
 from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz, coefLPF6Hz, coefLPF7Hz, coefLPF8Hz, 
                      coefLPF9Hz, coefLPF10Hz, coefLPF11Hz, coefLPF12Hz, coefLPF13Hz, coefLPF14Hz, coefLPF15Hz, 
                      coefLPF16Hz, coefLPF17Hz, coefLPF18Hz, coefLPF19Hz, coefLPF20Hz, coefLPF21Hz, coefLPF22Hz, 
@@ -55,6 +58,32 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+def exponential_backoff(retries):
+    base_delay = 1
+    max_delay = 60
+    delay = base_delay * (2 ** retries) + random.uniform(0, 1)
+    return min(delay, max_delay)
+
+def get_firestore_data(query):
+    retries = 0
+    max_retries = 10
+    while retries < max_retries:
+        try:
+            results = query.stream()
+            return list(results)
+        except ResourceExhausted as e:
+            st.warning(f"Quota exceeded, retrying... (attempt {retries + 1})")
+            time.sleep(exponential_backoff(retries))
+            retries += 1
+        except RetryError as e:
+            st.warning(f"Retry error: {e}, retrying... (attempt {retries + 1})")
+            time.sleep(exponential_backoff(retries))
+            retries += 1
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
+            break
+    raise Exception("Max retries exceeded")
+
 # Authenticate to Firestore with the JSON account key.
 db = firestore.Client.from_service_account_json("Web_App_Trebirth/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
 
@@ -83,7 +112,11 @@ if label_infstat != 'All':
     query = query.where('InfStat', '==', label_infstat)
 
 # Get documents based on the query
-query = query.get()
+try:
+    query_results = get_firestore_data(query)
+except Exception as e:
+    st.error(f"Failed to retrieve data: {e}")
+    st.stop()
 
 if len(query) == 0:
     st.write("No data found matching the specified criteria.")
