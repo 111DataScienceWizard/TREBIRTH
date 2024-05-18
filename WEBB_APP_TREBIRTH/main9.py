@@ -233,9 +233,6 @@ else:
     # Correctly apply the process function on each column
     filtered_data = df_combined_detrended[radar_adxl_columns].apply(lambda col: process(filter_coef, col.values))
 
-    # Combine filtered data with other columns
-    filtered_data = pd.concat([filtered_data, df_combined_detrended[df_combined_detrended.columns[df_radar.shape[1] + df_adxl.shape[1]:]]], axis=1)
-
     # Provide download button for the filtered data
     filtered_excel_data = BytesIO()
     with pd.ExcelWriter(filtered_excel_data, engine='xlsxwriter') as writer:
