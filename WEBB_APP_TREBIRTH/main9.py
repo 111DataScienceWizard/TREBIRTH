@@ -231,9 +231,7 @@ else:
     radar_adxl_columns = df_combined_detrended.columns[:df_radar.shape[1] + df_adxl.shape[1]]
 
     # Correctly apply the process function on each column
-    filtered_data = radar_adxl_columns.apply(lambda col: process(filter_coef, col.values))
-
-    #filtered_data = df_combined_detrended[radar_adxl_columns].apply(lambda col: process(filter_coef, col.values))
+    filtered_data = df_combined_detrended[radar_adxl_columns].apply(lambda col: process(filter_coef, col.values))
 
     # Provide download button for the filtered data
     filtered_excel_data = BytesIO()
