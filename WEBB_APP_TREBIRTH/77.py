@@ -249,7 +249,6 @@ else:
     else:
         filtered_data = df_combined_detrended[radar_adxl_columns].apply(lambda col: process(filter_coef, col.values))
 
-   import streamlit as st
 
 # Multi-select box to select desired sheets
 selected_sheets = st.multiselect('Select Sheets to Download', ['Filtered Data', 'Time Domain Features', 'Columns Comparison'])
