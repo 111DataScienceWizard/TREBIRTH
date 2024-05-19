@@ -3,6 +3,7 @@ from google.cloud import firestore
 import pandas as pd
 from google.cloud.firestore import FieldFilter
 from io import BytesIO
+import matplotlib.pyplot as plt
 from datetime import datetime
 import numpy as np
 import time
@@ -279,3 +280,40 @@ if st.button("Download Selected Sheets"):
 
     # Trigger the download of the Excel file
     st.download_button("Download Filtered Data", filtered_excel_data, file_name=f"Filtered_{filter_type.replace(' ', '_')}_{frequency if filter_type != 'Band Pass Filter (BPF)' else f'{low_freq}to{high_freq}'}Hz.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-filtered-excel')
+
+
+def plot_time_domain(data):
+    fig, ax = plt.subplots()
+    time_seconds = np.arange(len(data)) / 100  # Assuming 100 signals per second
+    ax.plot(time_seconds, data)
+    ax.set_xlabel('Time (s)')
+    ax.set_ylabel('Signal')
+    return fig
+
+def plot_frequency_domain(data):
+    frequencies, powers = fq(pd.Series(data))
+    powers_db = 10 * np.log10(powers)  # Convert power to dB scale
+    fig, ax = plt.subplots()
+    ax.plot(frequencies, powers_db)
+    ax.set_xlabel('Frequency (Hz)')
+    ax.set_ylabel('Power Spectrum (dB)')
+    return fig
+
+# Add a select box to choose the domain for plotting
+selected_domain = st.selectbox('Select Domain to Plot', ['Time Domain', 'Frequency Domain'])
+
+# Plot the graphs based on the selected domain
+if selected_domain == 'Time Domain':
+    fig = plot_time_domain(filtered_data)
+    st.pyplot(fig)
+elif selected_domain == 'Frequency Domain':
+    fig = plot_frequency_domain(filtered_data)
+    st.pyplot(fig)
+
+# Add a button to download the plot
+if st.button("Download Plot"):
+    # Prepare the plot for download
+    plot_buffer = BytesIO()
+    fig.savefig(plot_buffer, format='png')
+    plot_buffer.seek(0)
+    st.download_button(label='Download Plot', data=plot_buffer, file_name='plot.png', mime='image/png')
