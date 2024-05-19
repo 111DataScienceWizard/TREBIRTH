@@ -1,4 +1,8 @@
 import pandas as pd 
+import numpy as np
+import pandas as pd
+from scipy import signal
+from scipy.stats import skew, kurtosis
 
 def detrend(dataframe):
     detrended_data = dataframe - dataframe.mean()
