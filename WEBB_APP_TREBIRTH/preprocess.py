@@ -18,8 +18,8 @@ def fq(df):
         frequencies.append(f)
         powers.append(p)
 
-    frequencies = pd.DataFrame(frequencies)
-    powers = pd.DataFrame(powers)
+    #frequencies = pd.DataFrame(frequencies)
+    #powers = pd.DataFrame(powers)
     return frequencies, powers
 
 def stats_radar(df):
