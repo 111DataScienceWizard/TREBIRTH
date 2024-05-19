@@ -282,38 +282,48 @@ if st.button("Download Selected Sheets"):
     st.download_button("Download Filtered Data", filtered_excel_data, file_name=f"Filtered_{filter_type.replace(' ', '_')}_{frequency if filter_type != 'Band Pass Filter (BPF)' else f'{low_freq}to{high_freq}'}Hz.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-filtered-excel')
 
 
-def plot_time_domain(data):
+# Define functions for plotting time and frequency domain graphs
+def plot_time_domain(data, column, sampling_rate=100):
     fig, ax = plt.subplots()
-    time_seconds = np.arange(len(data)) / 100  # Assuming 100 signals per second
+    time_seconds = np.arange(len(data)) / sampling_rate  # Assuming 100 signals per second
     ax.plot(time_seconds, data)
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('Signal')
+    ax.set_title(f'{column} - Time Domain Plot')
     return fig
 
-def plot_frequency_domain(data):
+def plot_frequency_domain(data, column):
     frequencies, powers = fq(pd.Series(data))
     powers_db = 10 * np.log10(powers)  # Convert power to dB scale
     fig, ax = plt.subplots()
     ax.plot(frequencies, powers_db)
     ax.set_xlabel('Frequency (Hz)')
     ax.set_ylabel('Power Spectrum (dB)')
+    ax.set_title(f'{column} - Frequency Domain Plot')
     return fig
 
 # Add a select box to choose the domain for plotting
 selected_domain = st.selectbox('Select Domain to Plot', ['Time Domain', 'Frequency Domain'])
 
-# Plot the graphs based on the selected domain
-if selected_domain == 'Time Domain':
-    fig = plot_time_domain(filtered_data)
-    st.pyplot(fig)
-elif selected_domain == 'Frequency Domain':
-    fig = plot_frequency_domain(filtered_data)
-    st.pyplot(fig)
+# Dictionary to hold the filtered data columns
+filtered_columns = {
+    'Radar': filtered_data['Radar'],
+    'ADXL': filtered_data['ADXL']
+}
 
-# Add a button to download the plot
-if st.button("Download Plot"):
-    # Prepare the plot for download
-    plot_buffer = BytesIO()
-    fig.savefig(plot_buffer, format='png')
-    plot_buffer.seek(0)
-    st.download_button(label='Download Plot', data=plot_buffer, file_name='plot.png', mime='image/png')
+# Plot and download the graphs based on the selected domain
+for column, data in filtered_columns.items():
+    if selected_domain == 'Time Domain':
+        fig = plot_time_domain(data, column)
+        st.pyplot(fig)
+        plot_buffer = BytesIO()
+        fig.savefig(plot_buffer, format='png')
+        plot_buffer.seek(0)
+        st.download_button(label=f'Download {column} Time Domain Plot', data=plot_buffer, file_name=f'{column}_time_domain_plot.png', mime='image/png')
+    elif selected_domain == 'Frequency Domain':
+        fig = plot_frequency_domain(data, column)
+        st.pyplot(fig)
+        plot_buffer = BytesIO()
+        fig.savefig(plot_buffer, format='png')
+        plot_buffer.seek(0)
+        st.download_button(label=f'Download {column} Frequency Domain Plot', data=plot_buffer, file_name=f'{column}_frequency_domain_plot.png', mime='image/png')
