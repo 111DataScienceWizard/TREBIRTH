@@ -298,10 +298,10 @@ def plot_time_domain(data, column, sampling_rate=100):
     return fig
 
 def plot_frequency_domain(data, column):
-    frequencies, powers = fq(pd.Series(data))
-    powers_db = 10 * np.log10(powers)  # Convert power to dB scale
+    frequencies, powers = fq(pd.DataFrame(data))
+    powers_db = 10 * np.log10(powers[0])  # Convert power to dB scale
     fig, ax = plt.subplots()
-    ax.plot(frequencies, powers_db)
+    ax.plot(frequencies[0], powers_db)
     ax.set_xlabel('Frequency (Hz)')
     ax.set_ylabel('Power Spectrum (dB)')
     ax.set_title(f'{column} - Frequency Domain Plot')
