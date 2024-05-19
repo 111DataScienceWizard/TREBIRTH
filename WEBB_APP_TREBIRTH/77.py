@@ -281,6 +281,11 @@ if st.button("Download Selected Sheets"):
     # Trigger the download of the Excel file
     st.download_button("Download Filtered Data", filtered_excel_data, file_name=f"Filtered_{filter_type.replace(' ', '_')}_{frequency if filter_type != 'Band Pass Filter (BPF)' else f'{low_freq}to{high_freq}'}Hz.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-filtered-excel')
 
+# Dictionary to hold the filtered data columns
+filtered_columns = {
+    'Radar': filtered_data['Radar'],
+    'ADXL': filtered_data['ADXL']
+}
 
 # Define functions for plotting time and frequency domain graphs
 def plot_time_domain(data, column, sampling_rate=100):
@@ -305,11 +310,6 @@ def plot_frequency_domain(data, column):
 # Add a select box to choose the domain for plotting
 selected_domain = st.selectbox('Select Domain to Plot', ['Time Domain', 'Frequency Domain'])
 
-# Dictionary to hold the filtered data columns
-filtered_columns = {
-    'Radar': filtered_data['Radar'],
-    'ADXL': filtered_data['ADXL']
-}
 
 # Plot and download the graphs based on the selected domain
 for column, data in filtered_columns.items():
