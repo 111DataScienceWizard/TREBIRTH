@@ -249,16 +249,34 @@ else:
     else:
         filtered_data = df_combined_detrended[radar_adxl_columns].apply(lambda col: process(filter_coef, col.values))
 
-    # Apply the time domain features and columns comparison on the filtered data
-    time_domain_features_filtered = stats_radar(filtered_data)
-    columns_comparison_filtered = columns_reports_unique(filtered_data)
+   import streamlit as st
 
-    # Provide download button for the filtered data
+# Multi-select box to select desired sheets
+selected_sheets = st.multiselect('Select Sheets to Download', ['Filtered Data', 'Time Domain Features', 'Columns Comparison'])
+
+# Add a button to trigger the download
+if st.button("Download Selected Sheets"):
+    # Prepare the Excel file with selected sheets
     filtered_excel_data = BytesIO()
     with pd.ExcelWriter(filtered_excel_data, engine='xlsxwriter') as writer:
-        filtered_data.to_excel(writer, sheet_name='Filtered Data', index=False)
-        time_domain_features_filtered.to_excel(writer, sheet_name='Time Domain Features', index=False)
-        columns_comparison_filtered.to_excel(writer, sheet_name='Columns Comparison', index=False)
+        for sheet_name in selected_sheets:
+            # Write each selected sheet to the Excel file
+            if sheet_name == 'Filtered Data':
+                # Write filtered data to the sheet
+                filtered_data.to_excel(writer, sheet_name=sheet_name, index=False)
+            elif sheet_name == 'Time Domain Features':
+                # Apply the time domain features on the filtered data
+                time_domain_features_filtered = stats_radar(filtered_data)
+                # Write time domain features data to the sheet
+                time_domain_features_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
+            elif sheet_name == 'Columns Comparison':
+                # Apply the columns comparison on the filtered data
+                columns_comparison_filtered = columns_reports_unique(filtered_data)
+                # Write column comparison data to the sheet
+                columns_comparison_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
+
+    # Set the pointer to the beginning of the file
     filtered_excel_data.seek(0)
-    
+
+    # Trigger the download of the Excel file
     st.download_button("Download Filtered Data", filtered_excel_data, file_name=f"Filtered_{filter_type.replace(' ', '_')}_{frequency if filter_type != 'Band Pass Filter (BPF)' else f'{low_freq}to{high_freq}'}Hz.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-filtered-excel')
