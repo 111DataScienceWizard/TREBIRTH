@@ -234,15 +234,30 @@ else:
         filter_coef_high = globals()[f'coefLPF{high_freq}Hz']
 
     # Apply the selected filter only to Radar and ADXL columns
-    radar_adxl_columns = ['Radar', 'ADXL']
+    # List to hold all Radar and ADXL column names
+    radar_columns = [f'Radar {i}' for i in range(30)]  # Assuming there are 10 scans
+    adxl_columns = [f'ADXL {i}' for i in range(30)]  # Assuming there are 10 scans
 
-    # Apply the process function on each column
-    if filter_type == 'Band Pass Filter (BPF)':
-        filtered_data_low = df_combined_detrended[radar_adxl_columns].apply(lambda col: process(filter_coef_low, col.values))
-        filtered_data = filtered_data_low.apply(lambda col: process(filter_coef_high, col.values))
+    # Dictionary to hold the filtered data columns for Radar and ADXL
+    filtered_radar_columns = {}
+    filtered_adxl_columns = {}
+
+    # Add data for each scan to the filtered columns dictionary
+    for i in range(10):  # Assuming there are 10 scans
+        filtered_radar_columns[f'Radar {i}'] = df_combined_detrended[f'Radar {i}']
+        filtered_adxl_columns[f'ADXL {i}'] = df_combined_detrended[f'ADXL {i}']
+
+     # Apply the process function on each column
+     if filter_type == 'Band Pass Filter (BPF)':
+         filtered_radar_data_low = pd.DataFrame({col: process(filter_coef_low, data.values) for col, data in filtered_radar_columns.items()})
+         filtered_radar_data = pd.DataFrame({col: process(filter_coef_high, data.values) for col, data in filtered_radar_data_low.items()})
+         filtered_adxl_data_low = pd.DataFrame({col: process(filter_coef_low, data.values) for col, data in filtered_adxl_columns.items()})
+         filtered_adxl_data = pd.DataFrame({col: process(filter_coef_high, data.values) for col, data in filtered_adxl_data_low.items()})
     else:
-        filtered_data = df_combined_detrended[radar_adxl_columns].apply(lambda col: process(filter_coef, col.values))
+         filtered_radar_data = pd.DataFrame({col: process(filter_coef, data.values) for col, data in filtered_radar_columns.items()})
+         filtered_adxl_data = pd.DataFrame({col: process(filter_coef, data.values) for col, data in filtered_adxl_columns.items()})
 
+    filtered_data = pd.concat([filtered_radar_data, filtered_adxl_data], axis=1)
 
 # Multi-select box to select desired sheets
 selected_sheets = st.multiselect('Select Sheets to Download', ['Filtered Data', 'Time Domain Features', 'Columns Comparison'])
@@ -274,25 +289,6 @@ if st.button("Download Selected Sheets"):
     # Trigger the download of the Excel file
     st.download_button("Download Filtered Data", filtered_excel_data, file_name=f"Filtered_{filter_type.replace(' ', '_')}_{frequency if filter_type != 'Band Pass Filter (BPF)' else f'{low_freq}to{high_freq}'}Hz.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-filtered-excel')
 
-# Dictionary to hold the filtered data columns
-radar_columns = []
-adxl_columns = []
-
-# Loop through each scan and identify the corresponding column names
-for i in range(10):  # Assuming there are 10 scans
-    radar_columns += [f'Radar {i}']
-    adxl_columns += [f'ADXL {i}']
-
-# Dictionary to hold the filtered data columns for Radar and ADXL
-filtered_radar_columns = {}
-filtered_adxl_columns = {}
-
-# Add data for each scan to the filtered columns dictionary
-for i in range(10):  # Assuming there are 10 scans
-    # Extract Radar and ADXL data for the current scan
-    filtered_radar_columns[f'Radar {i}'] = filtered_data[f'Radar {i}']
-    filtered_adxl_columns[f'ADXL {i}'] = filtered_data[f'ADXL {i}']
-
 # Define functions for plotting time and frequency domain graphs
 def plot_time_domain(data, column, sampling_rate=100):
     fig, ax = plt.subplots()
@@ -330,86 +326,3 @@ for column, data in filtered_adxl_columns.items():
     elif selected_domain == 'Frequency Domain':
         # Plot frequency domain
         plot_frequency_domain(data, column)
-
-
-
-# List to hold all Radar and ADXL column names
-radar_columns = [f'Radar {i}' for i in range(30)]  # Assuming there are 10 scans
-adxl_columns = [f'ADXL {i}' for i in range(30)]  # Assuming there are 10 scans
-
-# Dictionary to hold the filtered data columns for Radar and ADXL
-filtered_radar_columns = {}
-filtered_adxl_columns = {}
-
-# Add data for each scan to the filtered columns dictionary
-for i in range(10):  # Assuming there are 10 scans
-    filtered_radar_columns[f'Radar {i}'] = df_combined_detrended[f'Radar {i}']
-    filtered_adxl_columns[f'ADXL {i}'] = df_combined_detrended[f'ADXL {i}']
-
-# Apply the process function on each column
-if filter_type == 'Band Pass Filter (BPF)':
-    filtered_radar_data_low = pd.DataFrame({col: process(filter_coef_low, data.values) for col, data in filtered_radar_columns.items()})
-    filtered_radar_data = pd.DataFrame({col: process(filter_coef_high, data.values) for col, data in filtered_radar_data_low.items()})
-    filtered_adxl_data_low = pd.DataFrame({col: process(filter_coef_low, data.values) for col, data in filtered_adxl_columns.items()})
-    filtered_adxl_data = pd.DataFrame({col: process(filter_coef_high, data.values) for col, data in filtered_adxl_data_low.items()})
-else:
-    filtered_radar_data = pd.DataFrame({col: process(filter_coef, data.values) for col, data in filtered_radar_columns.items()})
-    filtered_adxl_data = pd.DataFrame({col: process(filter_coef, data.values) for col, data in filtered_adxl_columns.items()})
-
-filtered_data = pd.concat([filtered_radar_data, filtered_adxl_data], axis=1)
-
-# Multi-select box to select desired sheets
-selected_sheets = st.multiselect('Select Sheets to Download', ['Filtered Data', 'Time Domain Features', 'Columns Comparison'])
-
-if st.button("Download Selected Sheets"):
-    # Prepare the Excel file with selected sheets
-    filtered_excel_data = BytesIO()
-    with pd.ExcelWriter(filtered_excel_data, engine='xlsxwriter') as writer:
-        for sheet_name in selected_sheets:
-            # Write each selected sheet to the Excel file
-            if sheet_name == 'Filtered Data':
-                # Write filtered data to the sheet
-                filtered_data.to_excel(writer, sheet_name=sheet_name, index=False)
-            elif sheet_name == 'Time Domain Features':
-                # Apply the time domain features on the filtered data
-                time_domain_features_filtered = stats_radar(filtered_data)
-                # Write time domain features data to the sheet
-                time_domain_features_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
-            elif sheet_name == 'Columns Comparison':
-                # Apply the columns comparison on the filtered data
-                columns_comparison_filtered = columns_reports_unique(filtered_data)
-                # Write column comparison data to the sheet
-                columns_comparison_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
-
-# Define functions for plotting time and frequency domain graphs
-def plot_time_domain(data, column, sampling_rate=100):
-    fig, ax = plt.subplots()
-    time_seconds = np.arange(len(data)) / sampling_rate  # Assuming 100 signals per second
-    ax.plot(time_seconds, data)
-    ax.set_xlabel('Time (s)')
-    ax.set_ylabel('Signal')
-    ax.set_title(f'{column} - Time Domain Plot')
-    return fig
-
-def plot_frequency_domain(data, column):
-    frequencies, powers = fq(pd.DataFrame(data))
-    powers_db = 10 * np.log10(powers[0])  # Convert power to dB scale
-    fig, ax = plt.subplots()
-    ax.plot(frequencies[0], powers_db)
-    ax.set_xlabel('Frequency (Hz)')
-    ax.set_ylabel('Power Spectrum (dB)')
-    ax.set_title(f'{column} - Frequency Domain Plot')
-    return fig
-
-# Loop through each Radar column and plot the selected domain
-for column, data in filtered_radar_columns.items():
-    if selected_domain == 'Time Domain':
-        # Plot time domain
-        plot_time_domain(data, column)
-    elif selected_domain == 'Frequency Domain':
-        # Plot frequency domain
-        plot_frequency_domain(data, column)
-
-# Loop through each ADXL column and plot the selected domain
-for column, data in filtered_adxl_columns.items():
-    if selected_domain
