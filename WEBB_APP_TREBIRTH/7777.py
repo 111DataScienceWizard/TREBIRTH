@@ -27,23 +27,20 @@ from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz,
                      coefHPF37Hz, coefHPF38Hz, coefHPF39Hz, coefHPF40Hz, coefHPF41Hz, coefHPF42Hz, coefHPF43Hz, 
                      coefHPF44Hz, coefHPF45Hz, coefHPF46Hz, coefHPF47Hz, coefHPF48Hz, coefHPF49Hz, coefHPF50Hz)
 
-# Filter processing function
+
 def process(coef, in_signal):
     FILTERTAPS = len(coef)
-    values = in_signal[:FILTERTAPS].copy()
-    k = 0
+    values = np.zeros(FILTERTAPS)
     out_signal = []
     gain = 1.0
+    k = 0
     for in_value in in_signal:
-        out = 0.0
         values[k] = in_value
-        for i in range(len(coef)):
-            out += coef[i] * values[(i + k) % FILTERTAPS]
+        out = np.dot(coef, np.roll(values, k))
         out /= gain
-        k = (k + 1) % FILTERTAPS
         out_signal.append(out)
+        k = (k + 1) % FILTERTAPS
     return out_signal
-
 # Set page configuration
 st.set_page_config(layout="wide")
 st.title('Data Analytics')
