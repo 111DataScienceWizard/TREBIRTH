@@ -143,8 +143,8 @@ else:
         metadata_list.append(metadata)
 
     # Create DataFrames for each data type
-    df_radar = pd.DataFrame(radar_data).transpose()
-    df_adxl = pd.DataFrame(adxl_data).transpose()
+    df_radar = pd.DataFrame(radar_data).transpose().add_prefix('Radar ')
+    df_adxl = pd.DataFrame(adxl_data).transpose().add_prefix('ADXL ')
     df_ax = pd.DataFrame(ax_data).transpose().add_prefix('Ax ')
     df_ay = pd.DataFrame(ay_data).transpose().add_prefix('Ay ')
     df_az = pd.DataFrame(az_data).transpose().add_prefix('Az ')
