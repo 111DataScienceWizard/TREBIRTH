@@ -306,20 +306,39 @@ def plot_frequency_domain(data, column):
     ax.set_title(f'{column} - Frequency Domain Plot')
     return fig
 
+selected_domain = st.selectbox('Select Domain to Plot', ['Time Domain', 'Frequency Domain'])
+
+
 # Loop through each Radar column and plot the selected domain
 for column, data in filtered_radar_columns.items():
     if selected_domain == 'Time Domain':
-        # Plot time domain
-        plot_time_domain(data, column)
+        fig = plot_time_domain(data, column)
+        st.pyplot(fig)
+        plot_buffer = BytesIO()
+        fig.savefig(plot_buffer, format='png')
+        plot_buffer.seek(0)
+        st.download_button(label=f'Download {column} Time Domain Plot', data=plot_buffer, file_name=f'{column}_time_domain_plot.png', mime='image/png')
     elif selected_domain == 'Frequency Domain':
-        # Plot frequency domain
-        plot_frequency_domain(data, column)
+        fig = plot_frequency_domain(data, column)
+        st.pyplot(fig)
+        plot_buffer = BytesIO()
+        fig.savefig(plot_buffer, format='png')
+        plot_buffer.seek(0)
+        st.download_button(label=f'Download {column} Frequency Domain Plot', data=plot_buffer, file_name=f'{column}_frequency_domain_plot.png', mime='image/png')
 
 # Loop through each ADXL column and plot the selected domain
 for column, data in filtered_adxl_columns.items():
     if selected_domain == 'Time Domain':
-        # Plot time domain
-        plot_time_domain(data, column)
+        fig = plot_time_domain(data, column)
+        st.pyplot(fig)
+        plot_buffer = BytesIO()
+        fig.savefig(plot_buffer, format='png')
+        plot_buffer.seek(0)
+        st.download_button(label=f'Download {column} Time Domain Plot', data=plot_buffer, file_name=f'{column}_time_domain_plot.png', mime='image/png')
     elif selected_domain == 'Frequency Domain':
-        # Plot frequency domain
-        plot_frequency_domain(data, column)
+        fig = plot_frequency_domain(data, column)
+        st.pyplot(fig)
+        plot_buffer = BytesIO()
+        fig.savefig(plot_buffer, format='png')
+        plot_buffer.seek(0)
+        st.download_button(label=f'Download {column} Frequency Domain Plot', data=plot_buffer, file_name=f'{column}_frequency_domain_plot.png', mime='image/png')
