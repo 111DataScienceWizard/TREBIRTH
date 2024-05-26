@@ -317,6 +317,17 @@ selected_domain = st.selectbox('Select Domain to Plot', ['Time Domain', 'Frequen
 temp_dir = "temp_plots"
 os.makedirs(temp_dir, exist_ok=True)
 
+# Function to save plot and return the file path
+def save_plot(fig, column, row_number, tree_number, scan_number):
+    plot_filename = f"{column.replace(' ', '_')}_{row_number}_{tree_number}_{scan_number}.png"
+    plot_path = os.path.join(temp_dir, plot_filename)
+    fig.savefig(plot_path, format='png')
+    plt.close(fig)  # Close the figure to release memory
+    return plot_path
+
+# List to store paths of the saved plots
+plot_paths = []
+
 # Loop through each Radar column and plot the selected domain
 for column, data in filtered_radar_columns.items():
     if selected_domain == 'Time Domain':
@@ -324,11 +335,9 @@ for column, data in filtered_radar_columns.items():
     elif selected_domain == 'Frequency Domain':
         fig = plot_frequency_domain(data, column)
     
-    # Save the plot in the temporary directory
-    plot_filename = f"{column.replace(' ', '_')}_{row_number}_{tree_number}_{scan_number}.png"
-    plot_path = os.path.join(temp_dir, plot_filename)
-    fig.savefig(plot_path, format='png')
-    plt.close(fig)  # Close the figure to release memory
+    plot_path = save_plot(fig, column, row_number, tree_number, scan_number)
+    plot_paths.append(plot_path)
+    st.image(plot_path)  # Display the plot in Streamlit
 
 # Loop through each ADXL column and plot the selected domain
 for column, data in filtered_adxl_columns.items():
@@ -337,11 +346,9 @@ for column, data in filtered_adxl_columns.items():
     elif selected_domain == 'Frequency Domain':
         fig = plot_frequency_domain(data, column)
     
-    # Save the plot in the temporary directory
-    plot_filename = f"{column.replace(' ', '_')}_{row_number}_{tree_number}_{scan_number}.png"
-    plot_path = os.path.join(temp_dir, plot_filename)
-    fig.savefig(plot_path, format='png')
-    plt.close(fig)  # Close the figure to release memory
+    plot_path = save_plot(fig, column, row_number, tree_number, scan_number)
+    plot_paths.append(plot_path)
+    st.image(plot_path)  # Display the plot in Streamlit
 
 # Create a zip file
 zip_filename = f"plots_{row_number}_{tree_number}_{scan_number}.zip"
@@ -349,9 +356,8 @@ zip_filepath = os.path.join(temp_dir, zip_filename)
 
 # Add plots to the zip file
 with zipfile.ZipFile(zip_filepath, 'w') as zipf:
-    for root, dirs, files in os.walk(temp_dir):
-        for file in files:
-            zipf.write(os.path.join(root, file), os.path.relpath(os.path.join(root, file), temp_dir))
+    for plot_path in plot_paths:
+        zipf.write(plot_path, os.path.basename(plot_path))
 
 # Provide a download button for the zip file
-st.markdown(f"### [Download All Plots](/{zip_filepath})")
+st.download_button("Download All Plots", data=open(zip_filepath, 'rb').read(), file_name=zip_filename, mime="application/zip")
