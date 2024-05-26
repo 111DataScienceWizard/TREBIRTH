@@ -139,12 +139,29 @@ else:
                 metadata[key] = value.replace(tzinfo=None)
         metadata_list.append(metadata)
 
+    num_scans = max(len(radar_data[0]), len(adxl_data[0]), len(ax_data[0]), len(ay_data[0]), len(az_data[0]))
+
     # Create DataFrames for each data type
-    df_radar = pd.DataFrame(radar_data).transpose().add_prefix('Radar ')
-    df_adxl = pd.DataFrame(adxl_data).transpose().add_prefix('ADXL ')
-    df_ax = pd.DataFrame(ax_data).transpose().add_prefix('Ax ')
-    df_ay = pd.DataFrame(ay_data).transpose().add_prefix('Ay ')
-    df_az = pd.DataFrame(az_data).transpose().add_prefix('Az ')
+    radar_columns = [f'Radar {i+1}' for i in range(num_scans)]
+    adxl_columns = [f'ADXL {i+1}' for i in range(num_scans)]
+    ax_columns = [f'Ax {i+1}' for i in range(num_scans)]
+    ay_columns = [f'Ay {i+1}' for i in range(num_scans)]
+    az_columns = [f'Az {i+1}' for i in range(num_scans)]
+
+    df_radar = pd.DataFrame(radar_data).transpose()
+    df_radar.columns = radar_columns
+
+    df_adxl = pd.DataFrame(adxl_data).transpose()
+    df_adxl.columns = adxl_columns
+
+    df_ax = pd.DataFrame(ax_data).transpose()
+    df_ax.columns = ax_columns
+
+    df_ay = pd.DataFrame(ay_data).transpose()
+    df_ay.columns = ay_columns
+
+    df_az = pd.DataFrame(az_data).transpose()
+    df_az.columns = az_columns
 
     # Concatenate the DataFrames column-wise
     df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
