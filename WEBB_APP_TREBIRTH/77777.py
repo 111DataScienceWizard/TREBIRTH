@@ -313,41 +313,36 @@ def plot_frequency_domain(data, column):
 
 selected_domain = st.selectbox('Select Domain to Plot', ['Time Domain', 'Frequency Domain'])
 
+# Create a temporary directory to store the plots
 temp_dir = "temp_plots"
 os.makedirs(temp_dir, exist_ok=True)
+
 # Loop through each Radar column and plot the selected domain
 for column, data in filtered_radar_columns.items():
     if selected_domain == 'Time Domain':
         fig = plot_time_domain(data, column)
-        st.pyplot(fig)
-        plot_buffer = BytesIO()
     elif selected_domain == 'Frequency Domain':
         fig = plot_frequency_domain(data, column)
-        st.pyplot(fig)
-        plot_buffer = BytesIO()
-
+    
     # Save the plot in the temporary directory
     plot_filename = f"{column.replace(' ', '_')}_{row_number}_{tree_number}_{scan_number}.png"
     plot_path = os.path.join(temp_dir, plot_filename)
     fig.savefig(plot_path, format='png')
     plt.close(fig)  # Close the figure to release memory
-    
+
 # Loop through each ADXL column and plot the selected domain
 for column, data in filtered_adxl_columns.items():
     if selected_domain == 'Time Domain':
         fig = plot_time_domain(data, column)
-        st.pyplot(fig)
-        plot_buffer = BytesIO()
     elif selected_domain == 'Frequency Domain':
         fig = plot_frequency_domain(data, column)
-        st.pyplot(fig)
-        plot_buffer = BytesIO()
+    
     # Save the plot in the temporary directory
     plot_filename = f"{column.replace(' ', '_')}_{row_number}_{tree_number}_{scan_number}.png"
     plot_path = os.path.join(temp_dir, plot_filename)
     fig.savefig(plot_path, format='png')
     plt.close(fig)  # Close the figure to release memory
-    
+
 # Create a zip file
 zip_filename = f"plots_{row_number}_{tree_number}_{scan_number}.zip"
 zip_filepath = os.path.join(temp_dir, zip_filename)
