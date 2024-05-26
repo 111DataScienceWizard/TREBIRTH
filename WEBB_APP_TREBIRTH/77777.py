@@ -81,6 +81,9 @@ def get_firestore_data(query):
             break
     raise Exception("Max retries exceeded")
 
+def get_firestore_data(query):
+    return [doc for doc in query.stream()]
+
 # Authenticate to Firestore with the JSON account key.
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
 
@@ -127,11 +130,11 @@ else:
     metadata_list = []
 
     for doc in query_results:
-        radar_data.append(doc.to_dict().get('RadarRaw', []))
-        adxl_data.append(doc.to_dict().get('ADXLRaw', []))
-        ax_data.append(doc.to_dict().get('Ax', []))
-        ay_data.append(doc.to_dict().get('Ay', []))
-        az_data.append(doc.to_dict().get('Az', []))
+        radar_data.exend(doc.to_dict().get('RadarRaw', []))
+        adxl_data.extend(doc.to_dict().get('ADXLRaw', []))
+        ax_data.extend(doc.to_dict().get('Ax', []))
+        ay_data.extend(doc.to_dict().get('Ay', []))
+        az_data.extend(doc.to_dict().get('Az', []))
         metadata = doc.to_dict()
         # Convert datetime values to timezone-unaware
         for key, value in metadata.items():
@@ -139,29 +142,12 @@ else:
                 metadata[key] = value.replace(tzinfo=None)
         metadata_list.append(metadata)
 
-    num_scans = 10
-
     # Create DataFrames for each data type
-    radar_columns = [f'Radar {i+1}' for i in range(num_scans)]
-    adxl_columns = [f'ADXL {i+1}' for i in range(num_scans)]
-    ax_columns = [f'Ax {i+1}' for i in range(num_scans)]
-    ay_columns = [f'Ay {i+1}' for i in range(num_scans)]
-    az_columns = [f'Az {i+1}' for i in range(num_scans)]
-
-    df_radar = pd.DataFrame(radar_data).transpose()
-    df_radar.columns = radar_columns
-
-    df_adxl = pd.DataFrame(adxl_data).transpose()
-    df_adxl.columns = adxl_columns
-
-    df_ax = pd.DataFrame(ax_data).transpose()
-    df_ax.columns = ax_columns
-
-    df_ay = pd.DataFrame(ay_data).transpose()
-    df_ay.columns = ay_columns
-
-    df_az = pd.DataFrame(az_data).transpose()
-    df_az.columns = az_columns
+    df_radar = pd.DataFrame(radar_data).transpose().add_prefix('Radar ')
+    df_adxl = pd.DataFrame(adxl_data).transpose().add_prefix('ADXL ')
+    df_ax = pd.DataFrame(ax_data).transpose().add_prefix('Ax ')
+    df_ay = pd.DataFrame(ay_data).transpose().add_prefix('Ay ')
+    df_az = pd.DataFrame(az_data).transpose().add_prefix('Az ')
 
     # Concatenate the DataFrames column-wise
     df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
@@ -301,7 +287,7 @@ if st.button("Download Selected Sheets"):
     filtered_excel_data.seek(0)
 
     # Trigger the download of the Excel file
-    st.download_button("Download Filtered Data", filtered_excel_data, file_name=f"Filtered_{filter_type.replace(' ', '_')}_{frequency if filter_type != 'Band Pass Filter (BPF)' else f'{low_freq}to{high_freq}'}Hz.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-filtered-excel')
+    st.download_button("Download Filtered Data", filtered_excel_data, file_name=f"Filtered_{filter_type.replace(' ', '')}{frequency if filter_type != 'Band Pass Filter (BPF)' else f'{low_freq}to{high_freq}'}Hz.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-filtered-excel')
 
 # Define functions for plotting time and frequency domain graphs
 def plot_time_domain(data, column, sampling_rate=100):
