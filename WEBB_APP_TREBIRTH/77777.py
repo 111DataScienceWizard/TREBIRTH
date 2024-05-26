@@ -296,9 +296,10 @@ def plot_time_domain(data, column, sampling_rate=100):
     fig, ax = plt.subplots()
     time_seconds = np.arange(len(data)) / sampling_rate  # Assuming 100 signals per second
     ax.plot(time_seconds, data)
+    title = f'{row_number}_{tree_number}_{column}_{filter_type}_{frequency}Hz - Time Domain Plot'
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('Signal')
-    ax.set_title(f'{column} - Time Domain Plot')
+    ax.set_title(title)
     return fig
 
 def plot_frequency_domain(data, column):
@@ -306,9 +307,10 @@ def plot_frequency_domain(data, column):
     powers_db = 10 * np.log10(powers[0])  # Convert power to dB scale
     fig, ax = plt.subplots()
     ax.plot(frequencies[0], powers_db)
+    title = f'{row_number}_{tree_number}_{column}_{filter_type}_{frequency}Hz - Frequency Domain Plot'
     ax.set_xlabel('Frequency (Hz)')
     ax.set_ylabel('Power Spectrum (dB)')
-    ax.set_title(f'{column} - Frequency Domain Plot')
+    ax.set_title(title)
     return fig
 
 selected_domain = st.selectbox('Select Domain to Plot', ['Time Domain', 'Frequency Domain'])
