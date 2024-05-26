@@ -139,7 +139,7 @@ else:
                 metadata[key] = value.replace(tzinfo=None)
         metadata_list.append(metadata)
 
-    num_scans = max(len(radar_data[0]))
+    num_scans = 20
 
     # Create DataFrames for each data type
     radar_columns = [f'Radar {i+1}' for i in range(num_scans)]
