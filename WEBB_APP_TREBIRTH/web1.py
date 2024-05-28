@@ -132,7 +132,7 @@ else:
 
     # Function to slice data
     def slice_data(data):
-        return data[100:-100] if len(data) > 200 else data
+        return data[100:-100] if len(data) > 1000 else data
 
     for doc in query_results:
         radar_data.append(slice_data(doc.get('RadarRaw', [])))
@@ -147,13 +147,15 @@ else:
                 metadata[key] = value.replace(tzinfo=None)
         metadata_list.append(metadata)
 
-    # Concatenate data for each scan
-    df_radar = pd.concat([pd.Series(data) for data in radar_data], axis=1).add_prefix('Radar ')
-    df_adxl = pd.concat([pd.Series(data) for data in adxl_data], axis=1).add_prefix('ADXL ')
-    df_ax = pd.concat([pd.Series(data) for data in ax_data], axis=1).add_prefix('Ax ')
-    df_ay = pd.concat([pd.Series(data) for data in ay_data], axis=1).add_prefix('Ay ')
-    df_az = pd.concat([pd.Series(data) for data in az_data], axis=1).add_prefix('Az ')
+    # Create DataFrames for each scan and concatenate them column-wise
+    def create_df(data_list, prefix):
+        return pd.concat([pd.Series(data) for data in data_list], axis=1).add_prefix(prefix)
 
+    df_radar = create_df(radar_data, 'Radar ')
+    df_adxl = create_df(adxl_data, 'ADXL ')
+    df_ax = create_df(ax_data, 'Ax ')
+    df_ay = create_df(ay_data, 'Ay ')
+    df_az = create_df(az_data, 'Az ')
     # Concatenate the DataFrames column-wise
     df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
     # Drop null values from the combined dataframe
