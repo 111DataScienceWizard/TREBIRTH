@@ -132,7 +132,9 @@ else:
 
     # Function to slice data
     def slice_data(data):
-        return data[100:-100] if len(data) > 1000 else data
+        if len(data) > 200:
+            return data[100:-100]
+        return data
 
     for doc in query_results:
         radar_data.append(slice_data(doc.get('RadarRaw', [])))
@@ -156,13 +158,12 @@ else:
     df_ax = create_df(ax_data, 'Ax ')
     df_ay = create_df(ay_data, 'Ay ')
     df_az = create_df(az_data, 'Az ')
-    # Concatenate the DataFrames column-wise
-    df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
-    # Drop null values from the combined dataframe
-    df_combined.dropna(inplace=True)
 
-    # Impute missing values (if any)
-    df_combined.fillna(df_combined.mean(), inplace=True)
+    # Concatenate all DataFrames column-wise
+    df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
+
+    # Ensure there are no misalignments due to NaN values by forward-filling NaNs
+    df_combined.fillna(method='ffill', inplace=True)
 
     # Detrend all the columns
     df_combined_detrended = df_combined.apply(detrend)
