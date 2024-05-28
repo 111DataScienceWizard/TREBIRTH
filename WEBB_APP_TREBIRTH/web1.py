@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import numpy as np
 import time
+import zipfile
+import os
 import random
 from scipy import signal
 from scipy.stats import skew, kurtosis
@@ -27,23 +29,22 @@ from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz,
                      coefHPF37Hz, coefHPF38Hz, coefHPF39Hz, coefHPF40Hz, coefHPF41Hz, coefHPF42Hz, coefHPF43Hz, 
                      coefHPF44Hz, coefHPF45Hz, coefHPF46Hz, coefHPF47Hz, coefHPF48Hz, coefHPF49Hz, coefHPF50Hz)
 
-# Filter processing function
+
+
+
 def process(coef, in_signal):
     FILTERTAPS = len(coef)
-    values = np.zeros(FILTERTAPS)  # Initialize with zeros
-    k = 0
+    values = np.zeros(FILTERTAPS)
     out_signal = []
     gain = 1.0
+    k = 0
     for in_value in in_signal:
-        out = 0.0
         values[k] = in_value
-        for i in range(len(coef)):
-            out += coef[i] * values[(i + k) % FILTERTAPS]
+        out = np.dot(coef, np.roll(values, k))
         out /= gain
-        k = (k + 1) % FILTERTAPS
         out_signal.append(out)
+        k = (k + 1) % FILTERTAPS
     return out_signal
-
 # Set page configuration
 st.set_page_config(layout="wide")
 st.title('Data Analytics')
@@ -98,10 +99,10 @@ label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], ind
 # Dropdown for selecting sheets in Excel
 selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Columns Comparison'], default=['Raw Data', 'Metadata'])
 
-# Create a reference to the Google post.
+# Create a reference to the Firestore collection
 query = db.collection('DevOps')
 
-# Filter based on user input
+# Apply filters based on user input
 if row_number != 'All':
     query = query.where('RowNo', '==', int(row_number))
 if tree_number != 'All':
@@ -113,12 +114,12 @@ if label_infstat != 'All':
 
 # Get documents based on the query
 try:
-    query_results = get_firestore_data(query)
+    query_results = [doc.to_dict() for doc in query.stream()]
 except Exception as e:
     st.error(f"Failed to retrieve data: {e}")
     st.stop()
 
-if len(query_results) == 0:
+if not query_results:
     st.write("No data found matching the specified criteria.")
 else:
     # Create empty lists to store data
@@ -130,12 +131,12 @@ else:
     metadata_list = []
 
     for doc in query_results:
-        radar_data.append(doc.to_dict().get('RadarRaw', []))
-        adxl_data.append(doc.to_dict().get('ADXLRaw', []))
-        ax_data.append(doc.to_dict().get('Ax', []))
-        ay_data.append(doc.to_dict().get('Ay', []))
-        az_data.append(doc.to_dict().get('Az', []))
-        metadata = doc.to_dict()
+        radar_data.extend(doc.get('RadarRaw', [])[100:1800])
+        adxl_data.extend(doc.get('ADXLRaw', [])[100:1800])
+        ax_data.extend(doc.get('Ax', [])[100:1800])
+        ay_data.extend(doc.get('Ay', [])[100:1800])
+        az_data.extend(doc.get('Az', [])[100:1800])
+        metadata = doc
         # Convert datetime values to timezone-unaware
         for key, value in metadata.items():
             if isinstance(value, datetime):
@@ -143,24 +144,14 @@ else:
         metadata_list.append(metadata)
 
     # Create DataFrames for each data type
-    df_radar = pd.DataFrame(radar_data).transpose()
-    df_adxl = pd.DataFrame(adxl_data).transpose()
-    df_ax = pd.DataFrame(ax_data).transpose()
-    df_ay = pd.DataFrame(ay_data).transpose()
-    df_az = pd.DataFrame(az_data).transpose()
-
-    # Rename columns to avoid suffixes
-    df_radar.columns = ['Radar']
-    df_adxl.columns = ['ADXL']
-    df_ax.columns = ['Ax']
-    df_ay.columns = ['Ay']
-    df_az.columns = ['Az']
+    df_radar = pd.DataFrame(radar_data).transpose().add_prefix('Radar ')
+    df_adxl = pd.DataFrame(adxl_data).transpose().add_prefix('ADXL ')
+    df_ax = pd.DataFrame(ax_data).transpose().add_prefix('Ax ')
+    df_ay = pd.DataFrame(ay_data).transpose().add_prefix('Ay ')
+    df_az = pd.DataFrame(az_data).transpose().add_prefix('Az ')
 
     # Concatenate the DataFrames column-wise
     df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
-
-    # Slice the DataFrame to the desired range
-    df_combined = df_combined[100:1800]
 
     # Drop null values from the combined dataframe
     df_combined.dropna(inplace=True)
@@ -241,15 +232,30 @@ else:
         filter_coef_high = globals()[f'coefLPF{high_freq}Hz']
 
     # Apply the selected filter only to Radar and ADXL columns
-    radar_adxl_columns = ['Radar', 'ADXL']
+    # List to hold all Radar and ADXL column names
+    radar_columns = [f'Radar {i}' for i in range(30)]  # Assuming there are 10 scans
+    adxl_columns = [f'ADXL {i}' for i in range(30)]  # Assuming there are 10 scans
+
+    # Dictionary to hold the filtered data columns for Radar and ADXL
+    filtered_radar_columns = {}
+    filtered_adxl_columns = {}
+
+    # Add data for each scan to the filtered columns dictionary
+    for i in range(10):  # Assuming there are 10 scans
+        filtered_radar_columns[f'Radar {i}'] = df_combined_detrended[f'Radar {i}']
+        filtered_adxl_columns[f'ADXL {i}'] = df_combined_detrended[f'ADXL {i}']
 
     # Apply the process function on each column
     if filter_type == 'Band Pass Filter (BPF)':
-        filtered_data_low = df_combined_detrended[radar_adxl_columns].apply(lambda col: process(filter_coef_low, col.values))
-        filtered_data = filtered_data_low.apply(lambda col: process(filter_coef_high, col.values))
+        filtered_radar_data_low = pd.DataFrame({col: process(filter_coef_low, data.values) for col, data in filtered_radar_columns.items()})
+        filtered_radar_data = pd.DataFrame({col: process(filter_coef_high, data.values) for col, data in filtered_radar_data_low.items()})
+        filtered_adxl_data_low = pd.DataFrame({col: process(filter_coef_low, data.values) for col, data in filtered_adxl_columns.items()})
+        filtered_adxl_data = pd.DataFrame({col: process(filter_coef_high, data.values) for col, data in filtered_adxl_data_low.items()})
     else:
-        filtered_data = df_combined_detrended[radar_adxl_columns].apply(lambda col: process(filter_coef, col.values))
+        filtered_radar_data = pd.DataFrame({col: process(filter_coef, data.values) for col, data in filtered_radar_columns.items()})
+        filtered_adxl_data = pd.DataFrame({col: process(filter_coef, data.values) for col, data in filtered_adxl_columns.items()})
 
+filtered_data = pd.concat([filtered_radar_data, filtered_adxl_data], axis=1)
 
 # Multi-select box to select desired sheets
 selected_sheets = st.multiselect('Select Sheets to Download', ['Filtered Data', 'Time Domain Features', 'Columns Comparison'])
@@ -279,22 +285,18 @@ if st.button("Download Selected Sheets"):
     filtered_excel_data.seek(0)
 
     # Trigger the download of the Excel file
-    st.download_button("Download Filtered Data", filtered_excel_data, file_name=f"Filtered_{filter_type.replace(' ', '_')}_{frequency if filter_type != 'Band Pass Filter (BPF)' else f'{low_freq}to{high_freq}'}Hz.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-filtered-excel')
+    st.download_button("Download Filtered Data", filtered_excel_data, file_name=f"Filtered_{filter_type.replace(' ', '')}{frequency if filter_type != 'Band Pass Filter (BPF)' else f'{low_freq}to{high_freq}'}Hz.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-filtered-excel')
 
-# Dictionary to hold the filtered data columns
-filtered_columns = {
-    'Radar': filtered_data['Radar'],
-    'ADXL': filtered_data['ADXL']
-}
 
 # Define functions for plotting time and frequency domain graphs
 def plot_time_domain(data, column, sampling_rate=100):
     fig, ax = plt.subplots()
     time_seconds = np.arange(len(data)) / sampling_rate  # Assuming 100 signals per second
     ax.plot(time_seconds, data)
+    title = f'{row_number}_{tree_number}_{column}_{filter_type}_{frequency}Hz - Time Domain Plot'
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('Signal')
-    ax.set_title(f'{column} - Time Domain Plot')
+    ax.set_title(title)
     return fig
 
 def plot_frequency_domain(data, column):
@@ -302,28 +304,59 @@ def plot_frequency_domain(data, column):
     powers_db = 10 * np.log10(powers[0])  # Convert power to dB scale
     fig, ax = plt.subplots()
     ax.plot(frequencies[0], powers_db)
+    title = f'{row_number}_{tree_number}_{column}_{filter_type}_{frequency}Hz - Frequency Domain Plot'
     ax.set_xlabel('Frequency (Hz)')
     ax.set_ylabel('Power Spectrum (dB)')
-    ax.set_title(f'{column} - Frequency Domain Plot')
+    ax.set_title(title)
     return fig
 
-# Add a select box to choose the domain for plotting
 selected_domain = st.selectbox('Select Domain to Plot', ['Time Domain', 'Frequency Domain'])
 
+# Create a temporary directory to store the plots
+temp_dir = "temp_plots"
+os.makedirs(temp_dir, exist_ok=True)
 
-# Plot and download the graphs based on the selected domain
-for column, data in filtered_columns.items():
+# Function to save plot and return the file path
+def save_plot(fig, column, row_number, tree_number, scan_number):
+    plot_filename = f"{column.replace(' ', '_')}_{row_number}_{tree_number}_{scan_number}.png"
+    plot_path = os.path.join(temp_dir, plot_filename)
+    fig.savefig(plot_path, format='png')
+    plt.close(fig)  # Close the figure to release memory
+    return plot_path
+
+# List to store paths of the saved plots
+plot_paths = []
+
+# Loop through each Radar column and plot the selected domain
+for column, data in filtered_radar_columns.items():
     if selected_domain == 'Time Domain':
         fig = plot_time_domain(data, column)
-        st.pyplot(fig)
-        plot_buffer = BytesIO()
-        fig.savefig(plot_buffer, format='png')
-        plot_buffer.seek(0)
-        st.download_button(label=f'Download {column} Time Domain Plot', data=plot_buffer, file_name=f'{column}_time_domain_plot.png', mime='image/png')
     elif selected_domain == 'Frequency Domain':
         fig = plot_frequency_domain(data, column)
-        st.pyplot(fig)
-        plot_buffer = BytesIO()
-        fig.savefig(plot_buffer, format='png')
-        plot_buffer.seek(0)
-        st.download_button(label=f'Download {column} Frequency Domain Plot', data=plot_buffer, file_name=f'{column}_frequency_domain_plot.png', mime='image/png')
+    
+    plot_path = save_plot(fig, column, row_number, tree_number, scan_number)
+    plot_paths.append(plot_path)
+    st.image(plot_path)  # Display the plot in Streamlit
+
+# Loop through each ADXL column and plot the selected domain
+for column, data in filtered_adxl_columns.items():
+    if selected_domain == 'Time Domain':
+        fig = plot_time_domain(data, column)
+    elif selected_domain == 'Frequency Domain':
+        fig = plot_frequency_domain(data, column)
+    
+    plot_path = save_plot(fig, column, row_number, tree_number, scan_number)
+    plot_paths.append(plot_path)
+    st.image(plot_path)  # Display the plot in Streamlit
+
+# Create a zip file
+zip_filename = f"plots_{row_number}_{tree_number}_{scan_number}.zip"
+zip_filepath = os.path.join(temp_dir, zip_filename)
+
+# Add plots to the zip file
+with zipfile.ZipFile(zip_filepath, 'w') as zipf:
+    for plot_path in plot_paths:
+        zipf.write(plot_path, os.path.basename(plot_path))
+
+# Provide a download button for the zip file
+st.download_button("Download All Plots", data=open(zip_filepath, 'rb').read(), file_name=zip_filename, mime="application/zip")
