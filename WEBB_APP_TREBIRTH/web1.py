@@ -130,12 +130,16 @@ else:
     az_data = []
     metadata_list = []
 
+    # Function to slice data
+    def slice_data(data):
+        return data[100:-100] if len(data) > 200 else data
+
     for doc in query_results:
-        radar_data.extend(doc.get('RadarRaw', [])[100:1800])
-        adxl_data.extend(doc.get('ADXLRaw', [])[100:1800])
-        ax_data.extend(doc.get('Ax', [])[100:1800])
-        ay_data.extend(doc.get('Ay', [])[100:1800])
-        az_data.extend(doc.get('Az', [])[100:1800])
+        radar_data.append(slice_data(doc.get('RadarRaw', [])))
+        adxl_data.append(slice_data(doc.get('ADXLRaw', [])))
+        ax_data.append(slice_data(doc.get('Ax', [])))
+        ay_data.append(slice_data(doc.get('Ay', [])))
+        az_data.append(slice_data(doc.get('Az', [])))
         metadata = doc
         # Convert datetime values to timezone-unaware
         for key, value in metadata.items():
@@ -143,16 +147,15 @@ else:
                 metadata[key] = value.replace(tzinfo=None)
         metadata_list.append(metadata)
 
-    # Create DataFrames for each data type
-    df_radar = pd.DataFrame(radar_data).transpose().add_prefix('Radar ')
-    df_adxl = pd.DataFrame(adxl_data).transpose().add_prefix('ADXL ')
-    df_ax = pd.DataFrame(ax_data).transpose().add_prefix('Ax ')
-    df_ay = pd.DataFrame(ay_data).transpose().add_prefix('Ay ')
-    df_az = pd.DataFrame(az_data).transpose().add_prefix('Az ')
+    # Concatenate data for each scan
+    df_radar = pd.concat([pd.Series(data) for data in radar_data], axis=1).add_prefix('Radar ')
+    df_adxl = pd.concat([pd.Series(data) for data in adxl_data], axis=1).add_prefix('ADXL ')
+    df_ax = pd.concat([pd.Series(data) for data in ax_data], axis=1).add_prefix('Ax ')
+    df_ay = pd.concat([pd.Series(data) for data in ay_data], axis=1).add_prefix('Ay ')
+    df_az = pd.concat([pd.Series(data) for data in az_data], axis=1).add_prefix('Az ')
 
     # Concatenate the DataFrames column-wise
     df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
-
     # Drop null values from the combined dataframe
     df_combined.dropna(inplace=True)
 
