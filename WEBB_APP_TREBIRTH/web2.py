@@ -158,12 +158,9 @@ else:
         for i, data in enumerate(data_list):
             df = pd.DataFrame(data).dropna()
             df.fillna(df.mean(), inplace=True)
-            df_detrended = df.apply(detrend)
-            df_normalized = (df_detrended - df_detrended.min()) / (df_detrended.max() - df_detrended.min())
-            # Create new column names with prefix
             new_columns = [f'{prefix}{i}']
-            df_normalized.columns = new_columns
-            processed_list.append(df_normalized)
+            df.columns = new_columns
+            processed_list.append(df)
         return pd.concat(processed_list, axis=1)
 
     df_radar = process_data(radar_data, 'Radar ')
