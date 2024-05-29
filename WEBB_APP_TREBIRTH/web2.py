@@ -152,12 +152,12 @@ else:
     # Process each scan's data individually and concatenate later
     def process_data(data_list, prefix):
         processed_list = []
-        for data in data_list:
+        for i, data in enumerate(data_list):
             df = pd.DataFrame(data).dropna()
             df.fillna(df.mean(), inplace=True)
             df_detrended = df.apply(detrend)
             df_normalized = (df_detrended - df_detrended.min()) / (df_detrended.max() - df_detrended.min())
-            processed_list.append(df_normalized.add_prefix(prefix))
+            processed_list.append(df_normalized.add_prefix(f'{prefix} {i} '))
         return pd.concat(processed_list, axis=1)
 
     df_radar = process_data(radar_data, 'Radar ')
