@@ -223,6 +223,7 @@ else:
 
     # Download button for selected sheets and metadata
     st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
+    st.write("Columns in df_combined_detrended:", df_combined_detrended.columns)
 
     # Adding filter selection components
     filter_type = st.selectbox('Select Filter Type', ['Low Pass Filter (LPF)', 'High Pass Filter (HPF)', 'Band Pass Filter (BPF)'])
