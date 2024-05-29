@@ -132,7 +132,7 @@ else:
 
     # Function to slice data
     def slice_data(data):
-        if len(data) > 200:
+        if len(data) > 1000:
             return data[100:-100]
         return data
 
