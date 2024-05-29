@@ -149,6 +149,7 @@ else:
                 metadata[key] = value.replace(tzinfo=None)
         metadata_list.append(metadata)
 
+
     # Process each scan's data individually and concatenate later
     def process_data(data_list, prefix):
         processed_list = []
@@ -157,7 +158,10 @@ else:
             df.fillna(df.mean(), inplace=True)
             df_detrended = df.apply(detrend)
             df_normalized = (df_detrended - df_detrended.min()) / (df_detrended.max() - df_detrended.min())
-            processed_list.append(df_normalized.add_prefix(f'{prefix} {i} '))
+            # Create new column names with prefix
+            new_columns = [f'{prefix}{i} {j}' for j in range(df_normalized.shape[1])]
+            df_normalized.columns = new_columns
+            processed_list.append(df_normalized)
         return pd.concat(processed_list, axis=1)
 
     df_radar = process_data(radar_data, 'Radar ')
