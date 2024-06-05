@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import numpy as np
 import time
+import zipfile
+import os
 import random
 from scipy import signal
 from scipy.stats import skew, kurtosis
@@ -27,7 +29,6 @@ from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz,
                      coefHPF37Hz, coefHPF38Hz, coefHPF39Hz, coefHPF40Hz, coefHPF41Hz, coefHPF42Hz, coefHPF43Hz, 
                      coefHPF44Hz, coefHPF45Hz, coefHPF46Hz, coefHPF47Hz, coefHPF48Hz, coefHPF49Hz, coefHPF50Hz)
 
-
 def process(coef, in_signal):
     FILTERTAPS = len(coef)
     values = np.zeros(FILTERTAPS)
@@ -41,6 +42,7 @@ def process(coef, in_signal):
         out_signal.append(out)
         k = (k + 1) % FILTERTAPS
     return out_signal
+  
 # Set page configuration
 st.set_page_config(layout="wide")
 st.title('Data Analytics')
@@ -88,6 +90,7 @@ db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20e
 row_number = st.text_input('Enter Row number', 'All')
 tree_number = st.text_input('Enter Tree number', 'All')
 scan_number = st.text_input('Enter Scan number', 'All')
+bucket_number =st.text_input('Enter Bucket number', 'All')
 
 # Dropdown for InfStat label selection
 label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], index=0)
@@ -95,10 +98,10 @@ label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], ind
 # Dropdown for selecting sheets in Excel
 selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Columns Comparison'], default=['Raw Data', 'Metadata'])
 
-# Create a reference to the Google post.
+# Create a reference to the Firestore collection
 query = db.collection('DevOps')
 
-# Filter based on user input
+# Apply filters based on user input
 if row_number != 'All':
     query = query.where('RowNo', '==', int(row_number))
 if tree_number != 'All':
@@ -107,15 +110,17 @@ if scan_number != 'All':
     query = query.where('ScanNo', '==', int(scan_number))
 if label_infstat != 'All':
     query = query.where('InfStat', '==', label_infstat)
+if bucket_number != 'All':
+    query = query.where('BucketID', '==', string(BucketID))
 
 # Get documents based on the query
 try:
-    query_results = get_firestore_data(query)
+    query_results = [doc.to_dict() for doc in query.stream()]
 except Exception as e:
     st.error(f"Failed to retrieve data: {e}")
     st.stop()
 
-if len(query_results) == 0:
+if not query_results:
     st.write("No data found matching the specified criteria.")
 else:
     # Create empty lists to store data
@@ -126,54 +131,47 @@ else:
     az_data = []
     metadata_list = []
 
+    # Function to slice data
+    def slice_data(data):
+        if len(data) > 1000:
+            return data[100:-100]
+        return data
+
     for doc in query_results:
-        radar_data.append(doc.to_dict().get('RadarRaw', []))
-        adxl_data.append(doc.to_dict().get('ADXLRaw', []))
-        ax_data.append(doc.to_dict().get('Ax', []))
-        ay_data.append(doc.to_dict().get('Ay', []))
-        az_data.append(doc.to_dict().get('Az', []))
-        metadata = doc.to_dict()
+        radar_data.append(slice_data(doc.get('RadarRaw', [])))
+        adxl_data.append(slice_data(doc.get('ADXLRaw', [])))
+        ax_data.append(slice_data(doc.get('Ax', [])))
+        ay_data.append(slice_data(doc.get('Ay', [])))
+        az_data.append(slice_data(doc.get('Az', [])))
+        metadata = doc
         # Convert datetime values to timezone-unaware
         for key, value in metadata.items():
             if isinstance(value, datetime):
                 metadata[key] = value.replace(tzinfo=None)
         metadata_list.append(metadata)
 
-    num_scans = max(len(radar_data[0]), len(adxl_data[0]), len(ax_data[0]), len(ay_data[0]), len(az_data[0]))
 
-    # Create DataFrames for each data type
-    radar_columns = [f'Radar {i+1}' for i in range(num_scans)]
-    adxl_columns = [f'ADXL {i+1}' for i in range(num_scans)]
-    ax_columns = [f'Ax {i+1}' for i in range(num_scans)]
-    ay_columns = [f'Ay {i+1}' for i in range(num_scans)]
-    az_columns = [f'Az {i+1}' for i in range(num_scans)]
 
-    df_radar = pd.DataFrame(radar_data).transpose()
-    df_radar.columns = radar_columns
 
-    df_adxl = pd.DataFrame(adxl_data).transpose()
-    df_adxl.columns = adxl_columns
+    # Process each scan's data individually and concatenate later
+    def process_data(data_list, prefix):
+        processed_list = []
+        for i, data in enumerate(data_list):
+            df = pd.DataFrame(data).dropna()
+            df.fillna(df.mean(), inplace=True)
+            new_columns = [f'{prefix}{i}']
+            df.columns = new_columns
+            processed_list.append(df)
+        return pd.concat(processed_list, axis=1)
 
-    df_ax = pd.DataFrame(ax_data).transpose()
-    df_ax.columns = ax_columns
+    df_radar = process_data(radar_data, 'Radar ')
+    df_adxl = process_data(adxl_data, 'ADXL ')
+    df_ax = process_data(ax_data, 'Ax ')
+    df_ay = process_data(ay_data, 'Ay ')
+    df_az = process_data(az_data, 'Az ')
 
-    df_ay = pd.DataFrame(ay_data).transpose()
-    df_ay.columns = ay_columns
-
-    df_az = pd.DataFrame(az_data).transpose()
-    df_az.columns = az_columns
-
-    # Concatenate the DataFrames column-wise
+    # Concatenate all DataFrames column-wise
     df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
-
-    # Slice the DataFrame to the desired range
-    df_combined = df_combined[100:1800]
-
-    # Drop null values from the combined dataframe
-    df_combined.dropna(inplace=True)
-
-    # Impute missing values (if any)
-    df_combined.fillna(df_combined.mean(), inplace=True)
 
     # Detrend all the columns
     df_combined_detrended = df_combined.apply(detrend)
@@ -229,6 +227,7 @@ else:
 
     # Download button for selected sheets and metadata
     st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
+    st.write("Columns in df_combined_detrended:", df_combined_detrended.columns)
 
     # Adding filter selection components
     filter_type = st.selectbox('Select Filter Type', ['Low Pass Filter (LPF)', 'High Pass Filter (HPF)', 'Band Pass Filter (BPF)'])
@@ -301,16 +300,18 @@ if st.button("Download Selected Sheets"):
     filtered_excel_data.seek(0)
 
     # Trigger the download of the Excel file
-    st.download_button("Download Filtered Data", filtered_excel_data, file_name=f"Filtered_{filter_type.replace(' ', '_')}_{frequency if filter_type != 'Band Pass Filter (BPF)' else f'{low_freq}to{high_freq}'}Hz.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-filtered-excel')
+    st.download_button("Download Filtered Data", filtered_excel_data, file_name=f"Filtered_{filter_type.replace(' ', '')}{frequency if filter_type != 'Band Pass Filter (BPF)' else f'{low_freq}to{high_freq}'}Hz.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-filtered-excel')
+
 
 # Define functions for plotting time and frequency domain graphs
 def plot_time_domain(data, column, sampling_rate=100):
     fig, ax = plt.subplots()
     time_seconds = np.arange(len(data)) / sampling_rate  # Assuming 100 signals per second
     ax.plot(time_seconds, data)
+    title = f'{row_number}_{tree_number}_{column}_{filter_type}_{frequency}Hz - Time Domain Plot'
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('Signal')
-    ax.set_title(f'{column} - Time Domain Plot')
+    ax.set_title(title)
     return fig
 
 def plot_frequency_domain(data, column):
@@ -318,44 +319,59 @@ def plot_frequency_domain(data, column):
     powers_db = 10 * np.log10(powers[0])  # Convert power to dB scale
     fig, ax = plt.subplots()
     ax.plot(frequencies[0], powers_db)
+    title = f'{row_number}_{tree_number}_{column}_{filter_type}_{frequency}Hz - Frequency Domain Plot'
     ax.set_xlabel('Frequency (Hz)')
     ax.set_ylabel('Power Spectrum (dB)')
-    ax.set_title(f'{column} - Frequency Domain Plot')
+    ax.set_title(title)
     return fig
 
 selected_domain = st.selectbox('Select Domain to Plot', ['Time Domain', 'Frequency Domain'])
 
+# Create a temporary directory to store the plots
+temp_dir = "temp_plots"
+os.makedirs(temp_dir, exist_ok=True)
+
+# Function to save plot and return the file path
+def save_plot(fig, column, row_number, tree_number, scan_number):
+    plot_filename = f"{column.replace(' ', '_')}_{row_number}_{tree_number}_{scan_number}.png"
+    plot_path = os.path.join(temp_dir, plot_filename)
+    fig.savefig(plot_path, format='png')
+    plt.close(fig)  # Close the figure to release memory
+    return plot_path
+
+# List to store paths of the saved plots
+plot_paths = []
 
 # Loop through each Radar column and plot the selected domain
 for column, data in filtered_radar_columns.items():
     if selected_domain == 'Time Domain':
         fig = plot_time_domain(data, column)
-        st.pyplot(fig)
-        plot_buffer = BytesIO()
-        fig.savefig(plot_buffer, format='png')
-        plot_buffer.seek(0)
-        st.download_button(label=f'Download {column} Time Domain Plot', data=plot_buffer, file_name=f'{column}_time_domain_plot.png', mime='image/png')
     elif selected_domain == 'Frequency Domain':
         fig = plot_frequency_domain(data, column)
-        st.pyplot(fig)
-        plot_buffer = BytesIO()
-        fig.savefig(plot_buffer, format='png')
-        plot_buffer.seek(0)
-        st.download_button(label=f'Download {column} Frequency Domain Plot', data=plot_buffer, file_name=f'{column}_frequency_domain_plot.png', mime='image/png')
+    
+    plot_path = save_plot(fig, column, row_number, tree_number, scan_number)
+    plot_paths.append(plot_path)
+    st.image(plot_path)  # Display the plot in Streamlit
 
 # Loop through each ADXL column and plot the selected domain
 for column, data in filtered_adxl_columns.items():
     if selected_domain == 'Time Domain':
         fig = plot_time_domain(data, column)
-        st.pyplot(fig)
-        plot_buffer = BytesIO()
-        fig.savefig(plot_buffer, format='png')
-        plot_buffer.seek(0)
-        st.download_button(label=f'Download {column} Time Domain Plot', data=plot_buffer, file_name=f'{column}_time_domain_plot.png', mime='image/png')
     elif selected_domain == 'Frequency Domain':
         fig = plot_frequency_domain(data, column)
-        st.pyplot(fig)
-        plot_buffer = BytesIO()
-        fig.savefig(plot_buffer, format='png')
-        plot_buffer.seek(0)
-        st.download_button(label=f'Download {column} Frequency Domain Plot', data=plot_buffer, file_name=f'{column}_frequency_domain_plot.png', mime='image/png')
+    
+    plot_path = save_plot(fig, column, row_number, tree_number, scan_number)
+    plot_paths.append(plot_path)
+    st.image(plot_path)  # Display the plot in Streamlit
+
+# Create a zip file
+zip_filename = f"plots_{row_number}_{tree_number}_{scan_number}.zip"
+zip_filepath = os.path.join(temp_dir, zip_filename)
+
+# Add plots to the zip file
+with zipfile.ZipFile(zip_filepath, 'w') as zipf:
+    for plot_path in plot_paths:
+        zipf.write(plot_path, os.path.basename(plot_path))
+
+# Provide a download button for the zip file
+st.download_button("Download All Plots", data=open(zip_filepath, 'rb').read(), file_name=zip_filename, mime="application/zip")
