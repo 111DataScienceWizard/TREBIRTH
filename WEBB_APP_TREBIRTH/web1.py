@@ -92,7 +92,6 @@ db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20e
 row_number = st.text_input('Enter Row number', 'All')
 tree_number = st.text_input('Enter Tree number', 'All')
 scan_number = st.text_input('Enter Scan number', 'All')
-bucket_number =st.text_input('Enter Bucket number', 'All')
 
 # Dropdown for InfStat label selection
 label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], index=0)
@@ -110,8 +109,6 @@ if tree_number != 'All':
     query = query.where('TreeNo', '==', int(tree_number))
 if scan_number != 'All':
     query = query.where('ScanNo', '==', int(scan_number))
-if bucket_number != 'All':
-    query = query.where('BucketID', '==', int(bucket_number))
 if label_infstat != 'All':
     query = query.where('InfStat', '==', label_infstat)
 
@@ -135,7 +132,7 @@ else:
 
     # Function to slice data
     def slice_data(data):
-        if len(data) > 200:
+        if len(data) > 1000:
             return data[100:-100]
         return data
 
@@ -152,21 +149,28 @@ else:
                 metadata[key] = value.replace(tzinfo=None)
         metadata_list.append(metadata)
 
-    # Create DataFrames for each scan and concatenate them column-wise
-    def create_df(data_list, prefix):
-        return pd.concat([pd.Series(data) for data in data_list], axis=1).add_prefix(prefix)
 
-    df_radar = create_df(radar_data, 'Radar ')
-    df_adxl = create_df(adxl_data, 'ADXL ')
-    df_ax = create_df(ax_data, 'Ax ')
-    df_ay = create_df(ay_data, 'Ay ')
-    df_az = create_df(az_data, 'Az ')
+
+
+    # Process each scan's data individually and concatenate later
+    def process_data(data_list, prefix):
+        processed_list = []
+        for i, data in enumerate(data_list):
+            df = pd.DataFrame(data).dropna()
+            df.fillna(df.mean(), inplace=True)
+            new_columns = [f'{prefix}{i}']
+            df.columns = new_columns
+            processed_list.append(df)
+        return pd.concat(processed_list, axis=1)
+
+    df_radar = process_data(radar_data, 'Radar ')
+    df_adxl = process_data(adxl_data, 'ADXL ')
+    df_ax = process_data(ax_data, 'Ax ')
+    df_ay = process_data(ay_data, 'Ay ')
+    df_az = process_data(az_data, 'Az ')
 
     # Concatenate all DataFrames column-wise
     df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
-
-    # Ensure there are no misalignments due to NaN values by forward-filling NaNs
-    df_combined.fillna(method='ffill', inplace=True)
 
     # Detrend all the columns
     df_combined_detrended = df_combined.apply(detrend)
@@ -222,6 +226,7 @@ else:
 
     # Download button for selected sheets and metadata
     st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
+    st.write("Columns in df_combined_detrended:", df_combined_detrended.columns)
 
     # Adding filter selection components
     filter_type = st.selectbox('Select Filter Type', ['Low Pass Filter (LPF)', 'High Pass Filter (HPF)', 'Band Pass Filter (BPF)'])
