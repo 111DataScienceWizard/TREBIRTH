@@ -6,6 +6,7 @@ from io import BytesIO
 import matplotlib.pyplot as plt
 from datetime import datetime
 import numpy as np
+import string as str
 import time
 import zipfile
 import os
@@ -111,7 +112,7 @@ if scan_number != 'All':
 if label_infstat != 'All':
     query = query.where('InfStat', '==', label_infstat)
 if bucket_number != 'All':
-    query = query.where('BucketID', '==', string(BucketID))
+    query = query.where('BucketID', '==', str(BucketID))
 
 # Get documents based on the query
 try:
