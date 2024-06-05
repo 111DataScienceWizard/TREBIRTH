@@ -6,7 +6,7 @@ from io import BytesIO
 import matplotlib.pyplot as plt
 from datetime import datetime
 import numpy as np
-import string as str
+import string
 import time
 import zipfile
 import os
