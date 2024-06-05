@@ -108,10 +108,11 @@ if tree_number != 'All':
     query = query.where('TreeNo', '==', int(tree_number))
 if scan_number != 'All':
     query = query.where('ScanNo', '==', int(scan_number))
+if bucket_number != 'All':
+    query = query.where('BucketID', '==', int(bucket_number))
 if label_infstat != 'All':
     query = query.where('InfStat', '==', label_infstat)
-if bucket_number != 'All':
-    query = query.where('BucketID', '==', bucket_number)
+
 
 # Get documents based on the query
 try:
