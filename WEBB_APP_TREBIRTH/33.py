@@ -155,29 +155,16 @@ else:
 
 
     # Process each scan's data individually and concatenate later
-    #def process_data(data_list, prefix):
-        #processed_list = []
-        #for i, data in enumerate(data_list):
-            #df = pd.DataFrame(data).dropna()
-            #df.fillna(df.mean(), inplace=True)
-            #new_columns = [f'{prefix}{i}']
-            #df.columns = new_columns
-            #processed_list.append(df)
-        #return pd.concat(processed_list, axis=1)
-      
     def process_data(data_list, prefix):
         processed_list = []
         for i, data in enumerate(data_list):
-            if len(data) > 0:  # Check if data is not empty
-                df = pd.DataFrame(data).dropna()
-                df.fillna(df.mean(), inplace=True)
-                new_columns = [f'{prefix}{i}']
-                df.columns = new_columns
-                processed_list.append(df)
-        if processed_list:  # Check if processed_list is not empty
-            return pd.concat(processed_list, axis=1)
-        else:
-            return pd.DataFrame()
+            df = pd.DataFrame(data).dropna()
+            df.fillna(df.mean(), inplace=True)
+            new_columns = [f'{prefix}{i}']
+            df.columns = new_columns
+            processed_list.append(df)
+        return pd.concat(processed_list, axis=1)
+      
 
     df_radar = process_data(radar_data, 'Radar ')
     df_adxl = process_data(adxl_data, 'ADXL ')
