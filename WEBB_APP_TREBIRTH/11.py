@@ -112,7 +112,7 @@ if scan_number != 'All':
 if label_infstat != 'All':
     query = query.where('InfStat', '==', label_infstat)
 if bucket_number != 'All':
-    query = query.where('BucketID', '==', str(BucketID))
+    query = query.where('BucketID', '==', str(bucket_number))
 
 # Get documents based on the query
 try:
