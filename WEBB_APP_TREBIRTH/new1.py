@@ -29,9 +29,6 @@ from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz,
                      coefHPF37Hz, coefHPF38Hz, coefHPF39Hz, coefHPF40Hz, coefHPF41Hz, coefHPF42Hz, coefHPF43Hz, 
                      coefHPF44Hz, coefHPF45Hz, coefHPF46Hz, coefHPF47Hz, coefHPF48Hz, coefHPF49Hz, coefHPF50Hz)
 
-
-
-
 def process(coef, in_signal):
     FILTERTAPS = len(coef)
     values = np.zeros(FILTERTAPS)
@@ -59,6 +56,31 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+def exponential_backoff(retries):
+    base_delay = 1
+    max_delay = 60
+    delay = base_delay * (2 ** retries) + random.uniform(0, 1)
+    return min(delay, max_delay)
+
+def get_firestore_data(query):
+    retries = 0
+    max_retries = 10
+    while retries < max_retries:
+        try:
+            results = query.stream()
+            return list(results)
+        except ResourceExhausted as e:
+            st.warning(f"Quota exceeded, retrying... (attempt {retries + 1})")
+            time.sleep(exponential_backoff(retries))
+            retries += 1
+        except RetryError as e:
+            st.warning(f"Retry error: {e}, retrying... (attempt {retries + 1})")
+            time.sleep(exponential_backoff(retries))
+            retries += 1
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
+            break
+    raise Exception("Max retries exceeded")
 
 # Authenticate to Firestore with the JSON account key.
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
@@ -67,6 +89,7 @@ db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20e
 row_number = st.text_input('Enter Row number', 'All')
 tree_number = st.text_input('Enter Tree number', 'All')
 scan_number = st.text_input('Enter Scan number', 'All')
+bucket_number = st.text_input('Enter Bucket number', 'All')
 
 # Dropdown for InfStat label selection
 label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], index=0)
@@ -84,6 +107,8 @@ if tree_number != 'All':
     query = query.where('TreeNo', '==', int(tree_number))
 if scan_number != 'All':
     query = query.where('ScanNo', '==', int(scan_number))
+if bucket_number != 'All':
+    query = query.where('BucketID', '==', int(bucket_number))
 if label_infstat != 'All':
     query = query.where('InfStat', '==', label_infstat)
 
@@ -123,6 +148,8 @@ else:
             if isinstance(value, datetime):
                 metadata[key] = value.replace(tzinfo=None)
         metadata_list.append(metadata)
+
+
 
 
     # Process each scan's data individually and concatenate later
@@ -273,3 +300,4 @@ if st.button("Download Selected Sheets"):
 
     # Trigger the download of the Excel file
     st.download_button("Download Filtered Data", filtered_excel_data, file_name=f"Filtered_{filter_type.replace(' ', '')}{frequency if filter_type != 'Band Pass Filter (BPF)' else f'{low_freq}to{high_freq}'}Hz.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-filtered-excel')
+
