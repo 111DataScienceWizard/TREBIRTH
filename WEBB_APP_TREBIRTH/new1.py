@@ -124,8 +124,6 @@ else:
                 metadata[key] = value.replace(tzinfo=None)
         metadata_list.append(metadata)
 
-    st.write("check", radar_data)
-
 
     # Process each scan's data individually and concatenate later
     def process_data(data_list, prefix):
