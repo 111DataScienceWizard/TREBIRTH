@@ -41,7 +41,7 @@ def stats_filtereddata(df, band):
     }
 
     for column in df.columns:
-        stats["Band"].append(band)
+        stats["Band"].append(f"{band} {column}")
         stats["STD"].append(np.std(df[column]))
         stats["PTP"].append(np.ptp(df[column]))
         stats["Mean"].append(np.mean(df[column]))
