@@ -267,7 +267,7 @@ else:
             filtered_data_dict[f'{low_freq}Hz-{high_freq}Hz'] = filtered_data
 
             # Calculate stats for the filtered data
-            stats_dict[f'{low_freq}Hz-{high_freq}Hz'] = stats_radar(filtered_data, f'{low_freq}Hz-{high_freq}Hz')
+            stats_dict[f'{low_freq}Hz-{high_freq}Hz'] = stats_filtereddata(filtered_data, f'{low_freq}Hz-{high_freq}Hz')
 
         # Create an Excel file with filtered data and stats
         filtered_excel_data = BytesIO()
