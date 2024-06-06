@@ -149,9 +149,6 @@ else:
                 metadata[key] = value.replace(tzinfo=None)
         metadata_list.append(metadata)
 
-
-
-
     # Process each scan's data individually and concatenate later
     def process_data(data_list, prefix):
         processed_list = []
@@ -172,9 +169,11 @@ else:
     # Concatenate all DataFrames column-wise
     df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
 
+    filtered_data_df = pd.DataFrame({col: process(coefLPF50Hz, df_combined[col].values) for col in df_combined.columns})
+
     # Detrend all the columns
     df_combined_detrended = df_combined.apply(detrend)
-
+  
     # Normalize all the columns
     df_combined_normalized = (df_combined_detrended - df_combined_detrended.min()) / (df_combined_detrended.max() - df_combined_detrended.min())
 
