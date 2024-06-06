@@ -248,7 +248,46 @@ else:
     # Download button for selected sheets and metadata
     st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
     st.write("Columns in df_combined_detrended:", df_combined_detrended.columns)
+  
+    def download_filtered_data_and_stats():
+        filtered_data_dict = {}
+        stats_dict = {}
 
+        for low_freq in range(1, 50):
+            high_freq = low_freq + 1
+            hpf_coeffs = globals()[f'coefHPF{low_freq}Hz']
+            lpf_coeffs = globals()[f'coefLPF{high_freq}Hz']
+
+            # Apply HPF first
+            filtered_data_low = pd.DataFrame({col: process(hpf_coeffs, df_combined_detrended[col].values) for col in df_combined_detrended.columns})
+
+            # Apply LPF next
+            filtered_data = pd.DataFrame({col: process(lpf_coeffs, filtered_data_low[col].values) for col in filtered_data_low.columns})
+            filtered_data_dict[f'{low_freq}Hz-{high_freq}Hz'] = filtered_data
+
+            # Calculate stats for the filtered data
+            stats_dict[f'{low_freq}Hz-{high_freq}Hz'] = stats_filtereddata(filtered_data, f'{low_freq}Hz-{high_freq}Hz')
+
+        # Create an Excel file with filtered data and stats
+        filtered_excel_data = BytesIO()
+        with pd.ExcelWriter(filtered_excel_data, engine='xlsxwriter') as writer:
+            for band, filtered_data in filtered_data_dict.items():
+                filtered_data.to_excel(writer, sheet_name=f'{band} Filtered Data', index=False)
+            for band, stats in stats_dict.items():
+                stats.to_excel(writer, sheet_name=f'{band} Stats', index=False)
+        filtered_excel_data.seek(0)
+
+        # Provide a download button for the filtered data and stats
+        st.download_button(
+            "Download All Scans Filtered (1-50Hz) and Stats",
+            filtered_excel_data,
+            file_name="Filtered_1-50Hz_and_Stats.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+
+    # Add the download button before asking the user for filter type and frequency
+    download_filtered_data_and_stats()
+  
     # Adding filter selection components
     filter_type = st.selectbox('Select Filter Type', ['Low Pass Filter (LPF)', 'High Pass Filter (HPF)', 'Band Pass Filter (BPF)'])
 
