@@ -28,6 +28,50 @@ from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz,
                      coefHPF30Hz, coefHPF31Hz, coefHPF32Hz, coefHPF33Hz, coefHPF34Hz, coefHPF35Hz, coefHPF36Hz, 
                      coefHPF37Hz, coefHPF38Hz, coefHPF39Hz, coefHPF40Hz, coefHPF41Hz, coefHPF42Hz, coefHPF43Hz, 
                      coefHPF44Hz, coefHPF45Hz, coefHPF46Hz, coefHPF47Hz, coefHPF48Hz, coefHPF49Hz, coefHPF50Hz)
+import tornado.web
+import tornado.websocket
+import tornado.ioloop
+
+class MyWebSocketHandler(tornado.websocket.WebSocketHandler):
+    def check_origin(self, origin):
+        return True  # Allow all origins (for development purposes)
+
+    async def open(self):
+        print("WebSocket opened")
+        self.write_message("Welcome to the WebSocket!")
+
+    async def on_message(self, message):
+        print("Received message:", message)
+        try:
+            # Your message processing logic here
+            response_message = process_message(message)
+            await self.safe_write_message(response_message)
+        except Exception as e:
+            print("Error processing message:", e)
+
+    async def safe_write_message(self, message):
+        try:
+            await self.write_message(message)
+        except tornado.websocket.WebSocketClosedError:
+            print("WebSocket is already closed")
+
+    def on_close(self):
+        print("WebSocket closed")
+
+def make_app():
+    return tornado.web.Application([
+        (r"/websocket", MyWebSocketHandler),
+    ])
+
+if __name__ == "__main__":
+    app = make_app()
+    app.listen(8888)
+    tornado.ioloop.IOLoop.current().start()
+
+def process_message(message):
+    # Simulated processing function
+    return f"Processed: {message}"
+
 
 def process(coef, in_signal):
     FILTERTAPS = len(coef)
