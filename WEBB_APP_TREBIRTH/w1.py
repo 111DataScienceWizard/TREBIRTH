@@ -12,7 +12,7 @@ import os
 import random
 from scipy import signal
 from scipy.stats import skew, kurtosis
-from preprocess import detrend, fq, stats_radar, columns_reports_unique
+from preprocess import detrend, fq, columns_reports_unique
 from google.api_core.exceptions import ResourceExhausted, RetryError
 from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz, coefLPF6Hz, coefLPF7Hz, coefLPF8Hz, 
                      coefLPF9Hz, coefLPF10Hz, coefLPF11Hz, coefLPF12Hz, coefLPF13Hz, coefLPF14Hz, coefLPF15Hz, 
@@ -28,6 +28,31 @@ from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz,
                      coefHPF30Hz, coefHPF31Hz, coefHPF32Hz, coefHPF33Hz, coefHPF34Hz, coefHPF35Hz, coefHPF36Hz, 
                      coefHPF37Hz, coefHPF38Hz, coefHPF39Hz, coefHPF40Hz, coefHPF41Hz, coefHPF42Hz, coefHPF43Hz, 
                      coefHPF44Hz, coefHPF45Hz, coefHPF46Hz, coefHPF47Hz, coefHPF48Hz, coefHPF49Hz, coefHPF50Hz)
+
+def stats_radar(df):
+    result_df = pd.DataFrame()
+
+    for column in df.columns:
+        std_list, ptp_list, mean_list, rms_list = [], [], [], []
+
+        std_value = np.std(df[column])
+        ptp_value = np.ptp(df[column])
+        mean_value = np.mean(df[column])
+        rms_value = np.sqrt(np.mean(df[column]**2))
+
+        std_list.append(std_value)
+        ptp_list.append(ptp_value)
+        mean_list.append(mean_value)
+        rms_list.append(rms_value)
+
+        column_result_df = pd.DataFrame({
+            "STD": std_list,
+            "PTP": ptp_value,
+            "Mean": mean_list,
+            "RMS": rms_list
+        })
+        result_df = pd.concat([result_df, column_result_df], axis=0)
+    return result_df
 
 def process(coef, in_signal):
     FILTERTAPS = len(coef)
