@@ -28,49 +28,9 @@ from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz,
                      coefHPF30Hz, coefHPF31Hz, coefHPF32Hz, coefHPF33Hz, coefHPF34Hz, coefHPF35Hz, coefHPF36Hz, 
                      coefHPF37Hz, coefHPF38Hz, coefHPF39Hz, coefHPF40Hz, coefHPF41Hz, coefHPF42Hz, coefHPF43Hz, 
                      coefHPF44Hz, coefHPF45Hz, coefHPF46Hz, coefHPF47Hz, coefHPF48Hz, coefHPF49Hz, coefHPF50Hz)
-import tornado.web
-import tornado.websocket
-import tornado.ioloop
 
-class MyWebSocketHandler(tornado.websocket.WebSocketHandler):
-    def check_origin(self, origin):
-        return True  # Allow all origins (for development purposes)
 
-    async def open(self):
-        print("WebSocket opened")
-        self.write_message("Welcome to the WebSocket!")
 
-    async def on_message(self, message):
-        print("Received message:", message)
-        try:
-            # Your message processing logic here
-            response_message = process_message(message)
-            await self.safe_write_message(response_message)
-        except Exception as e:
-            print("Error processing message:", e)
-
-    async def safe_write_message(self, message):
-        try:
-            await self.write_message(message)
-        except tornado.websocket.WebSocketClosedError:
-            print("WebSocket is already closed")
-
-    def on_close(self):
-        print("WebSocket closed")
-
-def make_app():
-    return tornado.web.Application([
-        (r"/websocket", MyWebSocketHandler),
-    ])
-
-if __name__ == "__main__":
-    app = make_app()
-    app.listen(8888)
-    tornado.ioloop.IOLoop.current().start()
-
-def process_message(message):
-    # Simulated processing function
-    return f"Processed: {message}"
 
 
 def process(coef, in_signal):
@@ -100,32 +60,6 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
-def exponential_backoff(retries):
-    base_delay = 1
-    max_delay = 60
-    delay = base_delay * (2 ** retries) + random.uniform(0, 1)
-    return min(delay, max_delay)
-
-def get_firestore_data(query):
-    retries = 0
-    max_retries = 10
-    while retries < max_retries:
-        try:
-            results = query.stream()
-            return list(results)
-        except ResourceExhausted as e:
-            st.warning(f"Quota exceeded, retrying... (attempt {retries + 1})")
-            time.sleep(exponential_backoff(retries))
-            retries += 1
-        except RetryError as e:
-            st.warning(f"Retry error: {e}, retrying... (attempt {retries + 1})")
-            time.sleep(exponential_backoff(retries))
-            retries += 1
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
-            break
-    raise Exception("Max retries exceeded")
 
 # Authenticate to Firestore with the JSON account key.
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
