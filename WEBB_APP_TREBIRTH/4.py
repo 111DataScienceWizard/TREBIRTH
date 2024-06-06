@@ -29,6 +29,28 @@ from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz,
                      coefHPF37Hz, coefHPF38Hz, coefHPF39Hz, coefHPF40Hz, coefHPF41Hz, coefHPF42Hz, coefHPF43Hz, 
                      coefHPF44Hz, coefHPF45Hz, coefHPF46Hz, coefHPF47Hz, coefHPF48Hz, coefHPF49Hz, coefHPF50Hz)
 
+def stats_filtereddata(df, band):
+    stats = {
+        "Band": [],
+        "STD": [],
+        "PTP": [],
+        "Mean": [],
+        "RMS": [],
+        "Skew": [],
+        "Kurtosis": []
+    }
+
+    for column in df.columns:
+        stats["Band"].append(band)
+        stats["STD"].append(np.std(df[column]))
+        stats["PTP"].append(np.ptp(df[column]))
+        stats["Mean"].append(np.mean(df[column]))
+        stats["RMS"].append(np.sqrt(np.mean(df[column]**2)))
+        stats["Skew"].append(skew(df[column]))
+        stats["Kurtosis"].append(kurtosis(df[column]))
+
+    return pd.DataFrame(stats)
+
 def process(coef, in_signal):
     FILTERTAPS = len(coef)
     values = np.zeros(FILTERTAPS)
