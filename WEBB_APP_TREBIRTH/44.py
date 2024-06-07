@@ -177,7 +177,7 @@ else:
         for i, data in enumerate(data_list):
             df = pd.DataFrame(data).dropna()
             df.fillna(df.mean(), inplace=True)
-            new_columns = [f'{prefix}{i}']
+            new_columns = [f'{prefix}{i+1}']
             df.columns = new_columns
             processed_list.append(df)
         return pd.concat(processed_list, axis=1)
