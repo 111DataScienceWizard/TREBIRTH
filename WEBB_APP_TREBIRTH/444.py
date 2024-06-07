@@ -320,8 +320,8 @@ else:
 
     # Add data for each scan to the filtered columns dictionary
     for i in range(10):  # Assuming there are 10 scans
-        filtered_radar_columns[f'Radar {i+1}'] = df_combined_detrended[f'Radar {i}']
-        filtered_adxl_columns[f'ADXL {i+1}'] = df_combined_detrended[f'ADXL {i}']
+        filtered_radar_columns[f'Radar {i+1}'] = df_combined_detrended[f'Radar {i+1}']
+        filtered_adxl_columns[f'ADXL {i+1}'] = df_combined_detrended[f'ADXL {i+1}']
 
     # Apply the process function on each column
     if filter_type == 'Band Pass Filter (BPF)':
