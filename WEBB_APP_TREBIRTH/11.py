@@ -31,6 +31,15 @@ from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz,
 
 
 
+# Function to initialize session state variables
+def initialize_session_state():
+    if 'filter_button_clicked' not in st.session_state:
+        st.session_state.filter_button_clicked = False
+    if 'customize_button_clicked' not in st.session_state:
+        st.session_state.customize_button_clicked = False
+      
+initialize_session_state()
+
 def process(coef, in_signal):
     FILTERTAPS = len(coef)
     values = np.zeros(FILTERTAPS)
