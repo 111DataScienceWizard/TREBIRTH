@@ -30,7 +30,8 @@ from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz,
                      coefHPF44Hz, coefHPF45Hz, coefHPF46Hz, coefHPF47Hz, coefHPF48Hz, coefHPF49Hz, coefHPF50Hz)
 
 
-
+filtered_data_dict = {}
+stats_dict = {}
 # Function to initialize session state variables
 def initialize_session_state():
     if 'filter_button_clicked' not in st.session_state:
