@@ -29,22 +29,6 @@ from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz,
                      coefHPF37Hz, coefHPF38Hz, coefHPF39Hz, coefHPF40Hz, coefHPF41Hz, coefHPF42Hz, coefHPF43Hz, 
                      coefHPF44Hz, coefHPF45Hz, coefHPF46Hz, coefHPF47Hz, coefHPF48Hz, coefHPF49Hz, coefHPF50Hz)
 
-def calculate_statistics(df):
-
-    df = df.apply(pd.to_numeric, errors='coerce')
-    df.fillna(df.mean(), inplace=True)
-    stats = {
-        'Mean': df.mean(),
-        'Median': df.median(),
-        'Std Deviation': df.std(),
-        'PTP': df.apply(lambda x: np.ptp(x)),
-        'Skewness': skew(df),
-        'Kurtosis': kurtosis(df),
-        'Min': df.min(),
-        'Max': df.max()
-    }
-    stats_df = pd.DataFrame(stats)
-    return stats_df
 
 def stats_filtereddata(df, band):
     stats = {
@@ -254,7 +238,7 @@ else:
         if 'Metadata' in selected_sheets:
             df_metadata_filtered.to_excel(writer, sheet_name='Metadata', index=False)
         if 'Time Domain Features' in selected_sheets:
-            time_domain_features = calculate_statistics(df_combined_detrended)
+            time_domain_features = stats_radar(df_combined_detrended)
             time_domain_features.to_excel(writer, sheet_name='Time Domain Features', index=False)
         if 'Frequency Domain Features' in selected_sheets:
             frequencies, powers = fq(df_combined_detrended)
