@@ -229,16 +229,6 @@ else:
     st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
     st.write("Columns in df_combined_detrended:", df_combined_detrended.columns)
 
-    # Button to trigger filtering
-    if st.button('Filter Data'):
-        st.session_state.filter_button_clicked = True
-        st.session_state.customize_button_clicked = False
-
-    # Button to trigger customization of filters
-    if st.button('Customize Filters'):
-        st.session_state.customize_button_clicked = True
-
-    if st.session_state.filter_button_clicked:
         def download_filtered_data_and_stats():
             filtered_data_dict = {}
             stats_dict = {}
@@ -278,13 +268,6 @@ else:
         # Add the download button before asking the user for filter type and frequency
         download_filtered_data_and_stats()
 
-    if st.session_state.customize_button_clicked:
-    st.write("Customize filter options here.")
-    # Add your customized filter options and processing here
-
-    if st.button('Apply Customized Filters'):
-        # Implement customized filter logic
-        st.write("Customized filters applied.")
     # Adding filter selection components
     filter_type = st.selectbox('Select Filter Type', ['Low Pass Filter (LPF)', 'High Pass Filter (HPF)', 'Band Pass Filter (BPF)'])
 
