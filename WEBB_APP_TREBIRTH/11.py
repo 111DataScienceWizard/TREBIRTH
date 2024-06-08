@@ -284,9 +284,8 @@ else:
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
-       # Add the download button before asking the user for filter type and frequency
-       download_filtered_data_and_stats()
-       pass
+        # Add the download button before asking the user for filter type and frequency
+        download_filtered_data_and_stats()
 
     if st.session_state.customize_button_clicked:
         st.write("Customize filter options here.")
