@@ -26,10 +26,11 @@ def stats_radar(df):
     result_df = pd.DataFrame()
 
     for column in df.columns:
-        std_list, ptp_list, median_list, mean_list, Skewness_list, Kurtosis_list, Min_list, Max_list = [], [], [], [], [], [], [], []
+        column_list, std_list, ptp_list, median_list, mean_list, Skewness_list, Kurtosis_list, Min_list, Max_list = [], [], [], [], [], [], [], [], []
         df[column] = pd.to_numeric(df[column], errors='coerce')
         df[column].fillna(df[column].mean(), inplace=True)
 
+        
         std_value = np.std(df[column])
         ptp_value = np.ptp(df[column])
         mean_value = np.mean(df[column])
@@ -40,6 +41,7 @@ def stats_radar(df):
         Max_value = np.max(df[column])
         #rms_value = np.sqrt(np.mean(df[column]**2))
 
+        column_list.append(f"{column}")
         std_list.append(std_value)
         ptp_list.append(ptp_value)
         median_list.append(median_value)
@@ -51,6 +53,7 @@ def stats_radar(df):
         Max_list.append(Max_value)
         
         column_result_df = pd.DataFrame({
+            "Column": column_list,
             "STD Deviation": std_list,
             "PTP": ptp_value,
             "Mean": mean_list,
@@ -63,6 +66,32 @@ def stats_radar(df):
         })
         result_df = pd.concat([result_df, column_result_df], axis=0)
     return result_df
+    
+def stats_filtereddata(df, band):
+    stats = {
+        "Band": [],
+        "STD": [],
+        "PTP": [],
+        "Mean": [],
+        "RMS": [],
+        "Skew": [],
+        "Kurtosis": []
+    }
+
+    for column in df.columns:
+        # Ensure the column is numeric and handle NaN values
+        df[column] = pd.to_numeric(df[column], errors='coerce')
+        df[column].fillna(df[column].mean(), inplace=True)
+      
+        stats["Band"].append(f"{band} {column}")
+        stats["STD"].append(np.std(df[column]))
+        stats["PTP"].append(np.ptp(df[column]))
+        stats["Mean"].append(np.mean(df[column]))
+        stats["RMS"].append(np.sqrt(np.mean(df[column]**2)))
+        stats["Skew"].append(skew(df[column]))
+        stats["Kurtosis"].append(kurtosis(df[column]))
+
+    return pd.DataFrame(stats)
 
 # Define function to compare columns
 def columns_reports_unique(df):
