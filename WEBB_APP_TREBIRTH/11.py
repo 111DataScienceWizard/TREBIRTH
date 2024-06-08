@@ -165,7 +165,7 @@ else:
         processed_list = []
         for i, data in enumerate(data_list):
             df = pd.DataFrame(data).dropna()
-            df.fillna(df.mean(), inplace=True)
+            df[column] = df[column].fillna(df[column].mean())
             new_columns = [f'{prefix}{i+1}']
             df.columns = new_columns
             processed_list.append(df)
@@ -246,7 +246,7 @@ else:
     # Button to trigger customization of filters
     if st.button('Customize Filters'):
         st.session_state.customize_button_clicked = True
-
+       
     if st.session_state.filter_button_clicked:
         def download_filtered_data_and_stats():
             filtered_data_dict = {}
@@ -284,8 +284,9 @@ else:
             mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         )
 
-    # Add the download button before asking the user for filter type and frequency
-    download_filtered_data_and_stats()
+       # Add the download button before asking the user for filter type and frequency
+       download_filtered_data_and_stats()
+       pass
 
     if st.session_state.customize_button_clicked:
         st.write("Customize filter options here.")
