@@ -239,24 +239,24 @@ else:
         st.session_state.customize_button_clicked = True
 
     if st.session_state.filter_button_clicked:
-    def download_filtered_data_and_stats():
-        filtered_data_dict = {}
-        stats_dict = {}
+        def download_filtered_data_and_stats():
+            filtered_data_dict = {}
+            stats_dict = {}
 
-        for low_freq in range(1, 50):
-            high_freq = low_freq + 1
-            hpf_coeffs = globals()[f'coefHPF{low_freq}Hz']
-            lpf_coeffs = globals()[f'coefLPF{high_freq}Hz']
+            for low_freq in range(1, 50):
+                high_freq = low_freq + 1
+                hpf_coeffs = globals()[f'coefHPF{low_freq}Hz']
+                lpf_coeffs = globals()[f'coefLPF{high_freq}Hz']
 
-            # Apply HPF first
-            filtered_data_low = pd.DataFrame({col: process(hpf_coeffs, df_combined_detrended[col].values) for col in df_combined_detrended.columns})
+                # Apply HPF first
+                filtered_data_low = pd.DataFrame({col: process(hpf_coeffs, df_combined_detrended[col].values) for col in df_combined_detrended.columns})
 
-            # Apply LPF next
-            filtered_data = pd.DataFrame({col: process(lpf_coeffs, filtered_data_low[col].values) for col in filtered_data_low.columns})
-            filtered_data_dict[f'{low_freq}Hz-{high_freq}Hz'] = filtered_data
+                # Apply LPF next
+                filtered_data = pd.DataFrame({col: process(lpf_coeffs, filtered_data_low[col].values) for col in filtered_data_low.columns})
+                filtered_data_dict[f'{low_freq}Hz-{high_freq}Hz'] = filtered_data
 
-            # Calculate stats for the filtered data
-            stats_dict[f'{low_freq}Hz-{high_freq}Hz'] = stats_filtereddata(filtered_data, f'{low_freq}Hz-{high_freq}Hz')
+                # Calculate stats for the filtered data
+                stats_dict[f'{low_freq}Hz-{high_freq}Hz'] = stats_filtereddata(filtered_data, f'{low_freq}Hz-{high_freq}Hz')
 
         # Create an Excel file with filtered data and stats
         filtered_excel_data = BytesIO()
@@ -279,12 +279,13 @@ else:
     download_filtered_data_and_stats()
 
     if st.session_state.customize_button_clicked:
-    st.write("Customize filter options here.")
-    # Add your customized filter options and processing here
+        st.write("Customize filter options here.")
+        # Add your customized filter options and processing here
 
     if st.button('Apply Customized Filters'):
         # Implement customized filter logic
         st.write("Customized filters applied.")
+      
     # Adding filter selection components
     filter_type = st.selectbox('Select Filter Type', ['Low Pass Filter (LPF)', 'High Pass Filter (HPF)', 'Band Pass Filter (BPF)'])
 
