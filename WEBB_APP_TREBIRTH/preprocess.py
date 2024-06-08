@@ -31,7 +31,7 @@ def stats_radar(df):
         df[column].fillna(df[column].mean(), inplace=True)
 
         std_value = np.std(df[column])
-        ptp_value = np.ptp(df[column]))
+        ptp_value = np.ptp(df[column])
         mean_value = np.mean(df[column])
         median_value = np.median(df[column])
         Skewness_value = skew(df[column])
