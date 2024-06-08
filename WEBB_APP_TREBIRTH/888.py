@@ -12,7 +12,7 @@ import os
 import random
 from scipy import signal
 from scipy.stats import skew, kurtosis
-from preprocess import detrend, fq, stats_radar, columns_reports_unique
+from preprocess import detrend, fq, stats_radar, columns_reports_unique, stats_filtereddata
 from google.api_core.exceptions import ResourceExhausted, RetryError
 from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz, coefLPF6Hz, coefLPF7Hz, coefLPF8Hz, 
                      coefLPF9Hz, coefLPF10Hz, coefLPF11Hz, coefLPF12Hz, coefLPF13Hz, coefLPF14Hz, coefLPF15Hz, 
@@ -30,31 +30,6 @@ from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz,
                      coefHPF44Hz, coefHPF45Hz, coefHPF46Hz, coefHPF47Hz, coefHPF48Hz, coefHPF49Hz, coefHPF50Hz)
 
 
-def stats_filtereddata(df, band):
-    stats = {
-        "Band": [],
-        "STD": [],
-        "PTP": [],
-        "Mean": [],
-        "RMS": [],
-        "Skew": [],
-        "Kurtosis": []
-    }
-
-    for column in df.columns:
-        # Ensure the column is numeric and handle NaN values
-        df[column] = pd.to_numeric(df[column], errors='coerce')
-        df[column].fillna(df[column].mean(), inplace=True)
-      
-        stats["Band"].append(f"{band} {column}")
-        stats["STD"].append(np.std(df[column]))
-        stats["PTP"].append(np.ptp(df[column]))
-        stats["Mean"].append(np.mean(df[column]))
-        stats["RMS"].append(np.sqrt(np.mean(df[column]**2)))
-        stats["Skew"].append(skew(df[column]))
-        stats["Kurtosis"].append(kurtosis(df[column]))
-
-    return pd.DataFrame(stats)
 
 def process(coef, in_signal):
     FILTERTAPS = len(coef)
