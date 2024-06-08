@@ -26,23 +26,40 @@ def stats_radar(df):
     result_df = pd.DataFrame()
 
     for column in df.columns:
-        std_list, ptp_list, mean_list, rms_list = [], [], [], []
+        std_list, ptp_list, median_list, mean_list, Skewness_list, Kurtosis_list, Min_list, Max_list = [], [], [], [], [], [], [], []
+        df[column] = pd.to_numeric(df[column], errors='coerce')
+        df[column].fillna(df[column].mean(), inplace=True)
 
         std_value = np.std(df[column])
-        ptp_value = np.ptp(df[column])
+        ptp_value = np.ptp(df[column]))
         mean_value = np.mean(df[column])
-        rms_value = np.sqrt(np.mean(df[column]**2))
+        median_value = np.median(df[column])
+        Skewness_value = skew(df[column])
+        Kurtosis_value = kurtosis(df[column])
+        Min_value = np.min(df[column])
+        Max_value = np.max(df[column])
+        #rms_value = np.sqrt(np.mean(df[column]**2))
 
         std_list.append(std_value)
         ptp_list.append(ptp_value)
+        median_list.append(median_value)
+        #rms_list.append(rms_value)
         mean_list.append(mean_value)
-        rms_list.append(rms_value)
-
+        Skewness_list.append(Skewness_value)
+        Kurtosis_list.append(Kurtosis_value)
+        Min_list.append(Min_value)
+        Max_list.append(Max_value)
+        
         column_result_df = pd.DataFrame({
-            "STD": std_list,
+            "STD Deviation": std_list,
             "PTP": ptp_value,
             "Mean": mean_list,
-            "RMS": rms_list
+            "Median": median_list,
+            "Skewness": Skewness_list,
+            "Kurtosis": Kurtosis_list,
+            "Min": Min_list,
+            "Max": Max_list
+            #"RMS": rms_list
         })
         result_df = pd.concat([result_df, column_result_df], axis=0)
     return result_df
