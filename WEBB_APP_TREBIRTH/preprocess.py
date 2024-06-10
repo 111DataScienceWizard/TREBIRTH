@@ -66,7 +66,24 @@ def stats_radar(df):
         })
         result_df = pd.concat([result_df, column_result_df], axis=0)
     return result_df
-    
+def calculate_statistics(df):
+
+    df = df.apply(pd.to_numeric, errors='coerce')
+    df.fillna(df.mean(), inplace=True)
+    stats = {
+        'Column': (f"{column}"),
+        'Mean': df.mean(),
+        'Median': df.median(),
+        'Std Deviation': df.std(),
+        'PTP': df.apply(lambda x: np.ptp(x)),
+        'Skewness': skew(df),
+        'Kurtosis': kurtosis(df),
+        'Min': df.min(),
+        'Max': df.max()
+    }
+    stats_df = pd.DataFrame(stats)
+    return stats_df
+
 def stats_filtereddata(df, band):
     stats = {
         "Band": [],
