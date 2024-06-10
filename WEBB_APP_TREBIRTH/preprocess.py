@@ -66,6 +66,7 @@ def stats_radar(df):
         })
         result_df = pd.concat([result_df, column_result_df], axis=0)
     return result_df
+    
 def calculate_statistics(df):
 
     df = df.apply(pd.to_numeric, errors='coerce')
