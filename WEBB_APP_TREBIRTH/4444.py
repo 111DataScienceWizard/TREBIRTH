@@ -133,17 +133,18 @@ else:
     metadata_list = []
 
     # Function to slice data
-    def slice_data(data):
-        if len(data) > 1000:
-            return data[100:-100]
-        return data
+    #def slice_data(data):
+        #if len(data) > 1000:
+            #return data[100:-100]
+        #return data
 
     for doc in query_results:
-        radar_data.append(slice_data(doc.get('RadarRaw', [])))
-        adxl_data.append(slice_data(doc.get('ADXLRaw', [])))
-        ax_data.append(slice_data(doc.get('Ax', [])))
-        ay_data.append(slice_data(doc.get('Ay', [])))
-        az_data.append(slice_data(doc.get('Az', [])))
+        radar_data.append(doc.get('RadarRaw', []))
+        #adxl_data.append(slice_data(doc.get('ADXLRaw', [])))
+        adxl_data.append(doc.get('ADXLRaw', []))
+        ax_data.append(doc.get('Ax', []))
+        ay_data.append(doc.get('Ay', []))
+        az_data.append(doc.get('Az', []))
         metadata = doc
         # Convert datetime values to timezone-unaware
         for key, value in metadata.items():
