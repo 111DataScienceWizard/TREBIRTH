@@ -214,7 +214,7 @@ else:
         if 'Metadata' in selected_sheets:
             df_metadata_filtered.to_excel(writer, sheet_name='Metadata', index=False)
         if 'Time Domain Features' in selected_sheets:
-            time_domain_features = calculate_statistics(df_combined_detrended)
+            time_domain_features = calculate_statistics(df_combined)
             time_domain_features.to_excel(writer, sheet_name='Time Domain Features', index=False)
         if 'Frequency Domain Features' in selected_sheets:
             frequencies, powers = fq(df_combined_detrended)
