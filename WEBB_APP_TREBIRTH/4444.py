@@ -12,7 +12,7 @@ import os
 import random
 from scipy import signal
 from scipy.stats import skew, kurtosis
-from preprocess import detrend, fq, stats_radar, columns_reports_unique, stats_filtereddata
+from preprocess import detrend, fq, stats_radar, columns_reports_unique, stats_filtereddata, calculate_statistics
 from google.api_core.exceptions import ResourceExhausted, RetryError
 from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz, coefLPF6Hz, coefLPF7Hz, coefLPF8Hz, 
                      coefLPF9Hz, coefLPF10Hz, coefLPF11Hz, coefLPF12Hz, coefLPF13Hz, coefLPF14Hz, coefLPF15Hz, 
@@ -213,7 +213,7 @@ else:
         if 'Metadata' in selected_sheets:
             df_metadata_filtered.to_excel(writer, sheet_name='Metadata', index=False)
         if 'Time Domain Features' in selected_sheets:
-            time_domain_features = stats_radar(df_combined_detrended)
+            time_domain_features = calculate_statistics(df_combined_detrended)
             time_domain_features.to_excel(writer, sheet_name='Time Domain Features', index=False)
         if 'Frequency Domain Features' in selected_sheets:
             frequencies, powers = fq(df_combined_detrended)
