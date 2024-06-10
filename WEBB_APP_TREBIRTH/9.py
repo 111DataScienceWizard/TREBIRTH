@@ -172,7 +172,7 @@ else:
     # Concatenate all DataFrames column-wise
     df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
 
-    filtered_data_df = pd.DataFrame({col: process(coefLPF50Hz, df_combined[col].values) for col in df_combined.columns})
+    #filtered_data_df = pd.DataFrame({col: process(coefLPF50Hz, df_combined[col].values) for col in df_combined.columns})
 
     # Detrend all the columns
     df_combined_detrended = df_combined.apply(detrend)
