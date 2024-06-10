@@ -72,7 +72,7 @@ def calculate_statistics(df):
     df = df.apply(pd.to_numeric, errors='coerce')
     df.fillna(df.mean(), inplace=True)
     stats = {
-        'Column': (f"{df.columns}"),
+        'Column': df.columns,
         'Mean': df.mean(),
         'Median': df.median(),
         'Std Deviation': df.std(),
