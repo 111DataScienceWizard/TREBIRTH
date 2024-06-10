@@ -100,7 +100,7 @@ label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], ind
 selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Columns Comparison'], default=['Raw Data', 'Metadata'])
 
 # Create a reference to the Firestore collection
-query = db.collection('DevOps')
+query = db.collection('M1V6_SS_Testing')
 
 # Apply filters based on user input
 if row_number != 'All':
@@ -183,7 +183,7 @@ else:
     df_metadata = pd.DataFrame(metadata_list)
 
     # Select only the desired columns
-    desired_columns = ['TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
+    desired_columns = ['DeviceName', 'TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
     df_metadata_filtered = df_metadata[desired_columns]
 
     # Construct file name based on user inputs
@@ -295,7 +295,7 @@ else:
     filtered_adxl_columns = {}
 
     # Add data for each scan to the filtered columns dictionary
-    for i in range(10):  # Assuming there are 10 scans
+    for i in range(30):  # Assuming there are 10 scans
         filtered_radar_columns[f'Radar {i+1}'] = df_combined_detrended[f'Radar {i+1}']
         filtered_adxl_columns[f'ADXL {i+1}'] = df_combined_detrended[f'ADXL {i+1}']
 
