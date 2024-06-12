@@ -110,7 +110,7 @@ if tree_number != 'All':
 if scan_number != 'All':
     query = query.where('ScanNo', '==', int(scan_number))
 if bucket_number != 'All':
-    query = query.where('BucketID', '==', int(bucket_number))
+    query = query.where('BucketID', '==', str(bucket_number))
 if label_infstat != 'All':
     query = query.where('InfStat', '==', label_infstat)
 
