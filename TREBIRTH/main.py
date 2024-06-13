@@ -10,6 +10,7 @@ import time
 import zipfile
 import os
 import random
+import json
 from scipy import signal
 from scipy.stats import skew, kurtosis
 from preprocess import detrend, fq, calculate_statistics, columns_reports_unique, stats_filtereddata
@@ -30,6 +31,19 @@ from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz,
                      coefHPF44Hz, coefHPF45Hz, coefHPF46Hz, coefHPF47Hz, coefHPF48Hz, coefHPF49Hz, coefHPF50Hz)
 
 
+# Read the credentials from Streamlit secrets
+creds = {
+    "type": st.secrets["firestore"]["type"],
+    "project_id": st.secrets["firestore"]["project_id"],
+    "private_key_id": st.secrets["firestore"]["private_key_id"],
+    "private_key": st.secrets["firestore"]["private_key"].replace("\\n", "\n"),  # Ensure the newlines are correctly interpreted
+    "client_email": st.secrets["firestore"]["client_email"],
+    "client_id": st.secrets["firestore"]["client_id"],
+    "auth_uri": st.secrets["firestore"]["auth_uri"],
+    "token_uri": st.secrets["firestore"]["token_uri"],
+    "auth_provider_x509_cert_url": st.secrets["firestore"]["auth_provider_x509_cert_url"],
+    "client_x509_cert_url": st.secrets["firestore"]["client_x509_cert_url"]
+}
 
 def process(coef, in_signal):
     FILTERTAPS = len(coef)
@@ -85,7 +99,8 @@ def get_firestore_data(query):
     raise Exception("Max retries exceeded")
 
 # Authenticate to Firestore with the JSON account key.
-db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
+#db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
+db = firestore.Client.from_service_account_info(creds)
 
 # User input for Row No., Tree No., Scan No., and Label
 row_number = st.text_input('Enter Row number', 'All')
