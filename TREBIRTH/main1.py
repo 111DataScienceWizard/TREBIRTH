@@ -30,6 +30,8 @@ from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz,
                      coefHPF37Hz, coefHPF38Hz, coefHPF39Hz, coefHPF40Hz, coefHPF41Hz, coefHPF42Hz, coefHPF43Hz, 
                      coefHPF44Hz, coefHPF45Hz, coefHPF46Hz, coefHPF47Hz, coefHPF48Hz, coefHPF49Hz, coefHPF50Hz)
 
+st.set_page_config(layout="wide")
+
 # Predefined credentials
 VALID_USERNAME = "TREBIRTH"
 VALID_PASSWORD = "MUKUND"
@@ -82,7 +84,6 @@ def show_login_page():
 
 # Function to show main content
 def show_main_page():
-    st.set_page_config(layout="wide")
     st.title('Data Analytics')
     st.markdown(
         """
