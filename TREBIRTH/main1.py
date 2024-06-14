@@ -36,7 +36,7 @@ VALID_PASSWORD = "password123"
 
 # Function to check login credentials
 def check_login(username, password):
-    return username == VALID_USERNAME and password == VALID_PASSWORD
+    return username == TREBIRTH and password == MUKUND
 
 # Read the credentials from Streamlit secrets
 creds = {
