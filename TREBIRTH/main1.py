@@ -31,8 +31,8 @@ from Filters import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz,
                      coefHPF44Hz, coefHPF45Hz, coefHPF46Hz, coefHPF47Hz, coefHPF48Hz, coefHPF49Hz, coefHPF50Hz)
 
 # Predefined credentials
-VALID_USERNAME = "admin"
-VALID_PASSWORD = "password123"
+VALID_USERNAME = "TREBIRTH"
+VALID_PASSWORD = "MUKUND"
 
 # Function to check login credentials
 def check_login(username, password):
