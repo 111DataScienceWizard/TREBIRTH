@@ -266,77 +266,84 @@ else:
         )
 
     # Add the download button before asking the user for filter type and frequency
-    download_filtered_data_and_stats()
+    #download_filtered_data_and_stats()
 
-    # Adding filter selection components
-    filter_type = st.selectbox('Select Filter Type', ['Low Pass Filter (LPF)', 'High Pass Filter (HPF)', 'Band Pass Filter (BPF)'])
+    def filter_data_and_download():
+        filter_type = st.selectbox('Select Filter Type', ['Low Pass Filter (LPF)', 'High Pass Filter (HPF)', 'Band Pass Filter (BPF)'])
 
-    if filter_type == 'Band Pass Filter (BPF)':
-        low_freq, high_freq = st.slider('Select Frequency Range (Hz)', 1, 50, (5, 10))
-    else:
-        frequency = st.slider('Select Frequency (Hz)', 1, 50)
+        if filter_type == 'Band Pass Filter (BPF)':
+            low_freq, high_freq = st.slider('Select Frequency Range (Hz)', 1, 50, (5, 10))
+        else:
+            frequency = st.slider('Select Frequency (Hz)', 1, 50)
 
-    # Map selected filter type and frequency to the corresponding coefficients
-    if filter_type == 'Low Pass Filter (LPF)':
-        filter_coef = globals()[f'coefLPF{frequency}Hz']
-    elif filter_type == 'High Pass Filter (HPF)':
-        filter_coef = globals()[f'coefHPF{frequency}Hz']
-    elif filter_type == 'Band Pass Filter (BPF)':
-        filter_coef_low = globals()[f'coefHPF{low_freq}Hz']
-        filter_coef_high = globals()[f'coefLPF{high_freq}Hz']
+        # Map selected filter type and frequency to the corresponding coefficients
+        if filter_type == 'Low Pass Filter (LPF)':
+            filter_coef = globals()[f'coefLPF{frequency}Hz']
+        elif filter_type == 'High Pass Filter (HPF)':
+            filter_coef = globals()[f'coefHPF{frequency}Hz']
+        elif filter_type == 'Band Pass Filter (BPF)':
+            filter_coef_low = globals()[f'coefHPF{low_freq}Hz']
+            filter_coef_high = globals()[f'coefLPF{high_freq}Hz']
 
-    # Apply the selected filter only to Radar and ADXL columns
-    # List to hold all Radar and ADXL column names
-    radar_columns = [f'Radar {i}' for i in range(30)]  # Assuming there are 10 scans
-    adxl_columns = [f'ADXL {i}' for i in range(30)]  # Assuming there are 10 scans
+        # Apply the selected filter only to Radar and ADXL columns
+        # List to hold all Radar and ADXL column names
+        radar_columns = [f'Radar {i}' for i in range(30)]  # Assuming there are 10 scans
+        adxl_columns = [f'ADXL {i}' for i in range(30)]  # Assuming there are 10 scans
 
-    # Dictionary to hold the filtered data columns for Radar and ADXL
-    filtered_radar_columns = {}
-    filtered_adxl_columns = {}
+        # Dictionary to hold the filtered data columns for Radar and ADXL
+        filtered_radar_columns = {}
+        filtered_adxl_columns = {}
 
-    # Add data for each scan to the filtered columns dictionary
-    for i in range(10):  # Assuming there are 10 scans
-        filtered_radar_columns[f'Radar {i+1}'] = df_combined_detrended[f'Radar {i+1}']
-        filtered_adxl_columns[f'ADXL {i+1}'] = df_combined_detrended[f'ADXL {i+1}']
+        # Add data for each scan to the filtered columns dictionary
+        for i in range(10):  # Assuming there are 10 scans
+            filtered_radar_columns[f'Radar {i+1}'] = df_combined_detrended[f'Radar {i+1}']
+            filtered_adxl_columns[f'ADXL {i+1}'] = df_combined_detrended[f'ADXL {i+1}']
 
-    # Apply the process function on each column
-    if filter_type == 'Band Pass Filter (BPF)':
-        filtered_radar_data_low = pd.DataFrame({col: process(filter_coef_low, data.values) for col, data in filtered_radar_columns.items()})
-        filtered_radar_data = pd.DataFrame({col: process(filter_coef_high, data.values) for col, data in filtered_radar_data_low.items()})
-        filtered_adxl_data_low = pd.DataFrame({col: process(filter_coef_low, data.values) for col, data in filtered_adxl_columns.items()})
-        filtered_adxl_data = pd.DataFrame({col: process(filter_coef_high, data.values) for col, data in filtered_adxl_data_low.items()})
-    else:
-        filtered_radar_data = pd.DataFrame({col: process(filter_coef, data.values) for col, data in filtered_radar_columns.items()})
-        filtered_adxl_data = pd.DataFrame({col: process(filter_coef, data.values) for col, data in filtered_adxl_columns.items()})
+        # Apply the process function on each column
+        if filter_type == 'Band Pass Filter (BPF)':
+            filtered_radar_data_low = pd.DataFrame({col: process(filter_coef_low, data.values) for col, data in filtered_radar_columns.items()})
+            filtered_radar_data = pd.DataFrame({col: process(filter_coef_high, data.values) for col, data in filtered_radar_data_low.items()})
+            filtered_adxl_data_low = pd.DataFrame({col: process(filter_coef_low, data.values) for col, data in filtered_adxl_columns.items()})
+            filtered_adxl_data = pd.DataFrame({col: process(filter_coef_high, data.values) for col, data in filtered_adxl_data_low.items()})
+        else:
+            filtered_radar_data = pd.DataFrame({col: process(filter_coef, data.values) for col, data in filtered_radar_columns.items()})
+            filtered_adxl_data = pd.DataFrame({col: process(filter_coef, data.values) for col, data in filtered_adxl_columns.items()})
 
-filtered_data = pd.concat([filtered_radar_data, filtered_adxl_data], axis=1)
+        filtered_data = pd.concat([filtered_radar_data, filtered_adxl_data], axis=1)
 
-# Multi-select box to select desired sheets
-selected_sheets = st.multiselect('Select Sheets to Download', ['Filtered Data', 'Time Domain Features', 'Columns Comparison'])
+        # Multi-select box to select desired sheets
+        selected_sheets = st.multiselect('Select Sheets to Download', ['Filtered Data', 'Time Domain Features', 'Columns Comparison'])
 
-# Add a button to trigger the download
-if st.button("Download Selected Sheets"):
-    # Prepare the Excel file with selected sheets
-    filtered_excel_data = BytesIO()
-    with pd.ExcelWriter(filtered_excel_data, engine='xlsxwriter') as writer:
-        for sheet_name in selected_sheets:
-            # Write each selected sheet to the Excel file
-            if sheet_name == 'Filtered Data':
-                # Write filtered data to the sheet
-                filtered_data.to_excel(writer, sheet_name=sheet_name, index=False)
-            elif sheet_name == 'Time Domain Features':
-                # Apply the time domain features on the filtered data
-                time_domain_features_filtered = stats_radar(filtered_data)
-                # Write time domain features data to the sheet
-                time_domain_features_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
-            elif sheet_name == 'Columns Comparison':
-                # Apply the columns comparison on the filtered data
-                columns_comparison_filtered = columns_reports_unique(filtered_data)
-                # Write column comparison data to the sheet
-                columns_comparison_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
+        # Add a button to trigger the download
+        if st.button("Download Selected Sheets"):
+            # Prepare the Excel file with selected sheets
+            filtered_excel_data = BytesIO()
+            with pd.ExcelWriter(filtered_excel_data, engine='xlsxwriter') as writer:
+                for sheet_name in selected_sheets:
+                    # Write each selected sheet to the Excel file
+                    if sheet_name == 'Filtered Data':
+                        # Write filtered data to the sheet
+                        filtered_data.to_excel(writer, sheet_name=sheet_name, index=False)
+                    elif sheet_name == 'Time Domain Features':
+                        # Apply the time domain features on the filtered data
+                        time_domain_features_filtered = stats_radar(filtered_data)
+                        # Write time domain features data to the sheet
+                        time_domain_features_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
+                    elif sheet_name == 'Columns Comparison':
+                        # Apply the columns comparison on the filtered data
+                        columns_comparison_filtered = columns_reports_unique(filtered_data)
+                        # Write column comparison data to the sheet
+                        columns_comparison_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
 
-    # Set the pointer to the beginning of the file
-    filtered_excel_data.seek(0)
+            # Set the pointer to the beginning of the file
+            filtered_excel_data.seek(0)
 
-    # Trigger the download of the Excel file
-    st.download_button("Download Filtered Data", filtered_excel_data, file_name=f"Filtered_{filter_type.replace(' ', '')}{frequency if filter_type != 'Band Pass Filter (BPF)' else f'{low_freq}to{high_freq}'}Hz.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-filtered-excel')
+            # Trigger the download of the Excel file
+            st.download_button("Download Filtered Data", filtered_excel_data, file_name=f"Filtered_{filter_type.replace(' ', '')}{frequency if filter_type != 'Band Pass Filter (BPF)' else f'{low_freq}to{high_freq}'}Hz.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-filtered-excel')
+
+    # Add buttons to trigger the functions
+    if st.button("Run First Session of Code"):
+        download_filtered_data_and_stats()
+
+    if st.button("Run Second Session of Code"):
+        filter_data_and_download()
