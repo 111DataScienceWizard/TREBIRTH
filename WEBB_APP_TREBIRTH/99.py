@@ -198,7 +198,7 @@ else:
     # Convert index data to DataFrame if present
     if index_data:
         df_index = pd.DataFrame(index_data)
-
+        df_index_long = df_index.apply(pd.Series.explode)
     # Construct file name based on user inputs
     file_name_parts = []
     if row_number != 'All':
@@ -236,7 +236,7 @@ else:
             columns_comparison = columns_reports_unique(df_combined_detrended)
             columns_comparison.to_excel(writer, sheet_name='Columns Comparison', index=False)
         if 'Index Data' in selected_sheets and index_data:
-            df_index.to_excel(writer, sheet_name='Index Data', index=False)
+            df_index_long.to_excel(writer, sheet_name='Index Data', index=False)
           
     excel_data.seek(0)
 
