@@ -97,7 +97,7 @@ bucket_number = st.text_input('Enter Bucket number', 'All')
 label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], index=0)
 
 # Dropdown for selecting sheets in Excel
-selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Columns Comparison'], default=['Raw Data', 'Metadata'])
+selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Index Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Columns Comparison'], default=['Raw Data', 'Metadata'])
 
 # Create a reference to the Firestore collection
 query = db.collection('M1V6_SS_Testing')
@@ -131,7 +131,7 @@ else:
     ay_data = []
     az_data = []
     metadata_list = []
-
+    index_data = []
     # Function to slice data
     #def slice_data(data):
         #if len(data) > 1000:
@@ -151,7 +151,15 @@ else:
             if isinstance(value, datetime):
                 metadata[key] = value.replace(tzinfo=None)
         metadata_list.append(metadata)
-
+        
+        # Append index data if present
+        if all(field in doc for field in ['IndexAx', 'IndexAy', 'IndexAz', 'IndexRadar']):
+            index_data.append({
+                'IndexAx': doc['IndexAx'],
+                'IndexAy': doc['IndexAy'],
+                'IndexAz': doc['IndexAz'],
+                'IndexRadar': doc['IndexRadar']
+            })
     # Process each scan's data individually and concatenate later
     def process_data(data_list, prefix):
         processed_list = []
@@ -186,6 +194,10 @@ else:
     # Select only the desired columns
     desired_columns = ['DeviceName:', 'TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
     df_metadata_filtered = df_metadata[desired_columns]
+
+    # Convert index data to DataFrame if present
+    if index_data:
+        df_index = pd.DataFrame(index_data)
 
     # Construct file name based on user inputs
     file_name_parts = []
@@ -223,7 +235,9 @@ else:
         if 'Columns Comparison' in selected_sheets:
             columns_comparison = columns_reports_unique(df_combined_detrended)
             columns_comparison.to_excel(writer, sheet_name='Columns Comparison', index=False)
-
+        if 'Index Data' in selected_sheets and index_data:
+            df_index.to_excel(writer, sheet_name='Index Data', index=False)
+          
     excel_data.seek(0)
 
     # Download button for selected sheets and metadata
