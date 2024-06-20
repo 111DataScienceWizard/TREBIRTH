@@ -199,7 +199,30 @@ else:
     if index_data:
         df_index = pd.DataFrame(index_data)
         df_index_long = df_index.apply(pd.Series.explode)
-  
+
+    # Function to debug and handle duplicate index issue
+    def explode_and_handle_duplicates(df):
+        try:
+            # Attempt to apply explode directly
+            return df.apply(pd.Series.explode)
+        except ValueError as e:
+            if 'duplicate labels' in str(e):
+                st.error(f"Duplicate index labels encountered: {e}")
+                # Reset the index and try again
+                return df.reset_index(drop=True).apply(pd.Series.explode)
+            else:
+                raise
+
+    # Main processing function
+    def main():
+    # Your existing code...
+    # Convert index data to DataFrame if present
+        if index_data:
+            df_index = pd.DataFrame(index_data)
+            st.write("Original df_index:", df_index)  # Debug statement
+            df_index_long = explode_and_handle_duplicates(df_index)
+            st.write("Exploded df_index_long:", df_index_long)  # Debug statement
+
     # Check for duplicate columns in the index data and handle them
     """if index_data:
         df_index = pd.DataFrame(index_data)
@@ -255,3 +278,6 @@ else:
     # Download button for selected sheets and metadata
     st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
     st.write("Columns in df_combined_detrended:", df_combined_detrended.columns)
+
+if __name__ == "__main__":
+    main()
