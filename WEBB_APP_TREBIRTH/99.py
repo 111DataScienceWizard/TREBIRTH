@@ -195,10 +195,10 @@ else:
     desired_columns = ['DeviceName:', 'TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
     df_metadata_filtered = df_metadata[desired_columns]
 
-    # Convert index data to DataFrame if present
+    """# Convert index data to DataFrame if present
     if index_data:
         df_index = pd.DataFrame(index_data)
-        df_index_long = df_index.apply(pd.Series.explode)
+        df_index_long = df_index.apply(pd.Series.explode)"""
 
     # Function to debug and handle duplicate index issue
     def explode_and_handle_duplicates(df):
