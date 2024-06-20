@@ -207,7 +207,9 @@ else:
         # Reset index before applying explode
         df_index = df_index.reset_index(drop=True)
         #Explode each column individually to avoid reindexing issues
-        df_index_exploded = pd.concat([df_index[col].explode() for col in df_index.columns], axis=1)
+        exploded_columns = [df_index[col].explode().reset_index(drop=True) for col in df_index.columns]
+        # Concatenate exploded columns
+        df_index_exploded = pd.concat(exploded_columns, axis=1)
         # Reset index after explode to ensure no duplicate labels
         df_index_long = df_index_exploded.reset_index(drop=True)
   
