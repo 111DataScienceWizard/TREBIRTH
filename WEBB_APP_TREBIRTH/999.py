@@ -200,7 +200,7 @@ else:
         #df_index = pd.DataFrame(index_data)
         #df_index_long = df_index.apply(pd.Series.explode)
       
-    Convert index data to DataFrame if present
+    #Convert index data to DataFrame if present
     #Check for duplicate columns in the index data and handle them
     if index_data:
         df_index = pd.DataFrame(index_data)
