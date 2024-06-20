@@ -199,9 +199,6 @@ else:
     if index_data:
         df_index = pd.DataFrame(index_data)
         df_index_long = df_index.apply(pd.Series.explode)
-    
-    # Reset index after explode to ensure no duplicate labels
-    df_index_long = df_index_exploded.reset_index(drop=True)
   
     # Check for duplicate columns in the index data and handle them
     """if index_data:
