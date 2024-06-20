@@ -199,6 +199,21 @@ else:
     if index_data:
         df_index = pd.DataFrame(index_data)
         df_index_long = df_index.apply(pd.Series.explode)
+    
+    # Reset index after explode to ensure no duplicate labels
+    df_index_long = df_index_exploded.reset_index(drop=True)
+  
+    # Check for duplicate columns in the index data and handle them
+    """if index_data:
+        df_index = pd.DataFrame(index_data)
+        # Reset index before applying explode
+        df_index = df_index.reset_index(drop=True)
+        #Explode each column individually to avoid reindexing issues
+        df_index_exploded = pd.concat([df_index[col].explode() for col in df_index.columns], axis=1)
+    
+    # Reset index after explode to ensure no duplicate labels
+    df_index_long = df_index_exploded.reset_index(drop=True)"""
+  
     # Construct file name based on user inputs
     file_name_parts = []
     if row_number != 'All':
