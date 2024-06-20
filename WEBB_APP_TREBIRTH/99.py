@@ -195,10 +195,10 @@ else:
     desired_columns = ['DeviceName:', 'TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
     df_metadata_filtered = df_metadata[desired_columns]
 
-    """# Convert index data to DataFrame if present
+    # Convert index data to DataFrame if present
     if index_data:
         df_index = pd.DataFrame(index_data)
-        df_index_long = df_index.apply(pd.Series.explode)"""
+        df_index_long = df_index.apply(pd.Series.explode)
 
     # Function to debug and handle duplicate index issue
     def explode_and_handle_duplicates(df):
@@ -224,15 +224,15 @@ else:
             st.write("Exploded df_index_long:", df_index_long)  # Debug statement
 
     # Check for duplicate columns in the index data and handle them
-    """if index_data:
-        df_index = pd.DataFrame(index_data)
+    #if index_data:
+       # df_index = pd.DataFrame(index_data)
         # Reset index before applying explode
-        df_index = df_index.reset_index(drop=True)
+        #df_index = df_index.reset_index(drop=True)
         #Explode each column individually to avoid reindexing issues
-        df_index_exploded = pd.concat([df_index[col].explode() for col in df_index.columns], axis=1)
+       # df_index_exploded = pd.concat([df_index[col].explode() for col in df_index.columns], axis=1)
     
     # Reset index after explode to ensure no duplicate labels
-    df_index_long = df_index_exploded.reset_index(drop=True)"""
+    #df_index_long = df_index_exploded.reset_index(drop=True)
   
     # Construct file name based on user inputs
     file_name_parts = []
