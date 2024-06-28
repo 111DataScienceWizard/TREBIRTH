@@ -134,7 +134,7 @@ else:
     index_data = []
     # Function to slice data
     def slice_data(data):
-        if len(data) > 1000:
+        #if len(data) > 1000:
             return data[55:-55]
         return data
 
