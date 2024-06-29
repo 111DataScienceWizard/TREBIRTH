@@ -134,9 +134,9 @@ else:
     index_data = []
     # Function to slice data
     def slice_data(data):
-        #if len(data) > 1000:
-        return data[55:-55]
-        #return data
+        if len(data) > 200:
+            return data[55:-55]
+        return data
 
     for doc in query_results:
         radar_data.append(slice_data(doc.get('RadarRaw', [])))
