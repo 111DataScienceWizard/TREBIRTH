@@ -164,7 +164,7 @@ else:
     def process_data(data_list, prefix):
         processed_list = []
         for i, data in enumerate(data_list):
-            df = pd.DataFrame(data).dropna()
+            df = pd.DataFrame(data)
             df.fillna(df.mean(), inplace=True)
             new_columns = [f'{prefix}{i+1}']
             df.columns = new_columns
