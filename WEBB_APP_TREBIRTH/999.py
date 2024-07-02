@@ -196,7 +196,7 @@ else:
         for i, (data, index) in enumerate(zip(data_list, index_list)):
             if len(data) != 999:
                 missing_packets = 999 - len(data)
-                if missing_packets > 100:
+                if missing_packets > 200:
                     st.write(f"Data packets are lost for {prefix}{i+1}. Please retake the scan.")
                     continue
                 else:
