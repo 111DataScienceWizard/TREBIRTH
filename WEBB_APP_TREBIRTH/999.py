@@ -202,7 +202,7 @@ else:
                 else:
                     data = insert_missing_packets([data], [index])[0]
             df = pd.DataFrame(data)
-            df.fillna(df.mean(), inplace=True)
+            df.fillna(df.median(), inplace=True)
             new_columns = [f'{prefix}{i+1}']
             df.columns = new_columns
             processed_list.append(df)
