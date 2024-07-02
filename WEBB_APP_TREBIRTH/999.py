@@ -162,74 +162,22 @@ else:
             })
 
 
-
-    # Function to check and insert missing data packets
-    def insert_missing_packets(data_list, index_list, packet_size=5, total_packets=200):
-        complete_data_list = []
-        for data, index in zip(data_list, index_list):
-            df_data = pd.DataFrame(data)
-            df_index = pd.Series(index)
-            
-            # Calculate expected indexes
-            expected_indexes = list(range(total_packets))
-            
-            # Identify missing packets
-            missing_indexes = list(set(expected_indexes) - set(df_index))
-            
-            # Insert NaN rows for missing packets
-            for mi in missing_indexes:
-                start_pos = mi * packet_size
-                end_pos = (mi + 1) * packet_size
-                insert_df = pd.DataFrame(np.nan, index=range(start_pos, end_pos), columns=df_data.columns)
-                df_data = pd.concat([df_data.iloc[:start_pos], insert_df, df_data.iloc[start_pos:]]).reset_index(drop=True)
-            
-            # Ensure the final length is correct
-            df_data = df_data.iloc[:total_packets * packet_size]
-            
-            complete_data_list.append(df_data)
-        
-        return complete_data_list
-
-    # Function to process data and check for missing packets
-    def process_and_check_data(data_list, index_list, prefix):
+    Process each scan's data individually and concatenate later
+    def process_data(data_list, prefix):
         processed_list = []
-        for i, (data, index) in enumerate(zip(data_list, index_list)):
-            if len(data) != 999:
-                missing_packets = 999 - len(data)
-                if missing_packets > 200:
-                    st.write(f"Data packets are lost for {prefix}{i+1}. Please retake the scan.")
-                    continue
-                else:
-                    data = insert_missing_packets([data], [index])[0]
+        for i, data in enumerate(data_list):
             df = pd.DataFrame(data)
             df.fillna(df.median(), inplace=True)
             new_columns = [f'{prefix}{i+1}']
             df.columns = new_columns
             processed_list.append(df)
-        return pd.concat(processed_list, axis=1) if processed_list else pd.DataFrame()
+        return pd.concat(processed_list, axis=1)
 
-    df_radar = process_and_check_data(radar_data, [idx['IndexRadar'] for idx in index_data], 'Radar ')
-    df_adxl = process_and_check_data(adxl_data, [idx['IndexAx'] for idx in index_data], 'ADXL ')
-    df_ax = process_and_check_data(ax_data, [idx['IndexAx'] for idx in index_data], 'Ax ')
-    df_ay = process_and_check_data(ay_data, [idx['IndexAy'] for idx in index_data], 'Ay ')
-    df_az = process_and_check_data(az_data, [idx['IndexAz'] for idx in index_data], 'Az ')
-
-    # Process each scan's data individually and concatenate later
-    #def process_data(data_list, prefix):
-        #processed_list = []
-        #for i, data in enumerate(data_list):
-            #df = pd.DataFrame(data)
-            #df.fillna(df.mean(), inplace=True)
-            #new_columns = [f'{prefix}{i+1}']
-            #df.columns = new_columns
-            #processed_list.append(df)
-        #return pd.concat(processed_list, axis=1)
-
-    #df_radar = process_data(radar_data, 'Radar ')
-    #df_adxl = process_data(adxl_data, 'ADXL ')
-    #df_ax = process_data(ax_data, 'Ax ')
-    #df_ay = process_data(ay_data, 'Ay ')
-    #df_az = process_data(az_data, 'Az ')
+    df_radar = process_data(radar_data, 'Radar ')
+    df_adxl = process_data(adxl_data, 'ADXL ')
+    df_ax = process_data(ax_data, 'Ax ')
+    df_ay = process_data(ay_data, 'Ay ')
+    df_az = process_data(az_data, 'Az ')
 
     # Concatenate all DataFrames column-wise
     df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
