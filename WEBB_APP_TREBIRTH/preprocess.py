@@ -70,7 +70,7 @@ def stats_radar(df):
 def calculate_statistics(df):
 
     df = df.apply(pd.to_numeric, errors='coerce')
-    df.fillna(df.mean(), inplace=True)
+    df.fillna(df.median(), inplace=True)
     stats = {
         'Column': df.columns,
         'Mean': df.mean(),
