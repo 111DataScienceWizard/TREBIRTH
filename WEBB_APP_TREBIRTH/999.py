@@ -97,7 +97,7 @@ bucket_number = st.text_input('Enter Bucket number', 'All')
 label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], index=0)
 
 # Dropdown for selecting sheets in Excel
-selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Index Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Columns Comparison'], default=['Raw Data', 'Metadata'])
+selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Index Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Frequency Domain Stats', 'Columns Comparison'], default=['Raw Data', 'Metadata'])
 
 # Create a reference to the Firestore collection
 query = db.collection('M1V6_GoldStandard')
@@ -294,9 +294,20 @@ else:
             time_domain_features = calculate_statistics(df_combined)
             time_domain_features.to_excel(writer, sheet_name='Time Domain Features', index=False)
         if 'Frequency Domain Features' in selected_sheets:
-            frequencies, powers = fq(df_combined)
+            radar_columns = [col for col in df_combined.columns if 'Radar' in col]
+            df_radar_data = df_combined[radar_columns]
+            frequencies, powers = fq(df_radar_data)
+            #frequencies, powers = fq(df_combined)
             frequencies.to_excel(writer, sheet_name='Frequencies', index=False)
             powers.to_excel(writer, sheet_name='Powers', index=False)
+        if 'Frequency Domain Stats' in selected_sheets:
+            radar_columns = [col for col in df_combined.columns if 'Radar' in col]
+            df_radar_data = df_combined[radar_columns]
+            frequencies, powers = fq(df_radar_data)
+            frequencies_stats = calculate_statistics(frequencies)
+            powers_stats = calculate_statistics(powers)
+            frequencies_stats.to_excel(writer, sheet_name='Frequencies Stats', index=False)
+            powers_stats.to_excel(writer, sheet_name='Power Stats', index=False)
         if 'Columns Comparison' in selected_sheets:
             columns_comparison = columns_reports_unique(df_combined_detrended)
             columns_comparison.to_excel(writer, sheet_name='Columns Comparison', index=False)
