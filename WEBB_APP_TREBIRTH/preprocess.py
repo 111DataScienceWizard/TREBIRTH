@@ -13,6 +13,8 @@ def fq(df):
     frequencies = []
     powers = []
 
+    print("Data inside fq function:")
+    print(df.head())  # Debugging output
     for i in df.columns:
         try:
             f, p = signal.welch(df[i], 100, 'flattop', 1024, scaling='spectrum')
@@ -73,7 +75,7 @@ def stats_radar(df):
     
 def calculate_statistics(df):
     df = df.apply(pd.to_numeric, errors='coerce')
-    df.fillna(df.mean(), inplace=True)
+    df.fillna(df.median(), inplace=True)
     stats = {
         'Column': df.columns,
         'Mean': df.mean(),
