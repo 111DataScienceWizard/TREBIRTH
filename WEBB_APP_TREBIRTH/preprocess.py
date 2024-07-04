@@ -13,16 +13,10 @@ def fq(df):
     frequencies = []
     powers = []
 
-    print("Data inside fq function:")
-    print(df.head())  # Debugging output
     for i in df.columns:
-        try:
-            f, p = signal.welch(df[i], 100, 'flattop', 850, scaling='spectrum')
-            frequencies.append(f[1:])
-            powers.append(p[1:])
-            print(f'Column: {i}, Frequencies: {f[1:10]}, Powers: {p[1:10]}')  # Debugging output
-        except Exception as e:
-            print(f'Error processing column {i}: {e}')
+        f, p = signal.welch(df[i], 100, 'flattop', 850, scaling='spectrum')
+        frequencies.append(f[1:])
+        powers.append(p[1:])
 
     frequencies_df = pd.DataFrame(frequencies).transpose()
     powers_df = pd.DataFrame(powers).transpose()
