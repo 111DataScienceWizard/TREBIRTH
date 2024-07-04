@@ -296,20 +296,15 @@ else:
         if 'Frequency Domain Features' in selected_sheets:
             radar_columns = [col for col in df_combined.columns if 'Radar' in col]
             df_radar_data = df_combined[radar_columns]
-            file_numbers = [f"T{row_number}R{tree_number}S{scan_number}"] * df_radar_data.shape[1]  
-            frequencies, powers = fq(df_radar_data)
             #frequencies, powers = fq(df_combined)
             frequencies.to_excel(writer, sheet_name='Frequencies', index=False)
             powers.to_excel(writer, sheet_name='Powers', index=False)
         if 'Frequency Domain Stats' in selected_sheets:
             radar_columns = [col for col in df_combined.columns if 'Radar' in col]
             df_radar_data = df_combined[radar_columns]
-            file_numbers = [f"T{row_number}R{tree_number}S{scan_number}"] * df_radar_data.shape[1]
             frequencies, powers = fq(df_radar_data)
             frequencies_stats = calculate_statistics(frequencies)
-            frequencies_stats.columns = file_numbers
             powers_stats = calculate_statistics(powers)
-            powers_stats.columns = file_numbers
             frequencies_stats.to_excel(writer, sheet_name='Frequencies Stats', index=False)
             powers_stats.to_excel(writer, sheet_name='Power Stats', index=False)
         if 'Columns Comparison' in selected_sheets:
