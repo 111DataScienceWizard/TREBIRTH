@@ -15,11 +15,11 @@ def fq(df):
 
     for i in df.columns:
         f, p = signal.welch(df[i], 100, 'flattop', 1024, scaling='spectrum')
-        frequencies.append(f)
-        powers.append(p)
+        frequencies.append(f[1:])
+        powers.append(p[1:])
 
-    frequencies_df = pd.DataFrame(frequencies)
-    powers_df = pd.DataFrame(powers)
+    frequencies_df = pd.DataFrame(frequencies).transpose()
+    powers_df = pd.DataFrame(powers).transpose()
     return frequencies_df, powers_df
 
 def stats_radar(df):
@@ -69,7 +69,7 @@ def stats_radar(df):
     
 def calculate_statistics(df):
     df = df.apply(pd.to_numeric, errors='coerce')
-    df.fillna(df.median(), inplace=True)
+    df.fillna(df.mean(), inplace=True)
     stats = {
         'Column': df.columns,
         'Mean': df.mean(),
