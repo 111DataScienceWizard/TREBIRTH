@@ -294,7 +294,7 @@ else:
             time_domain_features = calculate_statistics(df_combined)
             time_domain_features.to_excel(writer, sheet_name='Time Domain Features', index=False)
         if 'Frequency Domain Features' in selected_sheets:
-            frequencies, powers = fq(df_combined_detrended)
+            frequencies, powers = fq(df_combined)
             frequencies.to_excel(writer, sheet_name='Frequencies', index=False)
             powers.to_excel(writer, sheet_name='Powers', index=False)
         if 'Columns Comparison' in selected_sheets:
