@@ -296,8 +296,6 @@ else:
         if 'Frequency Domain Features' in selected_sheets:
             radar_columns = [col for col in df_combined.columns if 'Radar' in col]
             df_radar_data = df_combined[radar_columns]
-            print("Dat being passed to fq function:")
-            print(df_radar_data.head())
             frequencies, powers = fq(df_radar_data)
             #frequencies, powers = fq(df_combined)
             frequencies.to_excel(writer, sheet_name='Frequencies', index=False)
@@ -305,8 +303,6 @@ else:
         if 'Frequency Domain Stats' in selected_sheets:
             radar_columns = [col for col in df_combined.columns if 'Radar' in col]
             df_radar_data = df_combined[radar_columns]
-            print("Dat being passed to fq function:")
-            print(df_radar_data.head())
             frequencies, powers = fq(df_radar_data)
             frequencies_stats = calculate_statistics(frequencies)
             powers_stats = calculate_statistics(powers)
@@ -322,7 +318,3 @@ else:
 
     # Download button for selected sheets and metadata
     st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
-    st.write("Columns in df_combined_detrended:", df_combined_detrended.columns)
-    st.write("Columns in df_combined:", df_combined.columns)
-    st.write("First few rows of df_combined:")
-    st.write(df_combined.head())
