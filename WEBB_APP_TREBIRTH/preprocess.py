@@ -13,7 +13,7 @@ def fq(df):
     frequencies = []
     powers = []
 
-    for i in df.columns:
+    for col in df.columns:
         f, p = signal.welch(df[col], 100, 'flattop', 1024, scaling='spectrum')
         #print(f'Column: {col}, Frequencies: {f[1:10]}, Powers: {p[1:10]}')
         frequencies.append(f[1:])
