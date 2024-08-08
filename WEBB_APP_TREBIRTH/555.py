@@ -100,7 +100,7 @@ label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], ind
 selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Index Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Frequency Domain Stats', 'Columns Comparison'], default=['Raw Data', 'Metadata'])
 
 # Create a reference to the Firestore collection
-query = db.collection('M1V6_SS_Testing')
+query = db.collection('DevOps')
 
 # Apply filters based on user input
 if row_number != 'All':
@@ -193,8 +193,8 @@ else:
     df_metadata = pd.DataFrame(metadata_list)
 
     # Select only the desired columns
-    desired_columns = ['DeviceName:', 'TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
-    #desired_columns = ['TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
+    #desired_columns = ['DeviceName:', 'TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
+    desired_columns = ['TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
     df_metadata_filtered = df_metadata[desired_columns]
 
     #Convert index data to DataFrame if present
@@ -204,16 +204,7 @@ else:
       
     #Convert index data to DataFrame if present
     #Check for duplicate columns in the index data and handle them
-    if index_data:
-        df_index = pd.DataFrame(index_data)
-        # Reset index before applying explode
-        df_index = df_index.reset_index(drop=True)
-        #Explode each column individually to avoid reindexing issues
-        exploded_columns = [df_index[col].explode().reset_index(drop=True) for col in df_index.columns]
-        # Concatenate exploded columns
-        df_index_exploded = pd.concat(exploded_columns, axis=1)
-        # Reset index after explode to ensure no duplicate labels
-        df_index_long = df_index_exploded.reset_index(drop=True)
+   
   
     # Construct file name based on user inputs
     file_name_parts = []
@@ -261,8 +252,6 @@ else:
         if 'Columns Comparison' in selected_sheets:
             columns_comparison = columns_reports_unique(df_combined_detrended)
             columns_comparison.to_excel(writer, sheet_name='Columns Comparison', index=False)
-        if 'Index Data' in selected_sheets and index_data:
-            df_index_long.to_excel(writer, sheet_name='Index Data', index=False)
           
     excel_data.seek(0)
 
