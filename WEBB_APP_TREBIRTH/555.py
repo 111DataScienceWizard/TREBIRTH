@@ -100,7 +100,7 @@ label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], ind
 selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Index Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Frequency Domain Stats', 'Columns Comparison'], default=['Raw Data', 'Metadata'])
 
 # Create a reference to the Firestore collection
-query = db.collection('DevOps')
+query = db.collection('DevMode')
 
 # Apply filters based on user input
 if row_number != 'All':
@@ -127,11 +127,8 @@ else:
     # Create empty lists to store data
     radar_data = []
     adxl_data = []
-    ax_data = []
-    ay_data = []
-    az_data = []
     metadata_list = []
-    index_data = []
+    
     # Function to slice data
     def slice_data(data):
         if len(data) > 200:
@@ -142,9 +139,6 @@ else:
         radar_data.append(slice_data(doc.get('RadarRaw', [])))
         #adxl_data.append(slice_data(doc.get('ADXLRaw', [])))
         adxl_data.append(slice_data(doc.get('ADXLRaw', [])))
-        ax_data.append(slice_data(doc.get('Ax', [])))
-        ay_data.append(slice_data(doc.get('Ay', [])))
-        az_data.append(slice_data(doc.get('Az', [])))
         metadata = doc
         # Convert datetime values to timezone-unaware
         for key, value in metadata.items():
@@ -152,16 +146,6 @@ else:
                 metadata[key] = value.replace(tzinfo=None)
         metadata_list.append(metadata)
         
-        # Append index data if present
-        if all(field in doc for field in ['IndexAx', 'IndexAy', 'IndexAz', 'IndexRadar']):
-            index_data.append({
-                'IndexAx': doc['IndexAx'],
-                'IndexAy': doc['IndexAy'],
-                'IndexAz': doc['IndexAz'],
-                'IndexRadar': doc['IndexRadar']
-            })
-
-   
     def process_data(data_list, prefix):
         processed_list = []
         for i, data in enumerate(data_list):
@@ -174,13 +158,11 @@ else:
 
     df_radar = process_data(radar_data, 'Radar ')
     df_adxl = process_data(adxl_data, 'ADXL ')
-    df_ax = process_data(ax_data, 'Ax ')
-    df_ay = process_data(ay_data, 'Ay ')
-    df_az = process_data(az_data, 'Az ')
+   
 
     # Concatenate all DataFrames column-wise
-    df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
-    #df_combined = pd.concat([df_radar, df_adxl], axis=1)
+    #df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
+    df_combined = pd.concat([df_radar, df_adxl], axis=1)
     #filtered_data_df = pd.DataFrame({col: process(coefLPF50Hz, df_combined[col].values) for col in df_combined.columns})
 
     # Detrend all the columns
