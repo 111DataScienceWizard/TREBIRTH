@@ -1,66 +1,75 @@
 import streamlit as st
 from google.cloud import firestore
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
+from datetime import datetime
+import numpy as np
 
-# Initialize Firestore
-db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
-
-# Set page layout and title
 st.set_page_config(layout="wide")
 st.title('Farm Analytics')
 
-# Dropdown for selecting a Firestore collection
-collection_name = st.selectbox('Select Collection', [
-    'testing', 'TechDemo', 'Plot1', 'Mr.Arjun', 'M1V6_SS_Testing', 
-    'M1V6_GoldStandard', 'DevOps', 'DevMode', 'debugging'
-])
+# Initialize Firestore client
+db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
 
-# Dropdown for selecting a row number
-row_number = st.text_input('Enter Row number', '')
+# Collection selection dropdown
+collections = ['testing', 'TechDemo', 'Plot1', 'Mr.Arjun', 'M1V6_SS_Testing', 'M1V6_GoldStandard', 'DevOps', 'DevMode', 'debugging']
+selected_collections = st.multiselect('Select Collection(s)', collections, default=['testing'])
 
-# Ensure that a collection and row number are selected
-if collection_name and row_number:
-    try:
-        # Query Firestore based on selected collection and row number
-        query = db.collection(collection_name).where('RowNo', '==', int(row_number))
-        query_results = [doc.to_dict() for doc in query.stream()]
-    except Exception as e:
-        st.error(f"Failed to retrieve data: {e}")
-        st.stop()
+# Get all timestamps from selected collections
+timestamps = []
+for collection in selected_collections:
+    docs = db.collection(collection).stream()
+    for doc in docs:
+        data = doc.to_dict()
+        timestamps.append(data['timestamp'])
 
-    if not query_results:
-        st.write("No data found matching the specified criteria.")
-    else:
-        # Initialize counters for Infected and Healthy statuses
-        infected_count = 0
-        healthy_count = 0
+# Remove time components and duplicates, then sort by date
+timestamps = sorted(list(set([ts.date() for ts in timestamps])))
 
-        # Count the number of Infected and Healthy scans
-        for doc in query_results:
-            inf_status = doc.get('InfStat', 'Healthy')
-            if inf_status == 'Infected':
-                infected_count += 1
-            elif inf_status == 'Healthy':
-                healthy_count += 1
+# Create a date range slider
+min_date, max_date = min(timestamps), max(timestamps)
+selected_date_range = st.slider('Select Date Range', min_value=min_date, max_value=max_date, value=(min_date, max_date), format="YYYY MMM DD")
 
-        # Prepare data for pie chart
-        labels = ['Infected', 'Healthy']
-        sizes = [infected_count, healthy_count]
-        colors = ['#ff9999','#66b3ff']
-        
-        # Plot the pie chart
+# Filter data by selected date range
+filtered_data = []
+for collection in selected_collections:
+    docs = db.collection(collection).where('timestamp', '>=', datetime.combine(selected_date_range[0], datetime.min.time())).where('timestamp', '<=', datetime.combine(selected_date_range[1], datetime.max.time())).stream()
+    for doc in docs:
+        filtered_data.append(doc.to_dict())
+
+# Analyze and plot data
+if filtered_data:
+    # Aggregate data for pie charts
+    for collection in selected_collections:
+        healthy_count = sum(1 for d in filtered_data if d['InfStat'] == 'Healthy' and d['Collection'] == collection)
+        infected_count = sum(1 for d in filtered_data if d['InfStat'] == 'Infected' and d['Collection'] == collection)
+        total_scans = healthy_count + infected_count
+
+        # Plot pie chart for the collection
         fig, ax = plt.subplots()
-        ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
-        ax.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-        plt.title(f'Infection Status for Row {row_number} in {collection_name} Collection')
-
-        # Display the pie chart
+        ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
+        ax.axis('equal')
         st.pyplot(fig)
 
-        # Display the counts
-        st.write(f"Total Scans: {infected_count + healthy_count}")
-        st.write(f"Infected: {infected_count}")
-        st.write(f"Healthy: {healthy_count}")
+        # Display stats
+        st.write(f"**{collection} Collection Stats:**")
+        st.write(f"Total Scans: {total_scans}")
+        st.write(f"Infected Scans: {infected_count}")
+        st.write(f"Healthy Scans: {healthy_count}")
+
+    # Combined pie chart for all selected collections
+    combined_healthy = sum(1 for d in filtered_data if d['InfStat'] == 'Healthy')
+    combined_infected = sum(1 for d in filtered_data if d['InfStat'] == 'Infected')
+
+    fig, ax = plt.subplots()
+    ax.pie([combined_healthy, combined_infected], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
+    ax.axis('equal')
+    st.pyplot(fig)
+
+    # Display combined stats
+    st.write(f"**Combined Collection Stats:**")
+    st.write(f"Total Scans: {len(filtered_data)}")
+    st.write(f"Infected Scans: {combined_infected}")
+    st.write(f"Healthy Scans: {combined_healthy}")
 else:
-    st.write("Please select a collection and enter a plot number.")
+    st.write("No data found for the selected date range.")
