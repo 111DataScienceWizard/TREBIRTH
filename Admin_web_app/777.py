@@ -1,8 +1,7 @@
 import streamlit as st
 from google.cloud import firestore
-import pandas as pd
-import matplotlib.pyplot as plt
 from datetime import datetime
+import matplotlib.pyplot as plt
 import numpy as np
 
 st.set_page_config(layout="wide")
@@ -28,13 +27,13 @@ timestamps = sorted(list(set([ts.date() for ts in timestamps])))
 
 # Check if there are multiple dates available
 if len(timestamps) > 1:
-    # Create a date range slider
+    # Create a date range slider for multiple dates
     min_date, max_date = min(timestamps), max(timestamps)
     selected_date_range = st.slider('Select Date Range', min_value=min_date, max_value=max_date, value=(min_date, max_date), format="YYYY MMM DD")
 else:
-    # Only one date available, so use that directly
-    st.write("Only one date available in the selected collections.")
-    selected_date_range = (timestamps[0], timestamps[0])
+    # Only one date available, so use a single-pointer slider
+    st.write("Only one date available:")
+    selected_date_range = st.slider('Select Date', min_value=timestamps[0], max_value=timestamps[0], value=timestamps[0], format="YYYY MMM DD")
 
 # Filter data by selected date range
 filtered_data = []
