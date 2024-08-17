@@ -10,3 +10,10 @@ plotly
 pydeck 
 Pillow
 datetime
+joblib==1.3.2
+scikit-learn==1.2.2
+protobuf==3.20.*
+xlsxwriter==3.0.1
+openpyxl
+matplotlib
+scipy>=1.7.1
