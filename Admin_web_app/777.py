@@ -26,9 +26,15 @@ for collection in selected_collections:
 # Remove time components and duplicates, then sort by date
 timestamps = sorted(list(set([ts.date() for ts in timestamps])))
 
-# Create a date range slider
-min_date, max_date = min(timestamps), max(timestamps)
-selected_date_range = st.slider('Select Date Range', min_value=min_date, max_value=max_date, value=(min_date, max_date), format="YYYY MMM DD")
+# Check if there are multiple dates available
+if len(timestamps) > 1:
+    # Create a date range slider
+    min_date, max_date = min(timestamps), max(timestamps)
+    selected_date_range = st.slider('Select Date Range', min_value=min_date, max_value=max_date, value=(min_date, max_date), format="YYYY MMM DD")
+else:
+    # Only one date available, so use that directly
+    st.write("Only one date available in the selected collections.")
+    selected_date_range = (timestamps[0], timestamps[0])
 
 # Filter data by selected date range
 filtered_data = []
