@@ -11,6 +11,7 @@ import zipfile
 import os
 import random
 from google.api_core.exceptions import ResourceExhausted, RetryError
+from collections import defaultdict
 
 
 def exponential_backoff(retries):
@@ -46,50 +47,74 @@ db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20e
 st.set_page_config(layout="wide")
 st.title('Farm Analytics')
 
-# Collection dropdown
+# Collection names
 collections = ['testing', 'TechDemo', 'Plot1', 'Mr.Arjun', 'M1V6_SS_Testing', 'M1V6_GoldStandard', 
                'DevOps', 'DevMode', 'debugging']
-selected_collections = st.multiselect('Select Collections', collections, default=['testing', 'debugging'])
 
-# Retrieve unique dates from all collections in batches to avoid timeout
-def get_unique_dates(collection):
-    unique_dates = set()
+# Retrieve unique dates from all collections and organize them
+def get_dates_grouped_by_month_year(collection):
+    dates_by_month_year = defaultdict(list)
     try:
         docs = db.collection(collection).stream()
         for doc in docs:
             timestamp = doc.to_dict().get('timestamp')
             if timestamp:
-                unique_dates.add(timestamp.date())
+                date = timestamp.date()
+                month_year = date.strftime('%b %Y')  # e.g., 'Jul 2024'
+                dates_by_month_year[month_year].append(date.day)
     except Exception as e:
         st.error(f"Error fetching data from collection {collection}: {e}")
-    return unique_dates
+    return dates_by_month_year
 
-all_dates = set()
+# Organize collections and dates
+collections_with_dates = {}
+
 for collection in collections:
-    all_dates.update(get_unique_dates(collection))
+    dates_by_month_year = get_dates_grouped_by_month_year(collection)
+    if dates_by_month_year:
+        # Create the display string
+        date_str_list = []
+        for month_year in sorted(dates_by_month_year.keys(), reverse=True, key=lambda x: datetime.strptime(x, '%b %Y')):
+            days = sorted(dates_by_month_year[month_year], reverse=True)
+            day_str = ','.join(map(str, days))
+            date_str_list.append(f"({day_str}) {month_year}")
+        collection_display_str = f"{collection} - {', '.join(date_str_list)}"
+        collections_with_dates[collection_display_str] = collection
 
-# Convert set to sorted list
-all_dates = sorted(list(all_dates))
+# Sort collections by the newest date first
+sorted_collections = sorted(collections_with_dates.keys(), reverse=True)
 
-# Dropdown for unique dates
-selected_dates = st.multiselect('Select Dates', all_dates, default=[])
+# Dropdown for collection with dates
+selected_collection_display = st.selectbox('Select Collection with Dates', sorted_collections)
 
-# Filter data based on selected collections and dates
+# Extract the selected collection name
+selected_collection = collections_with_dates[selected_collection_display]
+
+# Retrieve the selected dates
+selected_dates = get_dates_grouped_by_month_year(selected_collection)
+
+# Convert the selected dates to a set of datetime.date objects
+selected_dates_set = set()
+for month_year, days in selected_dates.items():
+    for day in days:
+        date = datetime.strptime(f"{day} {month_year}", "%d %b %Y").date()
+        selected_dates_set.add(date)
+
+# Filter data based on the selected collection and dates
 filtered_data = []
 
-def filter_data(collection, selected_dates):
+def filter_data(collection, selected_dates_set):
     try:
         docs = db.collection(collection).stream()
         for doc in docs:
             data = doc.to_dict()
             timestamp = data.get('timestamp')
-            if timestamp and (timestamp.date() in selected_dates or not selected_dates):
+            if timestamp and (timestamp.date() in selected_dates_set or not selected_dates_set):
                 filtered_data.append(data)
     except Exception as e:
         st.error(f"Error fetching data from collection {collection}: {e}")
 
-for collection in selected_collections:
-    filter_data(collection, selected_dates)
+filter_data(selected_collection, selected_dates_set)
 
 # Process and display data
 if filtered_data:
@@ -111,3 +136,4 @@ if filtered_data:
     
 else:
     st.write("No data found for the selected criteria.")
+
