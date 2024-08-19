@@ -13,7 +13,7 @@ import random
 from google.api_core.exceptions import ResourceExhausted, RetryError
 
 
-ef exponential_backoff(retries):
+def exponential_backoff(retries):
     base_delay = 1
     max_delay = 60
     delay = base_delay * (2 ** retries) + random.uniform(0, 1)
