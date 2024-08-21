@@ -67,9 +67,20 @@ if selected_collections:
                 elif data['InfStat'] == 'Infected':
                     infected_count += 1
                 total_scans += 1
+
+                # Process data for line chart
+                if 'DeviceName' in data and 'timestamp' in data:
+                    device_name = data['DeviceName']
+                    timestamp = data['timestamp']
+                    inf_stat = data['InfStat']
+
+                    # Aggregate data by device and date
+                    date_only = timestamp.date()
+                    device_data[device_name][date_only][inf_stat] += 1
             else:
-                st.warning(f"Skipping document {doc.id} due to missing 'InfStat' field.")
-        
+                # No warning for missing 'InfStat' for pie and bar charts
+                pass
+
         # Debug prints
         st.write(f"Collection: {collection}")
         st.write(f"Total Scans: {total_scans}")
@@ -80,40 +91,17 @@ if selected_collections:
         total_infected += infected_count
         collection_scan_counts[collection] = total_scans
 
-        # Create columns for side-by-side plots
-        col1, col2 = st.columns(2)
-
         # Plot individual pie chart for the collection
         if total_scans > 0:
             labels = ['Healthy', 'Infected']
             sizes = [healthy_count, infected_count]
             colors = ['#00FF00', '#FF0000']
 
-            fig, ax = plt.subplots(figsize=(3, 3))  # Adjust plot size
+            fig, ax = plt.subplots(figsize=(4, 4))  # Small plot size
             ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
             ax.axis('equal')
-
-            with col1:
-                st.write(f"**{collection} - Healthy vs Infected**")
-                st.pyplot(fig)
-
-        # Process data for line chart
-        for doc in docs:
-            data = doc.to_dict()
-            
-            if 'DeviceName' in data and 'timestamp' in data and 'InfStat' in data: 
-                device_name = data['DeviceName']
-                timestamp = data['timestamp']
-                inf_stat = data['InfStat']
-
-                # Aggregate data by device and date
-                date_only = timestamp.date()
-                device_data[device_name][date_only][inf_stat] += 1
-            else:
-                st.warning(f"Skipping document {doc.id} due to missing fields.")
-                
-    # Create columns for side-by-side plots
-    col1, col2 = st.columns(2)
+            st.write(f"**{collection} - Healthy vs Infected**")
+            st.pyplot(fig)
 
     # Plot combined pie chart for all selected collections
     if total_healthy + total_infected > 0:
@@ -121,13 +109,11 @@ if selected_collections:
         sizes = [total_healthy, total_infected]
         colors = ['#00FF00', '#FF0000']
 
-        fig, ax = plt.subplots(figsize=(3, 3))  # Adjust plot size
+        fig, ax = plt.subplots(figsize=(4, 4))  # Small plot size
         ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
         ax.axis('equal')
-
-        with col1:
-            st.write("**Combined Healthy vs Infected Scans Across Selected Collections**")
-            st.pyplot(fig)
+        st.write("**Combined Healthy vs Infected Scans Across Selected Collections**")
+        st.pyplot(fig)
 
     # Pie chart showing data share by each collection
     if collection_scan_counts:
@@ -135,13 +121,11 @@ if selected_collections:
 
         if total_scans_all_collections > 0:
             scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
-            fig, ax = plt.subplots(figsize=(3, 3))  # Adjust plot size
+            fig, ax = plt.subplots(figsize=(4, 4))  # Small plot size
             ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
             ax.axis('equal')
-
-            with col2:
-                st.write("**Data Share by Each Collection**")
-                st.pyplot(fig)
+            st.write("**Data Share by Each Collection**")
+            st.pyplot(fig)
 
     # Bar chart showing collections with most infected scans
     if total_infected > 0:
@@ -149,19 +133,17 @@ if selected_collections:
         collections = [item[0] for item in sorted_collections]
         infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collections]
 
-        fig, ax = plt.subplots(figsize=(6, 3))  # Adjust plot size
+        fig, ax = plt.subplots(figsize=(6, 4))  # Small plot size
         ax.barh(collections, infected_counts, color='#FF0000')
         ax.set_xlabel('Number of Infected Scans')
         ax.set_ylabel('Collection')
         ax.set_title('Infected Scans by Collection (Most to Least)')
-
-        with col1:
-            st.write("**Infected Scans by Collection**")
-            st.pyplot(fig)
+        st.write("**Infected Scans by Collection**")
+        st.pyplot(fig)
 
     # Line chart for device scan counts over time
     if device_data:
-        fig, ax = plt.subplots(figsize=(8, 3))  # Adjust plot size
+        fig, ax = plt.subplots(figsize=(8, 4))  # Small plot size
         colors = plt.cm.get_cmap('tab10', len(device_data) * 2)
 
         for i, (device, dates) in enumerate(device_data.items()):
@@ -179,9 +161,8 @@ if selected_collections:
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
         fig.autofmt_xdate()
 
-        with col2:
-            st.write("**Device Scan Counts Over Time**")
-            st.pyplot(fig)
+        st.write("**Device Scan Counts Over Time**")
+        st.pyplot(fig)
 
 else:
     st.write("No collections selected.")
