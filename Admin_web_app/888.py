@@ -176,7 +176,7 @@ if selected_collections:
         ax.set_ylabel('Number of Scans')
         ax.set_title('Device Scan Counts Over Time')
         ax.legend(loc='upper right', bbox_to_anchor=(1.15, 1))
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d')
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
         fig.autofmt_xdate()
 
         with col2:
