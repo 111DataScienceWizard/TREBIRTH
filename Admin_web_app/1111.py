@@ -135,13 +135,17 @@ if selected_collections:
     # Pie chart showing data shared by each plot
     if collection_scan_counts:
         total_scans_all_collections = sum(collection_scan_counts.values())
-        scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
 
-        fig, ax = plt.subplots()
-        ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
-        ax.axis('equal')
-        st.write("**Data Shared by Each Plot**")
-        st.pyplot(fig)
+        if total_scans_all_collections > 0:
+            scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
+            fig, ax = plt.subplots()
+            ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
+            ax.axis('equal')
+            st.write("**Data Shared by Each Plot**")
+            st.pyplot(fig)
+        else:
+            st.write("No scan data available to display.")
+       
 
     # Pie chart for the overall distribution of healthy and infected scans
     if total_healthy + total_infected > 0:
