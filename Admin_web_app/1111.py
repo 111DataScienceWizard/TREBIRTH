@@ -65,7 +65,8 @@ collection_dates = {
 dropdown_options = sorted(collection_dates.keys())
 
 # Multi-select dropdown for collection names
-selected_collections = st.multiselect('Select Collection(s)', dropdown_options)
+#selected_collections = st.multiselect('Select Collection(s)', dropdown_options)
+selected_collections = st.multiselect('Select Collection(s)', dropdown_options, default=['TechDemo', 'debugging'])
 
 # Process selected options to retrieve data and plot
 if selected_collections:
