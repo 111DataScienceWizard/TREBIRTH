@@ -97,7 +97,7 @@ if selected_collections:
             sizes = [healthy_count, infected_count]
             colors = ['#00FF00', '#FF0000']
 
-            fig, ax = plt.subplots(figsize=(1, 1))  # Small plot size
+            fig, ax = plt.subplots(figsize=(4, 4))  # Small plot size
             ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
             ax.axis('equal')
             st.write(f"**{collection} - Healthy vs Infected**")
@@ -109,7 +109,7 @@ if selected_collections:
         sizes = [total_healthy, total_infected]
         colors = ['#00FF00', '#FF0000']
 
-        fig, ax = plt.subplots(figsize=(1, 1))  # Small plot size
+        fig, ax = plt.subplots(figsize=(4, 4))  # Small plot size
         ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
         ax.axis('equal')
         st.write("**Combined Healthy vs Infected Scans Across Selected Collections**")
@@ -121,7 +121,7 @@ if selected_collections:
 
         if total_scans_all_collections > 0:
             scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
-            fig, ax = plt.subplots(figsize=(1, 1))  # Small plot size
+            fig, ax = plt.subplots(figsize=(4, 4))  # Small plot size
             ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
             ax.axis('equal')
             st.write("**Data Share by Each Collection**")
@@ -133,7 +133,7 @@ if selected_collections:
         collections = [item[0] for item in sorted_collections]
         infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collections]
 
-        fig, ax = plt.subplots(figsize=(1, 1))  # Small plot size
+        fig, ax = plt.subplots(figsize=(6, 4))  # Small plot size
         ax.barh(collections, infected_counts, color='#FF0000')
         ax.set_xlabel('Number of Infected Scans')
         ax.set_ylabel('Collection')
@@ -143,7 +143,7 @@ if selected_collections:
 
     # Line chart for device scan counts over time
     if device_data:
-        fig, ax = plt.subplots(figsize=(1, 1))  # Small plot size
+        fig, ax = plt.subplots(figsize=(4, 4))  # Small plot size
         colors = plt.cm.get_cmap('tab10', len(device_data) * 2)
 
         for i, (device, dates) in enumerate(device_data.items()):
