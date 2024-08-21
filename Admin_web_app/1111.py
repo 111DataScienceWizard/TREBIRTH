@@ -88,10 +88,29 @@ if selected_collections:
         # Retrieve all data for the selected collection
         docs = list(db.collection(collection).stream())
 
+        # Initialize counters
+        healthy_count = 0
+        infected_count = 0
+        total_scans = 0
+
         # Process and analyze the retrieved documents
-        healthy_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Healthy')
-        infected_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Infected')
-        total_scans = healthy_count + infected_count
+        for doc in docs:
+            data = doc.to_dict()
+            
+            if 'InfStat' in data:
+                if data['InfStat'] == 'Healthy':
+                    healthy_count += 1
+                elif data['InfStat'] == 'Infected':
+                    infected_count += 1
+                total_scans += 1
+            else:
+                st.warning(f"Skipping document {doc.id} due to missing 'InfStat' field.")
+        
+        # Debug prints
+        st.write(f"Collection: {collection}")
+        st.write(f"Total Scans: {total_scans}")
+        st.write(f"Healthy Scans: {healthy_count}")
+        st.write(f"Infected Scans: {infected_count}")
 
         total_healthy += healthy_count
         total_infected += infected_count
@@ -112,14 +131,18 @@ if selected_collections:
         # Process data for line chart
         for doc in docs:
             data = doc.to_dict()
-            device_name = data['DeviceName']
-            timestamp = data['timestamp']
-            inf_stat = data['InfStat']
+            
+            if 'DeviceName' in data and 'timestamp' in data and 'InfStat' in data: 
+                device_name = data['DeviceName']
+                timestamp = data['timestamp']
+                inf_stat = data['InfStat']
 
-            # Aggregate data by device and date
-            date_only = timestamp.date()
-            device_data[device_name][date_only][inf_stat] += 1
-
+                # Aggregate data by device and date
+                date_only = timestamp.date()
+                device_data[device_name][date_only][inf_stat] += 1
+            else:
+                st.warning(f"Skipping document {doc.id} due to missing fields.")
+                
     # Plot combined pie chart for all selected collections
     if total_healthy + total_infected > 0:
         labels = ['Healthy', 'Infected']
