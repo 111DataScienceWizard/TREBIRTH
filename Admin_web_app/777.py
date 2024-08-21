@@ -46,7 +46,7 @@ db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20e
 st.set_page_config(layout="wide")
 st.title('Farm Analytics')
 
-# Collection dates mapping (hardcoded as per your provided data)
+# Collection dates mapping (using original date format)
 collection_dates = {
     'TechDemo': ['2024-02-28', '2024-02-29'],
     'Plot1': [],  # No dates
@@ -61,16 +61,16 @@ collection_dates = {
     'debugging': ['2024-06-10', '2024-06-13', '2024-06-14']
 }
 
-# Generate dropdown options with collection names and dates
+# Generate dropdown options with collection names and original date format
 dropdown_options = []
 for collection, dates in collection_dates.items():
     if dates:
-        dropdown_options.extend([f"{collection} - {datetime.strptime(date, '%Y-%m-%d').strftime('%d %b %Y')}" for date in dates])
+        dropdown_options.extend([f"{collection} - {date}" for date in dates])
     else:
         dropdown_options.append(f"{collection} - No Dates")
 
 # Sort dropdown options by newest to oldest
-dropdown_options = sorted(dropdown_options, key=lambda x: datetime.strptime(x.split(' - ')[1], '%d %b %Y') if 'No Dates' not in x else datetime.min, reverse=True)
+dropdown_options = sorted(dropdown_options, key=lambda x: datetime.strptime(x.split(' - ')[1], '%Y-%m-%d') if 'No Dates' not in x else datetime.min, reverse=True)
 
 # Multi-select dropdown
 selected_options = st.multiselect('Select Collection(s) with Dates', dropdown_options)
@@ -95,7 +95,7 @@ if selected_options:
             st.write(f"**{collection} Collection**")
             docs = []
             for date_str in dates:
-                date_obj = datetime.strptime(date_str, '%d %b %Y')
+                date_obj = datetime.strptime(date_str, '%Y-%m-%d')
                 start_datetime = datetime.combine(date_obj, datetime.min.time())
                 end_datetime = datetime.combine(date_obj, datetime.max.time())
                 docs.extend(db.collection(collection)
@@ -123,4 +123,3 @@ if selected_options:
             st.write(f"No data available for the selected date(s) in {collection}.")
 else:
     st.write("No collections or dates selected.")
-
