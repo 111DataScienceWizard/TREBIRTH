@@ -97,23 +97,27 @@ if selected_collections:
             sizes = [healthy_count, infected_count]
             colors = ['#00FF00', '#FF0000']
 
-            fig, ax = plt.subplots(figsize=(4, 4))  # Small plot size
+            fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
             ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
             ax.axis('equal')
             st.write(f"**{collection} - Healthy vs Infected**")
             st.pyplot(fig)
+            
+    # Create columns for layout
+    col1, col2, col3 = st.columns(3)
 
-    # Plot combined pie chart for all selected collections
+    # Pie chart for combined data across all selected collections
     if total_healthy + total_infected > 0:
-        labels = ['Healthy', 'Infected']
-        sizes = [total_healthy, total_infected]
-        colors = ['#00FF00', '#FF0000']
+        with col1:
+            labels = ['Healthy', 'Infected']
+            sizes = [total_healthy, total_infected]
+            colors = ['#00FF00', '#FF0000']
 
-        fig, ax = plt.subplots(figsize=(4, 4))  # Small plot size
-        ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
-        ax.axis('equal')
-        st.write("**Combined Healthy vs Infected Scans Across Selected Collections**")
-        st.pyplot(fig)
+            fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
+            ax.pie(sizes, labels=labels, colors=colors, autopct='%1.1f%%', startangle=90)
+            ax.axis('equal')
+            st.write("**Combined Healthy vs Infected Scans Across Selected Collections**")
+            st.pyplot(fig)
 
     # Pie chart showing data share by each collection
     if collection_scan_counts:
@@ -121,11 +125,12 @@ if selected_collections:
 
         if total_scans_all_collections > 0:
             scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
-            fig, ax = plt.subplots(figsize=(4, 4))  # Small plot size
-            ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
-            ax.axis('equal')
-            st.write("**Data Share by Each Collection**")
-            st.pyplot(fig)
+            with col2:
+                fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
+                ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
+                ax.axis('equal')
+                st.write("**Data Share by Each Collection**")
+                st.pyplot(fig)
 
     # Bar chart showing collections with most infected scans
     if total_infected > 0:
@@ -133,36 +138,38 @@ if selected_collections:
         collections = [item[0] for item in sorted_collections]
         infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collections]
 
-        fig, ax = plt.subplots(figsize=(6, 4))  # Small plot size
-        ax.barh(collections, infected_counts, color='#FF0000')
-        ax.set_xlabel('Number of Infected Scans')
-        ax.set_ylabel('Collection')
-        ax.set_title('Infected Scans by Collection (Most to Least)')
-        st.write("**Infected Scans by Collection**")
-        st.pyplot(fig)
+        with col3:
+            fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
+            ax.barh(collections, infected_counts, color='#FF0000')
+            ax.set_xlabel('Number of Infected Scans')
+            ax.set_ylabel('Collection')
+            ax.set_title('Infected Scans by Collection (Most to Least)')
+            st.write("**Infected Scans by Collection**")
+            st.pyplot(fig)
 
     # Line chart for device scan counts over time
     if device_data:
-        fig, ax = plt.subplots(figsize=(4, 4))  # Small plot size
-        colors = plt.cm.get_cmap('tab10', len(device_data) * 2)
+        with st.container():
+            fig, ax = plt.subplots(figsize=(6, 4))  # Larger plot size to accommodate multiple lines
+            colors = plt.cm.get_cmap('tab10', len(device_data) * 2)
 
-        for i, (device, dates) in enumerate(device_data.items()):
-            date_list = sorted(dates.keys())
-            healthy_scans = [dates[date]['Healthy'] for date in date_list]
-            infected_scans = [dates[date]['Infected'] for date in date_list]
+            for i, (device, dates) in enumerate(device_data.items()):
+                date_list = sorted(dates.keys())
+                healthy_scans = [dates[date]['Healthy'] for date in date_list]
+                infected_scans = [dates[date]['Infected'] for date in date_list]
 
-            ax.plot(date_list, healthy_scans, label=f"{device} - Healthy", color=colors(i * 2))
-            ax.plot(date_list, infected_scans, label=f"{device} - Infected", color=colors(i * 2 + 1))
+                ax.plot(date_list, healthy_scans, label=f"{device} - Healthy", color=colors(i * 2))
+                ax.plot(date_list, infected_scans, label=f"{device} - Infected", color=colors(i * 2 + 1))
 
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Number of Scans')
-        ax.set_title('Device Scan Counts Over Time')
-        ax.legend(loc='upper right', bbox_to_anchor=(1.15, 1))
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-        fig.autofmt_xdate()
+            ax.set_xlabel('Date')
+            ax.set_ylabel('Number of Scans')
+            ax.set_title('Device Scan Counts Over Time')
+            ax.legend(loc='upper right', bbox_to_anchor=(1.15, 1))
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+            fig.autofmt_xdate()
 
-        st.write("**Device Scan Counts Over Time**")
-        st.pyplot(fig)
+            st.write("**Device Scan Counts Over Time**")
+            st.pyplot(fig)
 
 else:
     st.write("No collections selected.")
