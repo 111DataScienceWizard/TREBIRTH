@@ -175,6 +175,33 @@ if selected_options:
             st.pyplot(fig)
 
     # Line chart for device scan counts over time
+    device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
+
+    for collection, dates in selected_collections.items():
+        for date_str in dates:
+            date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+            start_datetime = datetime.combine(date_obj, datetime.min.time())
+            end_datetime = datetime.combine(date_obj, datetime.max.time())
+        
+            docs = db.collection(collection) \
+                     .where('timestamp', '>=', start_datetime) \
+                     .where('timestamp', '<=', end_datetime) \
+                     .where('DeviceName', '==', 'YourDeviceName') \
+                     .stream()
+
+            for doc in docs:
+                doc_data = doc.to_dict()
+                date_key = doc_data['timestamp'].strftime('%Y-%m-%d')
+                if doc_data.get('InfStat') == 'Healthy':
+                    device_data[collection][date_key]['Healthy'] += 1
+                elif doc_data.get('InfStat') == 'Infected':
+                    device_data[collection][date_key]['Infected'] += 1
+
+    # Debugging output to ensure data is correct
+    st.write("**Device Data for Line Chart**")
+    st.write(device_data)
+
+    # Line chart for device scan counts over time
     if device_data:
         with st.container():
             fig, ax = plt.subplots(figsize=(6, 4))  # Larger plot size to accommodate multiple lines
