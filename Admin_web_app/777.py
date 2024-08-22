@@ -186,16 +186,18 @@ if selected_options:
             docs = db.collection(collection) \
                      .where('timestamp', '>=', start_datetime) \
                      .where('timestamp', '<=', end_datetime) \
-                     .where('DeviceName', '==', 'YourDeviceName') \
                      .stream()
 
             for doc in docs:
                 doc_data = doc.to_dict()
+                device_name = doc_data.get('DeviceName', 'Unknown Device')  # Fallback in case DeviceName is missing
                 date_key = doc_data['timestamp'].strftime('%Y-%m-%d')
-                if doc_data.get('InfStat') == 'Healthy':
-                    device_data[collection][date_key]['Healthy'] += 1
-                elif doc_data.get('InfStat') == 'Infected':
-                    device_data[collection][date_key]['Infected'] += 1
+                inf_stat = doc_data.get('InfStat', 'Unknown')
+
+                if inf_stat == 'Healthy':
+                    device_data[collection][device_name][date_key]['Healthy'] += 1
+                elif inf_stat == 'Infected':
+                     device_data[collection][device_name][date_key]['Infected'] += 1
 
     # Debugging output to ensure data is correct
     st.write("**Device Data for Line Chart**")
@@ -207,13 +209,14 @@ if selected_options:
             fig, ax = plt.subplots(figsize=(6, 4))  # Larger plot size to accommodate multiple lines
             colors = plt.cm.get_cmap('tab10', len(device_data) * 2)
 
-            for i, (device, dates) in enumerate(device_data.items()):
-                date_list = sorted(dates.keys())
-                healthy_scans = [dates[date]['Healthy'] for date in date_list]
-                infected_scans = [dates[date]['Infected'] for date in date_list]
+            for i, (collection, devices) in enumerate(device_data.items()):
+                for j, (device_name, dates) in enumerate(devices.items()):
+                    date_list = sorted(dates.keys())
+                    healthy_scans = [dates[date]['Healthy'] for date in date_list]
+                    infected_scans = [dates[date]['Infected'] for date in date_list]
 
-                ax.plot(date_list, healthy_scans, label=f"{device} - Healthy", color=colors(i * 2))
-                ax.plot(date_list, infected_scans, label=f"{device} - Infected", color=colors(i * 2 + 1))
+                    ax.plot(date_list, healthy_scans, label=f"{collection} - {device_name} - Healthy", color=colors(i * 2))
+                    ax.plot(date_list, infected_scans, label=f"{collection} - {device_name} - Infected", color=colors(i * 2 + 1))
 
             ax.set_xlabel('Date')
             ax.set_ylabel('Number of Scans')
@@ -226,4 +229,4 @@ if selected_options:
             st.pyplot(fig)
 
 else:
-    st.write("No collections or dates selected.")
+    st.write("No device data available for the selected collections.")
