@@ -55,6 +55,7 @@ collection_dates = {
                '2024-06-04', '2024-06-05'],
     'DevMode': ['2024-02-22', '2024-02-23', '2024-02-24', '2024-02-25', '2024-02-26', '2024-02-28'],
     'debugging': ['2024-06-10', '2024-06-13', '2024-06-14']
+    'testing': ['2024-06-13']
 }
 
 # Generate dropdown options with collection names and original date format
