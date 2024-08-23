@@ -249,7 +249,7 @@ if selected_options:
         ax.set_title('Device Scan Counts Over Time')
 
         # Move the legend to the left side
-        ax.legend(bbox_to_anchor=(-0.3, 1), loc='upper left', borderaxespad=0., labels=legend_labels)
+        ax.legend(bbox_to_anchor=(-0.3, 0.3), loc='upper left', borderaxespad=0., labels=legend_labels)
 
         st.write("**Device Scan Counts Over Time**")
         st.pyplot(fig)
