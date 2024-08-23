@@ -216,8 +216,8 @@ if selected_options:
 
     # Line chart for device scan counts over time
     if device_data:
-        fig, ax = plt.subplots(figsize=(10, 6))  # Larger plot size to accommodate multiple lines
-        width = 0.35
+        fig, ax = plt.subplots(figsize=(6, 4))  # Larger plot size to accommodate multiple lines
+        width = 2
 
         colors = plt.cm.get_cmap('tab10', len(device_data) * 2)
         bars = []
