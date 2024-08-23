@@ -177,7 +177,7 @@ if selected_options:
             st.write("**Infected Scans by Collection**")
             st.pyplot(fig)
 
-    # Line chart for device scan counts over time
+    # vertical chart for device scan counts over time
     device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
 
     for collection, dates in selected_collections.items():
@@ -213,30 +213,44 @@ if selected_options:
                 continue
 
     # Debugging output to ensure data is correct
-    st.write("**Device Data for Line Chart**")
-    st.write(device_data)
+    st.write("**Device Data for Bar Chart**")
 
     # Line chart for device scan counts over time
     if device_data:
         fig, ax = plt.subplots(figsize=(10, 6))  # Larger plot size to accommodate multiple lines
+        width = 0.35
+
         colors = plt.cm.get_cmap('tab10', len(device_data) * 2)
-
+        bars = []
+        legend_labels = []
+        
         for i, (device_name, dates) in enumerate(device_data.items()):
-            date_list = sorted([datetime.strptime(date_str, '%Y-%m-%d') for date_str in dates.keys()])
-            healthy_scans = [dates[date.strftime('%Y-%m-%d')]['Healthy'] for date in date_list]
-            infected_scans = [dates[date.strftime('%Y-%m-%d')]['Infected'] for date in date_list]
+            date_list = sorted(dates.keys())
+            healthy_scans = [dates[date]['Healthy'] for date in date_list]
+            infected_scans = [dates[date]['Infected'] for date in date_list]
 
-            if any(healthy_scans):
-                ax.plot(date_list, healthy_scans, label=f"{device_name} - Healthy", color=colors(i * 2))
-            if any(infected_scans):
-                ax.plot(date_list, infected_scans, label=f"{device_name} - Infected", color=colors(i * 2 + 1))
+            # Position bars slightly offset for healthy and infected scans
+            bars1 = ax.bar([datetime.strptime(date, '%Y-%m-%d') for date in date_list], healthy_scans, width=width, 
+                           label=f"{device_name} - Healthy", color=colors(i * 2))
+            bars2 = ax.bar([datetime.strptime(date, '%Y-%m-%d') for date in date_list], infected_scans, width=width, 
+                           bottom=healthy_scans, label=f"{device_name} - Infected", color=colors(i * 2 + 1))
 
+            bars.append(bars1)
+            bars.append(bars2)
+            legend_labels.append(f"{device_name} - Healthy")
+            legend_labels.append(f"{device_name} - Infected")
+
+        # Format the x-axis to display dates properly
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+        fig.autofmt_xdate()
+
+        # Set labels and title
         ax.set_xlabel('Date')
         ax.set_ylabel('Number of Scans')
         ax.set_title('Device Scan Counts Over Time')
-        ax.legend(loc='upper right', bbox_to_anchor=(1.15, 1))
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-        fig.autofmt_xdate()
+
+        # Move the legend to the left side
+        ax.legend(bbox_to_anchor=(-0.3, 1), loc='upper left', borderaxespad=0., labels=legend_labels)
 
         st.write("**Device Scan Counts Over Time**")
         st.pyplot(fig)
