@@ -94,7 +94,6 @@ if selected_options:
             docs = db.collection(collection).stream()
             st.write(f"**{collection} Collection (All Data)**")
         else:
-            st.write(f"**{collection} Collection**")
             docs = []
             for date_str in dates:
                 date_obj = datetime.strptime(date_str, '%Y-%m-%d')
