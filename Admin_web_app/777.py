@@ -118,7 +118,7 @@ if selected_options:
         # Collect device-specific data for line chart
         for doc in docs:
             data = doc.to_dict()
-            device_name = data.get('DeviceName')
+            device_name = data.get('DeviceName:')
             if device_name:
                 date_key = data.get('timestamp').date()
                 if data.get('InfStat') == 'Healthy':
@@ -194,7 +194,7 @@ if selected_options:
                 for doc in docs:
                     try:
                         doc_data = doc.to_dict()
-                        device_name = doc_data.get('DeviceName')
+                        device_name = doc_data.get('DeviceName:')
                         if not device_name:
                             continue  # Skip if DeviceName is missing
 
