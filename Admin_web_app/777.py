@@ -182,22 +182,31 @@ if selected_options:
             date_obj = datetime.strptime(date_str, '%Y-%m-%d')
             start_datetime = datetime.combine(date_obj, datetime.min.time())
             end_datetime = datetime.combine(date_obj, datetime.max.time())
-        
-            docs = db.collection(collection) \
-                     .where('timestamp', '>=', start_datetime) \
-                     .where('timestamp', '<=', end_datetime) \
-                     .stream()
 
+            try:
+                
+                docs = db.collection(collection) \
+                         .where('timestamp', '>=', start_datetime) \
+                         .where('timestamp', '<=', end_datetime) \
+                         .stream()
+            except Exception as e:
+                st.error(f"Error fetching data from collection {collection} for date {date_str}: {str(e)}")
+                continue
+                
             for doc in docs:
-                doc_data = doc.to_dict()
-                device_name = doc_data.get('DeviceName', 'Unknown Device')  # Fallback in case DeviceName is missing
-                date_key = doc_data['timestamp'].strftime('%Y-%m-%d')
-                inf_stat = doc_data.get('InfStat', 'Unknown')
+                try:
+                    doc_data = doc.to_dict()
+                    device_name = doc_data.get('DeviceName', 'Unknown Device')  # Fallback in case DeviceName is missing
+                    date_key = doc_data['timestamp'].strftime('%Y-%m-%d')
+                    inf_stat = doc_data.get('InfStat', 'Unknown')
 
                 if inf_stat == 'Healthy':
                     device_data[collection][device_name][date_key]['Healthy'] += 1
                 elif inf_stat == 'Infected':
                      device_data[collection][device_name][date_key]['Infected'] += 1
+            except Exception as e:
+                st.warning(f"Skipping document due to error: {str(e)}")
+                continue
 
     # Debugging output to ensure data is correct
     st.write("**Device Data for Line Chart**")
@@ -205,28 +214,25 @@ if selected_options:
 
     # Line chart for device scan counts over time
     if device_data:
-        with st.container():
-            fig, ax = plt.subplots(figsize=(6, 4))  # Larger plot size to accommodate multiple lines
-            colors = plt.cm.get_cmap('tab10', len(device_data) * 2)
+        fig, ax = plt.subplots(figsize=(6, 4))  # Larger plot size to accommodate multiple lines
+        colors = plt.cm.get_cmap('tab10', len(device_data) * 2)
 
-            for i, (collection, devices) in enumerate(device_data.items()):
-                for j, (device_name, dates) in enumerate(devices.items()):
-                    date_list = sorted(dates.keys())
-                    healthy_scans = [dates[date]['Healthy'] for date in date_list]
-                    infected_scans = [dates[date]['Infected'] for date in date_list]
+        for i, (collection, devices) in enumerate(device_data.items()):
+            date_list = sorted(dates.keys())
+            healthy_scans = [dates[date]['Healthy'] for date in date_list]
+            infected_scans = [dates[date]['Infected'] for date in date_list]
 
-                    ax.plot(date_list, healthy_scans, label=f"{collection} - {device_name} - Healthy", color=colors(i * 2))
-                    ax.plot(date_list, infected_scans, label=f"{collection} - {device_name} - Infected", color=colors(i * 2 + 1))
+            ax.plot(date_list, healthy_scans, label=f"{collection} - {device_name} - Healthy", color=colors(i * 2))
+            ax.plot(date_list, infected_scans, label=f"{collection} - {device_name} - Infected", color=colors(i * 2 + 1))
 
-            ax.set_xlabel('Date')
-            ax.set_ylabel('Number of Scans')
-            ax.set_title('Device Scan Counts Over Time')
-            ax.legend(loc='upper right', bbox_to_anchor=(1.15, 1))
-            ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-            fig.autofmt_xdate()
+        ax.set_xlabel('Date')
+        ax.set_ylabel('Number of Scans')
+        ax.set_title('Device Scan Counts Over Time')
+        ax.legend(loc='upper right', bbox_to_anchor=(1.15, 1))
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+        fig.autofmt_xdate()
 
-            st.write("**Device Scan Counts Over Time**")
-            st.pyplot(fig)
-
-else:
-    st.write("No device data available for the selected collections.")
+        st.write("**Device Scan Counts Over Time**")
+        st.pyplot(fig)
+    else:
+        st.write("No device data available for the selected collections.")
