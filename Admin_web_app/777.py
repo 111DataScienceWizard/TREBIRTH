@@ -273,7 +273,7 @@ st.markdown(f"""
         width: 300px;  /* Decreased box width */
         margin: 0 auto;
     ">
-       <h4 style="color: #007ACC; margin-bottom: 10px;">Achievements</h4>
+       <h4 style="color: #007ACC; margin-bottom: 10px;">Comments</h4>
         <hr style="border: none; height: 1px; background-color: #007ACC; margin-bottom: 10px;">
         <p style="font-size: 14px; margin: 5px 0;">
             <strong>Most Active Device:</strong> {most_active_device}
