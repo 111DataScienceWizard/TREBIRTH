@@ -264,20 +264,21 @@ total_infected_trees = 456
 # Create a styled box using HTML and CSS in Streamlit
 st.markdown(f"""
     <div style="
-        padding: 20px;
+        padding: 10px;
         background-color: #f5f5f5;
         border-radius: 10px;
         box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
         font-family: 'Arial', sans-serif;
         color: #333333;
-        text-align: center;
+        width: 300px;  /* Decreased box width */
+        margin: 0 auto;
     ">
-        <h2 style="color: #007ACC;">Comments</h2>
-        <hr style="border: none; height: 1px; background-color: #007ACC; margin-bottom: 20px;">
-        <p style="font-size: 18px; margin: 10px 0;">
+       <h4 style="color: #007ACC; margin-bottom: 10px;">Achievements</h4>
+        <hr style="border: none; height: 1px; background-color: #007ACC; margin-bottom: 10px;">
+        <p style="font-size: 14px; margin: 5px 0;">
             <strong>Most Active Device:</strong> {most_active_device}
         </p>
-        <p style="font-size: 18px; margin: 10px 0;">
+        <p style="font-size: 14px; margin: 5px 0;">
             <strong>Total Infected Trees Detected by Team TREBIRTH:</strong> {total_infected_trees}
         </p>
     </div>
