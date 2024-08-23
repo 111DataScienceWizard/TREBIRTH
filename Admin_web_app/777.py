@@ -272,13 +272,13 @@ st.markdown(f"""
         color: #333333;
         text-align: center;
     ">
-        <h2 style="color: #007ACC;">Achievements</h2>
+        <h2 style="color: #007ACC;">Comments</h2>
         <hr style="border: none; height: 1px; background-color: #007ACC; margin-bottom: 20px;">
         <p style="font-size: 18px; margin: 10px 0;">
             <strong>Most Active Device:</strong> {most_active_device}
         </p>
         <p style="font-size: 18px; margin: 10px 0;">
-            <strong>Total Infected Trees Detected by Team TReBirth:</strong> {total_infected_trees}
+            <strong>Total Infected Trees Detected by Team TREBIRTH:</strong> {total_infected_trees}
         </p>
     </div>
 """, unsafe_allow_html=True)
