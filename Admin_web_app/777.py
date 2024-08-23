@@ -183,30 +183,29 @@ if selected_options:
             end_datetime = datetime.combine(date_obj, datetime.max.time())
 
             try:
-                
                 docs = db.collection(collection) \
                          .where('timestamp', '>=', start_datetime) \
                          .where('timestamp', '<=', end_datetime) \
                          .stream()
+                for doc in docs:
+                    try:
+                        doc_data = doc.to_dict()
+                        device_name = doc_data.get('DeviceName')
+                        if not device_name:
+                            continue  # Skip if DeviceName is missing
+
+                        date_key = doc_data['timestamp'].date()
+                        inf_stat = doc_data.get('InfStat', 'Unknown')
+
+                        if inf_stat == 'Healthy':
+                            device_data[device_name][date_key]['Healthy'] += 1
+                        elif inf_stat == 'Infected':
+                            device_data[device_name][date_key]['Infected'] += 1
+                    except Exception as e:
+                        st.warning(f"Skipping document due to error: {str(e)}")
+                        continue
             except Exception as e:
                 st.error(f"Error fetching data from collection {collection} for date {date_str}: {str(e)}")
-                continue
-                
-            for doc in docs:
-                try:
-                    doc_data = doc.to_dict()
-                    device_name = doc_data.get('DeviceName')  # Fallback in case DeviceName is missing
-                    if not device_name:
-                        continue  
-                    date_key = doc_data['timestamp'].date()
-                    inf_stat = doc_data.get('InfStat', 'Unknown')
-
-                    if inf_stat == 'Healthy':
-                        device_data[device_name][date_key]['Healthy'] += 1
-                    elif inf_stat == 'Infected':
-                        device_data[device_name][date_key]['Infected'] += 1
-            except Exception as e:
-                st.warning(f"Skipping document due to error: {str(e)}")
                 continue
 
     # Debugging output to ensure data is correct
