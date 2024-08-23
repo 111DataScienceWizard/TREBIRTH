@@ -49,7 +49,6 @@ st.title('Farm Analytics')
 # Collection dates mapping (using original date format)
 collection_dates = {
     'TechDemo': ['2024-02-28', '2024-02-29'],
-    'Plot1': [],  # No dates
     'Mr.Arjun': ['2024-03-04', '2024-03-05'],
     'DevOps': ['2024-03-11', '2024-03-12', '2024-03-13', '2024-03-14', '2024-03-15', '2024-03-16', 
                '2024-06-04', '2024-06-05'],
@@ -196,14 +195,16 @@ if selected_options:
             for doc in docs:
                 try:
                     doc_data = doc.to_dict()
-                    device_name = doc_data.get('DeviceName', 'Unknown Device')  # Fallback in case DeviceName is missing
-                    date_key = doc_data['timestamp'].strftime('%Y-%m-%d')
+                    device_name = doc_data.get('DeviceName')  # Fallback in case DeviceName is missing
+                    if not device_name:
+                        continue  
+                    date_key = doc_data['timestamp'].date()
                     inf_stat = doc_data.get('InfStat', 'Unknown')
 
-                if inf_stat == 'Healthy':
-                    device_data[collection][device_name][date_key]['Healthy'] += 1
-                elif inf_stat == 'Infected':
-                     device_data[collection][device_name][date_key]['Infected'] += 1
+                    if inf_stat == 'Healthy':
+                        device_data[device_name][date_key]['Healthy'] += 1
+                    elif inf_stat == 'Infected':
+                        device_data[device_name][date_key]['Infected'] += 1
             except Exception as e:
                 st.warning(f"Skipping document due to error: {str(e)}")
                 continue
@@ -214,16 +215,18 @@ if selected_options:
 
     # Line chart for device scan counts over time
     if device_data:
-        fig, ax = plt.subplots(figsize=(6, 4))  # Larger plot size to accommodate multiple lines
+        fig, ax = plt.subplots(figsize=(10, 6))  # Larger plot size to accommodate multiple lines
         colors = plt.cm.get_cmap('tab10', len(device_data) * 2)
 
-        for i, (collection, devices) in enumerate(device_data.items()):
+        for i, (device_name, dates) in enumerate(device_data.items()):
             date_list = sorted(dates.keys())
             healthy_scans = [dates[date]['Healthy'] for date in date_list]
             infected_scans = [dates[date]['Infected'] for date in date_list]
 
-            ax.plot(date_list, healthy_scans, label=f"{collection} - {device_name} - Healthy", color=colors(i * 2))
-            ax.plot(date_list, infected_scans, label=f"{collection} - {device_name} - Infected", color=colors(i * 2 + 1))
+            if any(healthy_scans):
+                ax.plot(date_list, healthy_scans, label=f"{device_name} - Healthy", color=colors(i * 2))
+            if any(infected_scans):
+                ax.plot(date_list, infected_scans, label=f"{device_name} - Infected", color=colors(i * 2 + 1))
 
         ax.set_xlabel('Date')
         ax.set_ylabel('Number of Scans')
