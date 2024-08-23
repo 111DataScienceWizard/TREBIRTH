@@ -4,7 +4,7 @@ import pandas as pd
 from google.cloud.firestore import FieldFilter
 from io import BytesIO
 import matplotlib.pyplot as plt
-from datetime import datetime
+from datetime import datetime, timedelta
 import numpy as np
 import time
 import zipfile
@@ -198,7 +198,7 @@ if selected_options:
                         if not device_name:
                             continue  # Skip if DeviceName is missing
 
-                        date_key = doc_data['timestamp'].date()
+                        date_key = doc_data['timestamp'].date().strftime('%Y-%m-%d')
                         inf_stat = doc_data.get('InfStat', 'Unknown')
 
                         if inf_stat == 'Healthy':
@@ -222,9 +222,9 @@ if selected_options:
         colors = plt.cm.get_cmap('tab10', len(device_data) * 2)
 
         for i, (device_name, dates) in enumerate(device_data.items()):
-            date_list = sorted(dates.keys())
-            healthy_scans = [dates[date]['Healthy'] for date in date_list]
-            infected_scans = [dates[date]['Infected'] for date in date_list]
+            date_list = sorted([datetime.strptime(date_str, '%Y-%m-%d') for date_str in dates.keys()])
+            healthy_scans = [dates[date.strftime('%Y-%m-%d')]['Healthy'] for date in date_list]
+            infected_scans = [dates[date.strftime('%Y-%m-%d')]['Infected'] for date in date_list]
 
             if any(healthy_scans):
                 ax.plot(date_list, healthy_scans, label=f"{device_name} - Healthy", color=colors(i * 2))
