@@ -46,29 +46,14 @@ db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20e
 st.set_page_config(layout="wide")
 st.title('Farm Analytics')
 
-# CSS to display round images
-st.markdown(
-    """
-    <style>
-    .circular-image {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        object-fit: cover;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
-
 # Mapping collections to farmer images
 farmer_images = {
-    'TechDemo': 'Admin_web_app/Farmer_1.jpg',
-    'Mr.Arjun': 'Admin_web_app/Farmer_2.jpg',
-    'DevOps': 'Admin_web_app/Farmer_3.jpg',
-    'DevMode': 'Admin_web_app/Farmer_4.jpg',
-    'debugging': 'Admin_web_app/Farmer_5.jpg',
-    'testing': 'Admin_web_app/Farmer_6.jpg'
+    'TechDemo': 'Admin_web_app/F1.jpg',
+    'Mr.Arjun': 'Admin_web_app/F2.jpg',
+    'DevOps': 'Admin_web_app/F3.jpg',
+    'DevMode': 'Admin_web_app/F4.jpg',
+    'debugging': 'Admin_web_app/F5.jpg',
+    'testing': 'Admin_web_app/F6.jpg'
 }
 
 
@@ -173,7 +158,7 @@ if selected_options:
     if total_healthy + total_infected > 0:
         with col1:
             fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
-            ax.pie([total_healthy, total_infected], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'], wedgeprops={'edgecolor': 'black', 'linewidth': 1})
+            ax.pie([total_healthy, total_infected], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
             ax.axis('equal')
             st.write("**Combined Healthy vs Infected Scans Across Selected Collections**")
             st.pyplot(fig)
@@ -186,7 +171,7 @@ if selected_options:
             scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
             with col2:
                 fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
-                ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90, wedgeprops={'edgecolor': 'black', 'linewidth': 1})
+                ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
                 ax.axis('equal')
                 st.write("**Data Share by Each Collection**")
                 st.pyplot(fig)
