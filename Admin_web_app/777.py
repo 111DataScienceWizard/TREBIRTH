@@ -46,6 +46,20 @@ db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20e
 st.set_page_config(layout="wide")
 st.title('Farm Analytics')
 
+# CSS to display round images
+st.markdown(
+    """
+    <style>
+    .circular-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # Mapping collections to farmer images
 farmer_images = {
@@ -143,7 +157,7 @@ if selected_options:
                 # Display farmer image in round shape
                 farmer_image_path = farmer_images.get(collection)
                 if farmer_image_path:
-                    st.image(farmer_image_path, use_column_width=True, caption=collection, output_format='JPEG', clamp=True, channels="RGB", width=80)
+                    st.image(farmer_image_path, use_column_width=True, caption=collection, output_format='JPEG', clamp=True, channels="RGB", width=80, format="PNG")
 
                 fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
                 ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'], wedgeprops={'edgecolor': 'black', 'linewidth': 1})
