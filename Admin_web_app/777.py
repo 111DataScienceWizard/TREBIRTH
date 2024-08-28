@@ -143,10 +143,10 @@ if selected_options:
                 # Display farmer image in round shape
                 farmer_image_path = farmer_images.get(collection)
                 if farmer_image_path:
-                    st.image(farmer_image_path, use_column_width=True, caption=collection, output_format='JPEG', clamp=True, channels="RGB")
+                    st.image(farmer_image_path, use_column_width=True, caption=collection, output_format='JPEG', clamp=True, channels="RGB", width=80)
 
                 fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
-                ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
+                ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'], wedgeprops={'edgecolor': 'black', 'linewidth': 1})
                 ax.axis('equal')
                 st.write(f"Total Scans: {total_scans}")
                 st.write(f"Healthy Scans: {healthy_count}")
@@ -159,7 +159,7 @@ if selected_options:
     if total_healthy + total_infected > 0:
         with col1:
             fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
-            ax.pie([total_healthy, total_infected], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
+            ax.pie([total_healthy, total_infected], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'], wedgeprops={'edgecolor': 'black', 'linewidth': 1})
             ax.axis('equal')
             st.write("**Combined Healthy vs Infected Scans Across Selected Collections**")
             st.pyplot(fig)
@@ -172,7 +172,7 @@ if selected_options:
             scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
             with col2:
                 fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
-                ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
+                ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90, wedgeprops={'edgecolor': 'black', 'linewidth': 1})
                 ax.axis('equal')
                 st.write("**Data Share by Each Collection**")
                 st.pyplot(fig)
