@@ -86,6 +86,83 @@ with col1:
     # Multi-select dropdown
     selected_options = st.multiselect('Select Collection(s) with Dates', dropdown_options)
     
+    if selected_options:
+        selected_collections = {}
+        total_healthy = 0
+        total_infected = 0
+        collection_scan_counts = {}
+        device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
+
+        for option in selected_options:
+            collection, date_str = option.split(' - ')
+            if date_str == "No Dates":
+                date_str = None
+            if collection not in selected_collections:
+                selected_collections[collection] = []
+            selected_collections[collection].append(date_str)
+            
+        col1, col2, col3 = st.columns(3)
+        # Fetch data and plot pie charts
+        for i, (collection, dates) in enumerate(selected_collections.items()):
+            if "No Dates" in dates or not dates[0]:
+                docs = db.collection(collection).stream()
+                st.write(f"**{collection} Collection (All Data)**")
+            else:
+                docs = []
+                for date_str in dates:
+                    date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+                    start_datetime = datetime.combine(date_obj, datetime.min.time())
+                    end_datetime = datetime.combine(date_obj, datetime.max.time())
+                    docs.extend(db.collection(collection)
+                                .where('timestamp', '>=', start_datetime)
+                                .where('timestamp', '<=', end_datetime)
+                                .stream())
+
+            # Process and analyze the retrieved documents
+            healthy_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Healthy')
+            infected_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Infected')
+            total_scans = healthy_count + infected_count
+
+            # Accumulate counts for combined and data share pie charts
+            total_healthy += healthy_count
+            total_infected += infected_count
+            collection_scan_counts[collection] = total_scans
+
+            
+        # Pie chart for combined data across all selected collections
+        if total_healthy + total_infected > 0:
+            fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
+            ax.pie([total_healthy, total_infected], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
+            ax.axis('equal')
+            st.write("**Combined Healthy vs Infected Scans Across Selected Collections**")
+            st.pyplot(fig)
+
+        # Pie chart showing data share by each collection
+        if collection_scan_counts:
+            total_scans_all_collections = sum(collection_scan_counts.values())
+
+            if total_scans_all_collections > 0:
+                scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
+                fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
+                ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
+                ax.axis('equal')
+                st.write("**Data Share by Each Collection**")
+                st.pyplot(fig)
+
+        # Bar chart showing collections with most infected scans
+        if total_infected > 0:
+            sorted_collections = sorted(collection_scan_counts.items(), key=lambda item: item[1], reverse=True)
+            collections = [item[0] for item in sorted_collections]
+            infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collections]
+
+            fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
+            ax.barh(collections, infected_counts, color='#FF0000')
+            ax.set_xlabel('Number of Infected Scans')
+            ax.set_ylabel('Collection')
+            ax.set_title('Infected Scans by Collection (Most to Least)')
+            st.write("**Infected Scans by Collection**")
+            st.pyplot(fig)
+    
     # Styled box for comments
     most_active_device = "Sloth's Katana"
     total_infected_trees = 456
@@ -130,43 +207,6 @@ with col2:
             selected_collections[collection].append(date_str)
             
         col1, col2, col3 = st.columns(3)
-        # Fetch data and plot pie charts
-        for i, (collection, dates) in enumerate(selected_collections.items()):
-            if "No Dates" in dates or not dates[0]:
-                docs = db.collection(collection).stream()
-                st.write(f"**{collection} Collection (All Data)**")
-            else:
-                docs = []
-                for date_str in dates:
-                    date_obj = datetime.strptime(date_str, '%Y-%m-%d')
-                    start_datetime = datetime.combine(date_obj, datetime.min.time())
-                    end_datetime = datetime.combine(date_obj, datetime.max.time())
-                    docs.extend(db.collection(collection)
-                                .where('timestamp', '>=', start_datetime)
-                                .where('timestamp', '<=', end_datetime)
-                                .stream())
-
-            # Process and analyze the retrieved documents
-            healthy_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Healthy')
-            infected_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Infected')
-            total_scans = healthy_count + infected_count
-
-            # Accumulate counts for combined and data share pie charts
-            total_healthy += healthy_count
-            total_infected += infected_count
-            collection_scan_counts[collection] = total_scans
-
-            # Collect device-specific data for line chart
-            for doc in docs:
-                data = doc.to_dict()
-                device_name = data.get('DeviceName:')
-                if device_name:
-                    date_key = data.get('timestamp').date()
-                    if data.get('InfStat') == 'Healthy':
-                        device_data[device_name][date_key]['Healthy'] += 1
-                    elif data.get('InfStat') == 'Infected':
-                        device_data[device_name][date_key]['Infected'] += 1
-
             # Plot individual pie chart for the collection
             if total_scans > 0:
                 with [col1, col2, col3][i % 3]:
@@ -182,45 +222,8 @@ with col2:
                     st.write(f"Healthy Scans: {healthy_count}")
                     st.write(f"Infected Scans: {infected_count}")
                     st.pyplot(fig)
-        # Create columns for layout
-        col1, col2, col3 = st.columns(3)
-
-        # Pie chart for combined data across all selected collections
-        if total_healthy + total_infected > 0:
-            with col1:
-                fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
-                ax.pie([total_healthy, total_infected], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
-                ax.axis('equal')
-                st.write("**Combined Healthy vs Infected Scans Across Selected Collections**")
-                st.pyplot(fig)
-
-        # Pie chart showing data share by each collection
-        if collection_scan_counts:
-            total_scans_all_collections = sum(collection_scan_counts.values())
-
-            if total_scans_all_collections > 0:
-                scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
-                with col2:
-                    fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
-                    ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
-                    ax.axis('equal')
-                    st.write("**Data Share by Each Collection**")
-                    st.pyplot(fig)
-
-        # Bar chart showing collections with most infected scans
-        if total_infected > 0:
-            sorted_collections = sorted(collection_scan_counts.items(), key=lambda item: item[1], reverse=True)
-            collections = [item[0] for item in sorted_collections]
-            infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collections]
-
-            with col3:
-                fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
-                ax.barh(collections, infected_counts, color='#FF0000')
-                ax.set_xlabel('Number of Infected Scans')
-                ax.set_ylabel('Collection')
-                ax.set_title('Infected Scans by Collection (Most to Least)')
-                st.write("**Infected Scans by Collection**")
-                st.pyplot(fig)
+      
+        
 
         # vertical chart for device scan counts over time
         device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
