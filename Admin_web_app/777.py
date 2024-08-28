@@ -48,12 +48,12 @@ st.title('Farm Analytics')
 
 # Mapping collections to farmer images
 farmer_images = {
-    'TechDemo': 'Admin_web_app/F1.jpg',
-    'Mr.Arjun': 'Admin_web_app/F2.jpg',
-    'DevOps': 'Admin_web_app/F3.jpg',
-    'DevMode': 'Admin_web_app/F4.jpg',
-    'debugging': 'Admin_web_app/F5.jpg',
-    'testing': 'Admin_web_app/F6.jpg'
+    'TechDemo': 'Admin_web_app/F1.png',
+    'Mr.Arjun': 'Admin_web_app/F2.png',
+    'DevOps': 'Admin_web_app/F3.png',
+    'DevMode': 'Admin_web_app/F4.png',
+    'debugging': 'Admin_web_app/F5.png',
+    'testing': 'Admin_web_app/F6.png'
 }
 
 
