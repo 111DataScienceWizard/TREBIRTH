@@ -50,10 +50,10 @@ st.title('Farm Analytics')
 farmer_images = {
     'TechDemo': 'Admin_web_app/F1.png',
     'Mr.Arjun': 'Admin_web_app/F2.png',
-    'DevOps': 'Admin_web_app/F3.png',
+    'DevOps': 'Admin_web_app/F6.png',
     'DevMode': 'Admin_web_app/F4.png',
     'debugging': 'Admin_web_app/F5.png',
-    'testing': 'Admin_web_app/F6.png'
+    'testing': 'Admin_web_app/F3.png'
 }
 
 
