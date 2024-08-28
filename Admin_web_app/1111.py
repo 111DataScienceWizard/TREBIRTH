@@ -140,7 +140,7 @@ with col1:
 
             if total_scans_all_collections > 0:
                 scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
-                fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
+                fig, ax = plt.subplots(figsize=(2, 2))  # Small plot size
                 ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
                 ax.axis('equal')
                 st.write("**Data Share by Each Collection**")
@@ -152,7 +152,7 @@ with col1:
             collections = [item[0] for item in sorted_collections]
             infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collections]
 
-            fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
+            fig, ax = plt.subplots(figsize=(2, 2))  # Small plot size
             ax.barh(collections, infected_counts, color='#FF0000')
             ax.set_xlabel('Number of Infected Scans')
             ax.set_ylabel('Collection')
@@ -236,7 +236,7 @@ with col2:
 
                 with row_col3:
                     # Pie chart for healthy vs infected scans per collection
-                    fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
+                    fig, ax = plt.subplots(figsize=(2, 2))  # Small plot size
                     ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
                     ax.axis('equal')
                     st.pyplot(fig)
