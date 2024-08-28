@@ -142,7 +142,7 @@ if selected_options:
                 # Display farmer image in round shape
                 farmer_image_path = farmer_images.get(collection)
                 if farmer_image_path:
-                    st.image(farmer_image_path, caption=collection, width=80)
+                    st.image(farmer_image_path, use_column_width=True, caption=collection, output_format='JPEG', clamp=True, channels="RGB")
 
                 fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
                 ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
