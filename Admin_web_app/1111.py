@@ -208,20 +208,45 @@ with col2:
             
         col1, col2, col3 = st.columns(3)
         # Plot individual pie chart for the collection
-        if total_scans > 0:
-            with [col1, col2, col3][i % 3]:
-                # Display farmer image in round shape
-                farmer_image_path = farmer_images.get(collection)
-                if farmer_image_path:
-                    st.image(farmer_image_path, use_column_width=True, caption=collection)
+        for i, (collection, dates) in enumerate(selected_collections.items()):
+            if "No Dates" in dates or not dates[0]:
+                docs = db.collection(collection).stream()
+                st.write(f"**{collection} Collection (All Data)**")
+            else:
+                docs = []
+                for date_str in dates:
+                    date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+                    start_datetime = datetime.combine(date_obj, datetime.min.time())
+                    end_datetime = datetime.combine(date_obj, datetime.max.time())
+                    docs.extend(db.collection(collection)
+                                .where('timestamp', '>=', start_datetime)
+                                .where('timestamp', '<=', end_datetime)
+                                .stream())
 
-                fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
-                ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
-                ax.axis('equal')
-                st.write(f"Total Scans: {total_scans}")
-                st.write(f"Healthy Scans: {healthy_count}")
-                st.write(f"Infected Scans: {infected_count}")
-                st.pyplot(fig)
+            # Process and analyze the retrieved documents
+            healthy_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Healthy')
+            infected_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Infected')
+            total_scans = healthy_count + infected_count
+
+            # Accumulate counts for combined and data share pie charts
+            total_healthy += healthy_count
+            total_infected += infected_count
+            collection_scan_counts[collection] = total_scans
+            
+            if total_scans > 0:
+                with [col1, col2, col3][i % 3]:
+                    # Display farmer image in round shape
+                    farmer_image_path = farmer_images.get(collection)
+                    if farmer_image_path:
+                        st.image(farmer_image_path, use_column_width=True, caption=collection)
+
+                    fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
+                    ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
+                    ax.axis('equal')
+                    st.write(f"Total Scans: {total_scans}")
+                    st.write(f"Healthy Scans: {healthy_count}")
+                    st.write(f"Infected Scans: {infected_count}")
+                    st.pyplot(fig)
       
         
 
