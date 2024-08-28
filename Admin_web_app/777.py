@@ -46,6 +46,18 @@ db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20e
 st.set_page_config(layout="wide")
 st.title('Farm Analytics')
 
+
+# Mapping collections to farmer images
+farmer_images = {
+    'TechDemo': 'farmer_1.jpg',
+    'Mr.Arjun': 'farmer_2.jpg',
+    'DevOps': 'farmer_3.jpg',
+    'DevMode': 'farmer_4.jpg',
+    'debugging': 'farmer_5.jpg',
+    'testing': 'farmer_6.jpg'
+}
+
+
 # Collection dates mapping (using original date format)
 collection_dates = {
     'TechDemo': ['2024-02-28', '2024-02-29'],
@@ -128,10 +140,14 @@ if selected_options:
         # Plot individual pie chart for the collection
         if total_scans > 0:
             with [col1, col2, col3][i % 3]:
+                # Display farmer image in round shape
+                farmer_image_path = farmer_images.get(collection)
+                if farmer_image_path:
+                    st.image(farmer_image_path, use_column_width=True, caption=collection, output_format='JPEG', clamp=True, channels="RGB")
+
                 fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
                 ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
                 ax.axis('equal')
-                st.write(f"**{collection} - Healthy vs Infected**")
                 st.write(f"Total Scans: {total_scans}")
                 st.write(f"Healthy Scans: {healthy_count}")
                 st.write(f"Infected Scans: {infected_count}")
