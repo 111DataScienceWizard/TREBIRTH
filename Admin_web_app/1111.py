@@ -207,21 +207,21 @@ with col2:
             selected_collections[collection].append(date_str)
             
         col1, col2, col3 = st.columns(3)
-            # Plot individual pie chart for the collection
-            if total_scans > 0:
-                with [col1, col2, col3][i % 3]:
-                    # Display farmer image in round shape
-                    farmer_image_path = farmer_images.get(collection)
-                    if farmer_image_path:
-                        st.image(farmer_image_path, use_column_width=True, caption=collection)
+        # Plot individual pie chart for the collection
+        if total_scans > 0:
+            with [col1, col2, col3][i % 3]:
+                # Display farmer image in round shape
+                farmer_image_path = farmer_images.get(collection)
+                if farmer_image_path:
+                    st.image(farmer_image_path, use_column_width=True, caption=collection)
 
-                    fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
-                    ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
-                    ax.axis('equal')
-                    st.write(f"Total Scans: {total_scans}")
-                    st.write(f"Healthy Scans: {healthy_count}")
-                    st.write(f"Infected Scans: {infected_count}")
-                    st.pyplot(fig)
+                fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
+                ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
+                ax.axis('equal')
+                st.write(f"Total Scans: {total_scans}")
+                st.write(f"Healthy Scans: {healthy_count}")
+                st.write(f"Infected Scans: {infected_count}")
+                st.pyplot(fig)
       
         
 
