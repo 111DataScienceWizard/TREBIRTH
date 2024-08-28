@@ -287,7 +287,7 @@ with col2:
 
             # Format the x-axis to display dates properly
             ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-           fig.autofmt_xdate()
+            fig.autofmt_xdate()
 
             # Set labels and title
             ax.set_xlabel('Date')
