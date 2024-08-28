@@ -79,31 +79,31 @@ for collection, dates in collection_dates.items():
 # Sort dropdown options by newest to oldest
 dropdown_options = sorted(dropdown_options, key=lambda x: datetime.strptime(x.split(' - ')[1], '%Y-%m-%d') if 'No Dates' not in x else datetime.min, reverse=True)
 
-# Create columns for layout: left for dropdown and comments, right for charts
-col1, col2 = st.columns([1, 2])
-
-with col1:
+# Sidebar for dropdown and comments
+with st.sidebar:
+    st.header('Filters and Comments')
+    
     # Multi-select dropdown
     selected_options = st.multiselect('Select Collection(s) with Dates', dropdown_options)
     
-    if selected_options:
-        selected_collections = {}
-        total_healthy = 0
-        total_infected = 0
-        collection_scan_counts = {}
-        device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
+    # Fetch data and process
+    selected_collections = {}
+    total_healthy = 0
+    total_infected = 0
+    collection_scan_counts = {}
+    device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
 
-        for option in selected_options:
-            collection, date_str = option.split(' - ')
-            if date_str == "No Dates":
-                date_str = None
-            if collection not in selected_collections:
-                selected_collections[collection] = []
-            selected_collections[collection].append(date_str)
-            
-        col1, col2, col3 = st.columns(3)
+    for option in selected_options:
+        collection, date_str = option.split(' - ')
+        if date_str == "No Dates":
+            date_str = None
+        if collection not in selected_collections:
+            selected_collections[collection] = []
+        selected_collections[collection].append(date_str)
+        
+    if selected_options:
         # Fetch data and plot pie charts
-        for i, (collection, dates) in enumerate(selected_collections.items()):
+        for collection, dates in selected_collections.items():
             if "No Dates" in dates or not dates[0]:
                 docs = db.collection(collection).stream()
                 st.write(f"**{collection} Collection (All Data)**")
@@ -127,7 +127,6 @@ with col1:
             total_healthy += healthy_count
             total_infected += infected_count
             collection_scan_counts[collection] = total_scans
-
             
         # Pie chart for combined data across all selected collections
         if total_healthy + total_infected > 0:
@@ -162,7 +161,7 @@ with col1:
             ax.set_title('Infected Scans by Collection (Most to Least)')
             st.write("**Infected Scans by Collection**")
             st.pyplot(fig)
-    
+
     # Styled box for comments
     most_active_device = "Sloth's Katana"
     total_infected_trees = 456
@@ -188,65 +187,45 @@ with col1:
             </p>
         </div>
     """, unsafe_allow_html=True)
-    
 
-with col2:
-    if selected_options:
-        selected_collections = {}
-        total_healthy = 0
-        total_infected = 0
-        collection_scan_counts = {}
-        device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
+# Main area for individual pie charts
+if selected_options:
+    col1, col2, col3 = st.columns(3)
 
-        for option in selected_options:
-            collection, date_str = option.split(' - ')
-            if date_str == "No Dates":
-                date_str = None
-            if collection not in selected_collections:
-                selected_collections[collection] = []
-            selected_collections[collection].append(date_str)
-            
-        col1, col2, col3 = st.columns(3)
-        # Plot individual pie chart for the collection
-        for i, (collection, dates) in enumerate(selected_collections.items()):
-            if "No Dates" in dates or not dates[0]:
-                docs = db.collection(collection).stream()
-                st.write(f"**{collection} Collection (All Data)**")
-            else:
-                docs = []
-                for date_str in dates:
-                    date_obj = datetime.strptime(date_str, '%Y-%m-%d')
-                    start_datetime = datetime.combine(date_obj, datetime.min.time())
-                    end_datetime = datetime.combine(date_obj, datetime.max.time())
-                    docs.extend(db.collection(collection)
-                                .where('timestamp', '>=', start_datetime)
-                                .where('timestamp', '<=', end_datetime)
-                                .stream())
+    for i, (collection, dates) in enumerate(selected_collections.items()):
+        if "No Dates" in dates or not dates[0]:
+            docs = db.collection(collection).stream()
+            st.write(f"**{collection} Collection (All Data)**")
+        else:
+            docs = []
+            for date_str in dates:
+                date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+                start_datetime = datetime.combine(date_obj, datetime.min.time())
+                end_datetime = datetime.combine(date_obj, datetime.max.time())
+                docs.extend(db.collection(collection)
+                            .where('timestamp', '>=', start_datetime)
+                            .where('timestamp', '<=', end_datetime)
+                            .stream())
 
-            # Process and analyze the retrieved documents
-            healthy_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Healthy')
-            infected_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Infected')
-            total_scans = healthy_count + infected_count
+        # Process and analyze the retrieved documents
+        healthy_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Healthy')
+        infected_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Infected')
+        total_scans = healthy_count + infected_count
 
-            # Accumulate counts for combined and data share pie charts
-            total_healthy += healthy_count
-            total_infected += infected_count
-            collection_scan_counts[collection] = total_scans
-            
-            if total_scans > 0:
-                with [col1, col2, col3][i % 3]:
-                    # Display farmer image in round shape
-                    farmer_image_path = farmer_images.get(collection)
-                    if farmer_image_path:
-                        st.image(farmer_image_path, use_column_width=True, caption=collection)
+        if total_scans > 0:
+            with [col1, col2, col3][i % 3]:
+                # Display farmer image in round shape
+                farmer_image_path = farmer_images.get(collection)
+                if farmer_image_path:
+                    st.image(farmer_image_path, use_column_width=True, caption=collection)
 
-                    fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
-                    ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
-                    ax.axis('equal')
-                    st.write(f"Total Scans: {total_scans}")
-                    st.write(f"Healthy Scans: {healthy_count}")
-                    st.write(f"Infected Scans: {infected_count}")
-                    st.pyplot(fig)
+                fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
+                ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
+                ax.axis('equal')
+                st.write(f"Total Scans: {total_scans}")
+                st.write(f"Healthy Scans: {healthy_count}")
+                st.write(f"Infected Scans: {infected_count}")
+                st.pyplot(fig)
       
         
 
