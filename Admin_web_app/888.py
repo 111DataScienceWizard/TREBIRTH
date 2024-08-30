@@ -43,6 +43,16 @@ def get_firestore_data(query):
 # Initialize Firestore client
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
 
+# Set the background of the entire app
+st.markdown("""
+    <style>
+    .main {
+        background-color: black;
+        color: white;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
 st.set_page_config(layout="wide")
 st.title('Farm Analytics')
 
@@ -128,9 +138,11 @@ with col1:
 
         # Pie chart for combined data across all selected collections
         if total_healthy + total_infected > 0:
-            fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
+            fig, ax = plt.subplots(figsize=(2, 2))  # Small plot size
             ax.pie([total_healthy, total_infected], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
             ax.axis('equal')
+            ax.set_facecolor('black')  # Set background to black
+            plt.setp(ax.texts, color='white')  # Set label text to white
             st.write("**Combined Healthy vs Infected Scans Across Selected Collections**")
             st.pyplot(fig)
 
@@ -143,6 +155,8 @@ with col1:
                 fig, ax = plt.subplots(figsize=(2, 2))  # Small plot size
                 ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
                 ax.axis('equal')
+                ax.set_facecolor('black')  # Set background to black
+                plt.setp(ax.texts, color='white')  # Set label text to white
                 st.write("**Data Share by Each Collection**")
                 st.pyplot(fig)
 
@@ -154,11 +168,19 @@ with col1:
 
             fig, ax = plt.subplots(figsize=(2, 2))  # Small plot size
             ax.barh(collections, infected_counts, color='#FF0000')
-            ax.set_xlabel('Number of Infected Scans')
-            ax.set_ylabel('Collection')
-            ax.set_title('Infected Scans by Collection (Most to Least)')
+            ax.set_xlabel('Number of Infected Scans', color='white')
+            ax.set_ylabel('Collection', color='white')
+            ax.set_title('Infected Scans by Collection (Most to Least)', color='white')
+            ax.set_facecolor('black')  # Set background to black
+            ax.spines['bottom'].set_color('white')
+            ax.spines['top'].set_color('white')
+            ax.spines['right'].set_color('white')
+            ax.spines['left'].set_color('white')
+            ax.tick_params(axis='x', colors='white')
+            ax.tick_params(axis='y', colors='white')
             st.write("**Infected Scans by Collection**")
             st.pyplot(fig)
+            
     
     # Styled box for comments
     most_active_device = "Sloth's Katana"
@@ -239,6 +261,8 @@ with col2:
                     fig, ax = plt.subplots(figsize=(2, 2))  # Small plot size
                     ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
                     ax.axis('equal')
+                    ax.set_facecolor('black')  # Set background to black
+                    plt.setp(ax.texts, color='white')  # Set label text to white
                     st.pyplot(fig)
 
       
