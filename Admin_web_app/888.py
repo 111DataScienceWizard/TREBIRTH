@@ -40,6 +40,9 @@ def get_firestore_data(query):
             break
     raise Exception("Max retries exceeded")
 
+
+st.set_page_config(layout="wide")
+
 # Initialize Firestore client
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
 
@@ -53,7 +56,6 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-st.set_page_config(layout="wide")
 st.title('Farm Analytics')
 
 # Mapping collections to farmer images
