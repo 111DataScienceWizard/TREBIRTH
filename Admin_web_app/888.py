@@ -40,31 +40,10 @@ def get_firestore_data(query):
             break
     raise Exception("Max retries exceeded")
 
-
-
-
-import streamlit as st
-import matplotlib.pyplot as plt
-from datetime import datetime, timedelta
-from collections import defaultdict
-import json
-from google.cloud import firestore
-
 # Initialize Firestore client
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
 
 st.set_page_config(layout="wide")
-
-# Set the background of the entire app
-st.markdown("""
-    <style>
-    .main {
-        background-color: black;
-        color: white;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
 st.title('Farm Analytics')
 
 # Mapping collections to farmer images
@@ -99,111 +78,222 @@ for collection, dates in collection_dates.items():
 # Sort dropdown options by newest to oldest
 dropdown_options = sorted(dropdown_options, key=lambda x: datetime.strptime(x.split(' - ')[1], '%Y-%m-%d') if 'No Dates' not in x else datetime.min, reverse=True)
 
-# Centered layout for dropdown
-st.markdown("<div style='text-align: center;'>", unsafe_allow_html=True)
-selected_options = st.multiselect('Select Collection(s) with Dates', dropdown_options)
-st.markdown("</div>", unsafe_allow_html=True)
+# Create columns for layout: left for dropdown and comments, right for charts
+col1, col2 = st.columns([1, 2])
 
-if selected_options:
-    selected_collections = {}
-    total_healthy = 0
-    total_infected = 0
-    collection_scan_counts = {}
+with col1:
+    # Multi-select dropdown
+    selected_options = st.multiselect('Select Collection(s) with Dates', dropdown_options)
+    
+    if selected_options:
+        selected_collections = {}
+        total_healthy = 0
+        total_infected = 0
+        collection_scan_counts = {}
+        device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
 
-    # Fetch data and plot pie charts
-    for option in selected_options:
-        collection, date_str = option.split(' - ')
-        if date_str == "No Dates":
-            date_str = None
-        if collection not in selected_collections:
-            selected_collections[collection] = []
-        selected_collections[collection].append(date_str)
+        for option in selected_options:
+            collection, date_str = option.split(' - ')
+            if date_str == "No Dates":
+                date_str = None
+            if collection not in selected_collections:
+                selected_collections[collection] = []
+            selected_collections[collection].append(date_str)
+            
+        # Fetch data and plot pie charts
+        for i, (collection, dates) in enumerate(selected_collections.items()):
+            if "No Dates" in dates or not dates[0]:
+                docs = db.collection(collection).stream()
+                st.write(f"**{collection} Collection (All Data)**")
+            else:
+                docs = []
+                for date_str in dates:
+                    date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+                    start_datetime = datetime.combine(date_obj, datetime.min.time())
+                    end_datetime = datetime.combine(date_obj, datetime.max.time())
+                    docs.extend(db.collection(collection)
+                                .where('timestamp', '>=', start_datetime)
+                                .where('timestamp', '<=', end_datetime)
+                                .stream())
 
-        docs = []
-        if date_str:
-            date_obj = datetime.strptime(date_str, '%Y-%m-%d')
-            start_datetime = datetime.combine(date_obj, datetime.min.time())
-            end_datetime = datetime.combine(date_obj, datetime.max.time())
-            docs = db.collection(collection) \
-                     .where('timestamp', '>=', start_datetime) \
-                     .where('timestamp', '<=', end_datetime) \
-                     .stream()
+            # Process and analyze the retrieved documents
+            healthy_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Healthy')
+            infected_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Infected')
+            total_scans = healthy_count + infected_count
 
-        healthy_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Healthy')
-        infected_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Infected')
-        total_scans = healthy_count + infected_count
+            # Accumulate counts for combined and data share pie charts
+            total_healthy += healthy_count
+            total_infected += infected_count
+            collection_scan_counts[collection] = total_scans
 
-        total_healthy += healthy_count
-        total_infected += infected_count
-        collection_scan_counts[collection] = total_scans
-
-    # First row with two pie charts and a horizontal bar chart
-    row1_col1, row1_col2, row1_col3 = st.columns([1, 1, 2])
-
-    with row1_col1:
+        # Pie chart for combined data across all selected collections
         if total_healthy + total_infected > 0:
-            fig, ax = plt.subplots(figsize=(3, 3))
+            fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
             ax.pie([total_healthy, total_infected], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
             ax.axis('equal')
             st.write("**Combined Healthy vs Infected Scans Across Selected Collections**")
             st.pyplot(fig)
 
-    with row1_col2:
+        # Pie chart showing data share by each collection
         if collection_scan_counts:
             total_scans_all_collections = sum(collection_scan_counts.values())
+
             if total_scans_all_collections > 0:
                 scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
-                fig, ax = plt.subplots(figsize=(3, 3))
+                fig, ax = plt.subplots(figsize=(2, 2))  # Small plot size
                 ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
                 ax.axis('equal')
                 st.write("**Data Share by Each Collection**")
                 st.pyplot(fig)
 
-    with row1_col3:
+        # Bar chart showing collections with most infected scans
         if total_infected > 0:
             sorted_collections = sorted(collection_scan_counts.items(), key=lambda item: item[1], reverse=True)
             collections = [item[0] for item in sorted_collections]
             infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collections]
 
-            fig, ax = plt.subplots(figsize=(3, 3))
+            fig, ax = plt.subplots(figsize=(2, 2))  # Small plot size
             ax.barh(collections, infected_counts, color='#FF0000')
             ax.set_xlabel('Number of Infected Scans')
             ax.set_ylabel('Collection')
             ax.set_title('Infected Scans by Collection (Most to Least)')
             st.write("**Infected Scans by Collection**")
             st.pyplot(fig)
+    
+    # Styled box for comments
+    most_active_device = "Sloth's Katana"
+    total_infected_trees = 456
+    
+    st.markdown(f"""
+        <div style="
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            font-family: 'Arial', sans-serif;
+            color: #333333;
+            width: 100%;  /* Take full column width */
+            margin-top: 20px;
+        ">
+           <h4 style="color: #007ACC; margin-bottom: 10px;">Comments</h4>
+            <hr style="border: none; height: 1px; background-color: #007ACC; margin-bottom: 10px;">
+            <p style="font-size: 14px; margin: 5px 0;">
+                <strong>Most Active Device:</strong> {most_active_device}
+            </p>
+            <p style="font-size: 14px; margin: 5px 0;">
+                <strong>Total Infected Trees Detected by Team TREBIRTH:</strong> {total_infected_trees}
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
 
-    # Second row with comments box and vertical bar chart
-    row2_col1, row2_col2 = st.columns([1, 3])
+with col2:
+    if selected_options:
+        selected_collections = {}
 
-    with row2_col1:
-        most_active_device = "Sloth's Katana"
-        total_infected_trees = 456
+        for option in selected_options:
+            collection, date_str = option.split(' - ')
+            if date_str == "No Dates":
+                date_str = None
+            if collection not in selected_collections:
+                selected_collections[collection] = []
+            selected_collections[collection].append(date_str)
 
-        st.markdown(f"""
-            <div style="
-                padding: 10px;
-                background-color: #f5f5f5;
-                border-radius: 10px;
-                box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-                font-family: 'Arial', sans-serif;
-                color: #333333;
-                width: 100%;  
-                margin-top: 20px;
-            ">
-               <h4 style="color: #007ACC; margin-bottom: 10px;">Comments</h4>
-                <hr style="border: none; height: 1px; background-color: #007ACC; margin-bottom: 10px;">
-                <p style="font-size: 14px; margin: 5px 0;">
-                    <strong>Most Active Device:</strong> {most_active_device}
-                </p>
-                <p style="font-size: 14px; margin: 5px 0;">
-                    <strong>Total Infected Trees Detected by Team TREBIRTH:</strong> {total_infected_trees}
-                </p>
-            </div>
-        """, unsafe_allow_html=True)
+        # Display individual collection plots row-wise
+        for i, (collection, dates) in enumerate(selected_collections.items()):
+            if "No Dates" in dates or not dates[0]:
+                docs = db.collection(collection).stream()
+                st.write(f"**{collection} Collection (All Data)**")
+            else:
+                docs = []
+                for date_str in dates:
+                    date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+                    start_datetime = datetime.combine(date_obj, datetime.min.time())
+                    end_datetime = datetime.combine(date_obj, datetime.max.time())
+                    docs.extend(db.collection(collection)
+                                .where('timestamp', '>=', start_datetime)
+                                .where('timestamp', '<=', end_datetime)
+                                .stream())
 
-    with row2_col2:
-        # Vertical bar chart for device scan counts over time
+            # Process and analyze the retrieved documents
+            healthy_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Healthy')
+            infected_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Infected')
+            total_scans = healthy_count + infected_count
+
+            if total_scans > 0:
+                st.write(f"**{collection} Collection**")
+
+                # Row layout: Image, details, and pie chart
+                row_col1, row_col2, row_col3, row_col4 = st.columns([1, 2, 2, 2])
+
+                with row_col1:
+                    if collection in farmer_images:
+                        st.image(farmer_images[collection], width=60, use_column_width=True)
+
+                with row_col2:
+                    st.write(f"**Total Scans:** {total_scans}")
+                    st.write(f"**Healthy Scans:** {healthy_count}")
+                    st.write(f"**Infected Scans:** {infected_count}")
+
+                with row_col3:
+                    # Pie chart for healthy vs infected scans per collection
+                    fig, ax = plt.subplots(figsize=(2, 2))  # Small plot size
+                    ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
+                    ax.axis('equal')
+                    st.pyplot(fig)
+
+                with row_col4:
+
+                    # Vertical bar chart for the device scan counts within the collection
+                    fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size for bar chart
+
+                    # Collect data for the bar chart
+                    device_names = []
+                    device_dates = []
+                    healthy_scans = defaultdict(lambda: defaultdict(int))  # Using defaultdict for easier accumulation
+                    infected_scans = defaultdict(lambda: defaultdict(int))
+
+                    for doc in docs:
+                        doc_data = doc.to_dict()
+                        device_name = doc_data.get('DeviceName:')
+                        if not device_name:
+                            continue  # Skip if DeviceName is missing
+
+                        date_key = doc_data['timestamp'].date().strftime('%Y-%m-%d')
+                        inf_stat = doc_data.get('InfStat', 'Unknown')
+
+                        if device_name not in device_names:
+                            device_names.append(device_name)
+                        if date_key not in device_dates:
+                            device_dates.append(date_key)
+
+                        if inf_stat == 'Healthy':
+                            healthy_scans[device_name][date_key] += 1
+                        elif inf_stat == 'Infected':
+                            infected_scans[device_name][date_key] += 1
+
+                    # Plot bar chart with only the dates and devices present in the collection
+                    for device_name in device_names:
+                        device_healthy_scans = [healthy_scans[device_name].get(date, 0) for date in device_dates]
+                        device_infected_scans = [infected_scans[device_name].get(date, 0) for date in device_dates]
+
+                        ax.bar(device_dates, device_healthy_scans, width=0.4, label=f'{device_name} - Healthy', color='#00FF00', align='center')
+                        ax.bar(device_dates, device_infected_scans, width=0.4, bottom=device_healthy_scans, label=f'{device_name} - Infected', color='#FF0000', align='center')
+
+                    # Configure the x-axis to show dates
+                    ax.set_xticks(device_dates)
+                    ax.set_xticklabels(device_dates, rotation=45, ha='right')
+
+                    # Set labels and legend
+                    ax.set_xlabel('Date')
+                    ax.set_ylabel('Number of Scans')
+                    ax.set_title(f'{collection} Collection - Device Scan Counts')
+                    ax.legend(loc='upper right', title='Devices')
+
+                    st.pyplot(fig)
+
+        
+
+        # vertical chart for device scan counts over time
         device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
 
         for collection, dates in selected_collections.items():
@@ -218,106 +308,68 @@ if selected_options:
                              .where('timestamp', '<=', end_datetime) \
                              .stream()
                     for doc in docs:
-                        doc_data = doc.to_dict()
-                        device_name = doc_data.get('DeviceName:')
-                        if not device_name:
-                            continue  # Skip if DeviceName is missing
+                        try:
+                            doc_data = doc.to_dict()
+                            device_name = doc_data.get('DeviceName:')
+                            if not device_name:
+                                continue  # Skip if DeviceName is missing
 
-                        date_key = doc_data['timestamp'].date().strftime('%Y-%m-%d')
-                        inf_stat = doc_data.get('InfStat', 'Unknown')
+                            date_key = doc_data['timestamp'].date().strftime('%Y-%m-%d')
+                            inf_stat = doc_data.get('InfStat', 'Unknown')
 
-                        if inf_stat == 'Healthy':
-                            device_data[device_name][date_key]['Healthy'] += 1
-                        elif inf_stat == 'Infected':
-                            device_data[device_name][date_key]['Infected'] += 1
+                            if inf_stat == 'Healthy':
+                                device_data[device_name][date_key]['Healthy'] += 1
+                            elif inf_stat == 'Infected':
+                                device_data[device_name][date_key]['Infected'] += 1
+                        except Exception as e:
+                            st.warning(f"Skipping document due to error: {str(e)}")
+                            continue
                 except Exception as e:
                     st.error(f"Error fetching data from collection {collection} for date {date_str}: {str(e)}")
+                    continue
 
+        # Debugging output to ensure data is correct
+        st.write("**Device Data for Bar Chart**")
+
+        # Line chart for device scan counts over time
         if device_data:
-            fig, ax = plt.subplots(figsize=(6, 4))
+            fig, ax = plt.subplots(figsize=(6, 4))  # Larger plot size to accommodate multiple lines
             width = 2
 
             colors = plt.cm.get_cmap('tab10', len(device_data) * 2)
             bars = []
             legend_labels = []
-
+        
             for i, (device_name, dates) in enumerate(device_data.items()):
-                date_keys = sorted(dates.keys())
-                healthy_counts = [dates[date_key]['Healthy'] for date_key in date_keys]
-                infected_counts = [dates[date_key]['Infected'] for date_key in date_keys]
+                date_list = sorted(dates.keys())
+                healthy_scans = [dates[date]['Healthy'] for date in date_list]
+                infected_scans = [dates[date]['Infected'] for date in date_list]
 
-                # Plot Healthy and Infected counts for each device
-                bars.append(ax.bar(date_keys, healthy_counts, width=width, label=f'{device_name} - Healthy', color=colors(i * 2)))
-                bars.append(ax.bar(date_keys, infected_counts, width=width, label=f'{device_name} - Infected', color=colors(i * 2 + 1), bottom=healthy_counts))
+                # Position bars slightly offset for healthy and infected scans
+                bars1 = ax.bar([datetime.strptime(date, '%Y-%m-%d') for date in date_list], healthy_scans, width=width, 
+                               label=f"{device_name} - Healthy", color=colors(i * 2))
+                bars2 = ax.bar([datetime.strptime(date, '%Y-%m-%d') for date in date_list], infected_scans, width=width, 
+                               bottom=healthy_scans, label=f"{device_name} - Infected", color=colors(i * 2 + 1))
 
-                legend_labels.extend([f'{device_name} - Healthy', f'{device_name} - Infected'])
+                bars.append(bars1)
+                bars.append(bars2)
+                legend_labels.append(f"{device_name} - Healthy")
+                legend_labels.append(f"{device_name} - Infected")
 
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Number of Scans')
-        ax.set_title('Device Scan Counts Over Time')
-        ax.legend(loc='upper right', bbox_to_anchor=(1.15, 1), labels=legend_labels)
-        st.write("**Device Scan Counts Over Time**")
-        st.pyplot(fig)
+            # Format the x-axis to display dates properly
+            ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+            fig.autofmt_xdate()
 
-    # Third row with individual pie charts and bar charts
-    st.write("### Individual Collection Analysis")
-    for collection, dates in selected_collections.items():
-        for date_str in dates:
-            date_obj = datetime.strptime(date_str, '%Y-%m-%d') if date_str else None
-            if date_obj:
-                start_datetime = datetime.combine(date_obj, datetime.min.time())
-                end_datetime = datetime.combine(date_obj, datetime.max.time())
-                docs = db.collection(collection) \
-                         .where('timestamp', '>=', start_datetime) \
-                         .where('timestamp', '<=', end_datetime) \
-                         .stream()
-            else:
-                docs = db.collection(collection).stream()
+            # Set labels and title
+            ax.set_xlabel('Date')
+            ax.set_ylabel('Number of Scans')
+            ax.set_title('Device Scan Counts Over Time')
 
-            healthy_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Healthy')
-            infected_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Infected')
-            total_scans = healthy_count + infected_count
+            # Move the legend to the left side
+            ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., labels=legend_labels)
 
-            row3_col1, row3_col2 = st.columns([1, 2])
+            st.write("**Device Scan Counts Over Time**")
+            st.pyplot(fig)
+        else:
+            st.write("No device data available for the selected collections.")
 
-            with row3_col1:
-                farmer_image = farmer_images.get(collection, 'default.png')
-                st.image(farmer_image, width=100)
-
-                st.write(f"**Collection: {collection}**")
-                st.write(f"Total Scans: {total_scans}")
-                st.write(f"Healthy Scans: {healthy_count}")
-                st.write(f"Infected Scans: {infected_count}")
-
-            with row3_col2:
-                fig, ax = plt.subplots(figsize=(1, 1))
-                ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
-                ax.axis('equal')
-                st.pyplot(fig)
-
-                device_scan_counts = defaultdict(lambda: {'Healthy': 0, 'Infected': 0})
-                for doc in docs:
-                    doc_data = doc.to_dict()
-                    device_name = doc_data.get('DeviceName:')
-                    if not device_name:
-                        continue  # Skip if DeviceName is missing
-
-                    inf_stat = doc_data.get('InfStat', 'Unknown')
-                    if inf_stat == 'Healthy':
-                        device_scan_counts[device_name]['Healthy'] += 1
-                    elif inf_stat == 'Infected':
-                        device_scan_counts[device_name]['Infected'] += 1
-
-                if device_scan_counts:
-                    fig, ax = plt.subplots(figsize=(3, 3))
-                    device_names = list(device_scan_counts.keys())
-                    healthy_counts = [device_scan_counts[device_name]['Healthy'] for device_name in device_names]
-                    infected_counts = [device_scan_counts[device_name]['Infected'] for device_name in device_names]
-
-                    ax.bar(device_names, healthy_counts, label='Healthy', color='#00FF00')
-                    ax.bar(device_names, infected_counts, label='Infected', color='#FF0000', bottom=healthy_counts)
-                    ax.set_xlabel('Device Name')
-                    ax.set_ylabel('Number of Scans')
-                    ax.set_title(f'Scans by Device for {collection}')
-                    ax.legend()
-                    st.pyplot(fig)
