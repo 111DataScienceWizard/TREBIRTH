@@ -257,8 +257,8 @@ if selected_options:
     
         with col1:
             # Display farmer image
-            farmer_image = farmer_images.get(collection, 'default.png')
-            st.image(farmer_image, width=60, use_column_width=True)
+            farmer_image = farmer_images.get('default.png')
+            st.image(farmer_image, width=60, use_column_width=True, caption=collection)
     
         with col2:
             # Display scan counts
