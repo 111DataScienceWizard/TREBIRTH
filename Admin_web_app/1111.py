@@ -223,7 +223,7 @@ with col2:
                 st.write(f"**{collection} Collection**")
 
                 # Row layout: Image, details, and pie chart
-                row_col1, row_col2, row_col3 = st.columns([1, 2, 2])
+                row_col1, row_col2, row_col3, row_col4 = st.columns([1, 2, 2, 2])
 
                 with row_col1:
                     if collection in farmer_images:
@@ -241,7 +241,64 @@ with col2:
                     ax.axis('equal')
                     st.pyplot(fig)
 
-      
+                with row_col4:
+                    # Pie chart for healthy vs infected scans per collection
+                    fig, ax = plt.subplots(figsize=(2, 2))  # Small plot size
+                    ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
+                    ax.axis('equal')
+                    st.pyplot(fig)
+
+                    # Vertical bar chart for the device scan counts within the collection
+                    fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size for bar chart
+
+                    # Collect data for the bar chart
+                    device_names = []
+                    device_dates = []
+                    healthy_scans = []
+                    infected_scans = []
+
+                    for doc in docs:
+                        doc_data = doc.to_dict()
+                        device_name = doc_data.get('DeviceName:')
+                        if not device_name:
+                            continue  # Skip if DeviceName is missing
+
+                        date_key = doc_data['timestamp'].date().strftime('%Y-%m-%d')
+                        inf_stat = doc_data.get('InfStat', 'Unknown')
+
+                        if inf_stat == 'Healthy':
+                            healthy_count = device_data[device_name][date_key]['Healthy']
+                        elif inf_stat == 'Infected':
+                            infected_count = device_data[device_name][date_key]['Infected']
+
+                        if device_name not in device_names:
+                            device_names.append(device_name)
+                            device_dates.append(date_key)
+                            healthy_scans.append(healthy_count)
+                            infected_scans.append(infected_count)
+                        else:
+                            # Update existing counts for the same device and date
+                            index = device_names.index(device_name)
+                            healthy_scans[index] += healthy_count
+                            infected_scans[index] += infected_count
+
+                    # Plot bar chart with only the dates and devices present in the collection
+                    for i, (device_name, date_key) in enumerate(zip(device_names, device_dates)):
+                        ax.bar(date_key, healthy_scans[i], width=0.4, label=f'{device_name} - Healthy', color='#00FF00')
+                        ax.bar(date_key, infected_scans[i], width=0.4, bottom=healthy_scans[i], label=f'{device_name} - Infected', color='#FF0000')
+
+                    # Configure the x-axis to show dates
+                    ax.set_xticks(device_dates)
+                    ax.set_xticklabels(device_dates, rotation=45, ha='right')
+
+                    # Set labels and legend
+                    ax.set_xlabel('Date')
+                    ax.set_ylabel('Number of Scans')
+                    ax.set_title(f'{collection} Collection - Device Scan Counts')
+                    ax.legend(loc='upper right', title='Devices')
+
+                    st.pyplot(fig)
+
         
 
         # vertical chart for device scan counts over time
