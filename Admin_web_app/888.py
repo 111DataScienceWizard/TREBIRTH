@@ -251,6 +251,7 @@ if selected_options:
 
         # Layout for collection details
         if total_scans > 0:
+            st.markdown(f"<div style='border: 2px solid #ccc; padding: 10px; border-radius: 5px;'>", unsafe_allow_html=True)
             st.write(f"**{collection} Collection**")
 
         col1, col2, col3, col4 = st.columns(4)
@@ -303,4 +304,5 @@ if selected_options:
             ax.legend(loc='upper right', title='Devices')
         
             st.pyplot(fig)
+        st.markdown("</div>", unsafe_allow_html=True)
     
