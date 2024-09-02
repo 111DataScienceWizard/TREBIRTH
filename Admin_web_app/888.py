@@ -165,7 +165,7 @@ if selected_options:
             collections = [item[0] for item in sorted_collections]
             infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collections]
 
-            fig, ax = plt.subplots(figsize=(5, 3))
+            fig, ax = plt.subplots(figsize=(3, 3))
             ax.barh(collections, infected_counts, color='#FF0000')
             ax.set_xlabel('Number of Infected Scans')
             ax.set_ylabel('Collection')
@@ -290,7 +290,7 @@ if selected_options:
                 st.write(f"Infected Scans: {infected_count}")
 
             with row3_col2:
-                fig, ax = plt.subplots(figsize=(3, 3))
+                fig, ax = plt.subplots(figsize=(1, 1))
                 ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
                 ax.axis('equal')
                 st.pyplot(fig)
@@ -309,7 +309,7 @@ if selected_options:
                         device_scan_counts[device_name]['Infected'] += 1
 
                 if device_scan_counts:
-                    fig, ax = plt.subplots(figsize=(4, 3))
+                    fig, ax = plt.subplots(figsize=(3, 3))
                     device_names = list(device_scan_counts.keys())
                     healthy_counts = [device_scan_counts[device_name]['Healthy'] for device_name in device_names]
                     infected_counts = [device_scan_counts[device_name]['Infected'] for device_name in device_names]
