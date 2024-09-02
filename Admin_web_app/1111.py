@@ -242,11 +242,6 @@ with col2:
                     st.pyplot(fig)
 
                 with row_col4:
-                    # Pie chart for healthy vs infected scans per collection
-                    fig, ax = plt.subplots(figsize=(2, 2))  # Small plot size
-                    ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
-                    ax.axis('equal')
-                    st.pyplot(fig)
 
                     # Vertical bar chart for the device scan counts within the collection
                     fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size for bar chart
