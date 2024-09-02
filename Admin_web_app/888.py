@@ -214,53 +214,93 @@ if selected_options:
         with col1:
             st.pyplot(fig)
 
-    # Individual collection details
+    # Process and analyze the retrieved documents
+    # Process and analyze the retrieved documents
     for collection in selected_collections.keys():
+        docs = db.collection(collection).stream()
+    
+        # Initialize counts
+        healthy_count = 0
+        infected_count = 0
+        total_scans = 0
+    
+        # Initialize device data storage
+        device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
+
+        # Process each document
+        for doc in docs:
+            doc_data = doc.to_dict()
+            inf_stat = doc_data.get('InfStat', 'Unknown')
+            device_name = doc_data.get('DeviceName:')
+            timestamp = doc_data.get('timestamp', None)
+        
+            if not timestamp:
+                continue
+        
+            date_key = timestamp.date().strftime('%Y-%m-%d')
+
+            # Update counts
+            if inf_stat == 'Healthy':
+                healthy_count += 1
+                device_data[device_name][date_key]['Healthy'] += 1
+            elif inf_stat == 'Infected':
+                infected_count += 1
+                device_data[device_name][date_key]['Infected'] += 1
+
+        total_scans = healthy_count + infected_count
+
+        # Layout for collection details
+        if total_scans > 0:
+            st.write(f"**{collection} Collection**")
+
         col1, col2, col3, col4 = st.columns(4)
+    
         with col1:
+            # Display farmer image
             farmer_image = farmer_images.get(collection, 'default.png')
-            st.image(farmer_image, width=150)
+            st.image(farmer_image, width=60, use_column_width=True)
+    
         with col2:
-            total_scans = collection_scan_counts.get(collection, 0)
-            healthy_scans = sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Healthy')
-            infected_scans = total_scans - healthy_scans
-            st.markdown(f"""
-                <div style="
-                    padding: 10px;
-                    background-color: #f5f5f5;
-                    border-radius: 10px;
-                    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-                    font-family: 'Arial', sans-serif;
-                    color: #333333;
-                    width: 100%;
-                ">
-                    <h4 style="color: #007ACC; margin-bottom: 10px;">{collection}</h4>
-                    <p style="font-size: 14px; margin: 5px 0;"><strong>Total Scans:</strong> {total_scans}</p>
-                    <p style="font-size: 14px; margin: 5px 0;"><strong>Healthy Scans:</strong> {healthy_scans}</p>
-                    <p style="font-size: 14px; margin: 5px 0;"><strong>Infected Scans:</strong> {infected_scans}</p>
-                </div>
-            """, unsafe_allow_html=True)
+            # Display scan counts
+            st.write(f"**Total Scans:** {total_scans}")
+            st.write(f"**Healthy Scans:** {healthy_count}")
+            st.write(f"**Infected Scans:** {infected_count}")
+
         with col3:
-            if healthy_scans + infected_scans > 0:
+        # Plot pie chart for healthy vs infected scans
+            if total_scans > 0:
                 fig, ax = plt.subplots(figsize=(3, 2))  # Small plot size
-                ax.pie([healthy_scans, infected_scans], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
+                ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
                 ax.axis('equal')
                 st.pyplot(fig)
+
         with col4:
+            # Plot vertical bar chart for device scan counts
+            fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size for bar chart
+        
+            # Prepare data for the bar chart
             device_names = list(device_data.keys())
             dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys()))
-
-            fig, ax = plt.subplots(figsize=(3, 2))  # Small plot size
-            for device in device_names:
-                if device not in device_data:
-                    continue
-                counts = [device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Healthy'] +
-                          device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Infected'] for date in dates]
-                ax.bar(dates, counts, label=device)
-
+        
+            for device_name in device_names:
+                counts = [device_data[device_name].get(date, {'Healthy': 0, 'Infected': 0})['Healthy'] +
+                          device_data[device_name].get(date, {'Healthy': 0, 'Infected': 0})['Infected'] for date in dates]
+                healthy_counts = [device_data[device_name].get(date, {'Healthy': 0, 'Infected': 0})['Healthy'] for date in dates]
+                infected_counts = [device_data[device_name].get(date, {'Healthy': 0, 'Infected': 0})['Infected'] for date in dates]
+            
+                # Plot bars for each device
+                ax.bar(dates, healthy_counts, width=0.4, label=f'{device_name} - Healthy', color='#00FF00')
+                ax.bar(dates, infected_counts, width=0.4, bottom=healthy_counts, label=f'{device_name} - Infected', color='#FF0000')
+        
+            # Configure x-axis to show dates
+            ax.set_xticks(dates)
+            ax.set_xticklabels(dates, rotation=45, ha='right')
+        
+            # Set labels and legend
             ax.set_xlabel('Date')
             ax.set_ylabel('Number of Scans')
-            ax.set_title('Scans by Device')
-            ax.legend(title='Device', bbox_to_anchor=(1.05, 1), loc='upper left')
-            fig.autofmt_xdate()  # Rotate date labels
+            ax.set_title(f'{collection} Collection - Device Scan Counts')
+            ax.legend(loc='upper right', title='Devices')
+        
             st.pyplot(fig)
+    
