@@ -310,7 +310,7 @@ if selected_options:
         device_names = list(device_data.keys())
         dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys()))
 
-        fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
+        fig, ax = plt.subplots(figsize=(3, 1))  # Small plot size
         for device in device_names:
             counts = [device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Healthy'] +
                       device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Infected'] for date in dates]
