@@ -387,8 +387,6 @@ if selected_options:
         total_scans = healthy_count + infected_count
 
         # Layout for collection details
-        with st.container():
-            st.markdown(f'<div style="border: 2px solid black; padding: 10px;">', unsafe_allow_html=True)
 
         col1, col2, col3, col4 = st.columns(4)
     
@@ -440,4 +438,3 @@ if selected_options:
             ax.legend(loc='upper right', title='Devices')
         
             st.pyplot(fig)
-        st.markdown('</div>', unsafe_allow_html=True)
