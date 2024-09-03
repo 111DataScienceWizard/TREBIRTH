@@ -191,7 +191,9 @@ farmer_images = {
     'DevOps': 'Admin_web_app/F6.png',
     'DevMode': 'Admin_web_app/F4.png',
     'debugging': 'Admin_web_app/F5.png',
-    'testing': 'Admin_web_app/F3.png'
+    'testing': 'Admin_web_app/F3.png',
+    'QDIC_test': 'Admin_web_app/F7.png',
+    'demo_db': 'Admin_web_app/F8.png'
 }
 
 # Collection dates mapping (using original date format)
@@ -202,7 +204,10 @@ collection_dates = {
                '2024-06-04', '2024-06-05'],
     'DevMode': ['2024-02-22', '2024-02-23', '2024-02-24', '2024-02-25', '2024-02-26', '2024-02-28'],
     'debugging': ['2024-06-10', '2024-06-13', '2024-06-14'],
-    'testing': ['2024-06-13']
+    'testing': ['2024-06-13'],
+    'demo_db': ['2024-08-23', '2024-08-24'],
+    'QDIC_test': ['2024-09-03']
+    
 }
 
 # Generate dropdown options with collection names and original date format
