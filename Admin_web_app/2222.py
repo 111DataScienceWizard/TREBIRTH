@@ -279,7 +279,7 @@ if selected_options:
         fig, ax = plt.subplots(figsize=(3, 2))  # Small plot size
         ax.pie([total_healthy, total_infected], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
         ax.axis('equal')
-        ax.set_title('Combined Healthy vs Infected Scans Across Selected Collections')
+        ax.set_title('Combined Healthy vs Infected Scans')
         col1.pyplot(fig)
 
     # Pie chart showing data share by each collection
