@@ -386,6 +386,8 @@ if selected_options:
 
         total_scans = healthy_count + infected_count
 
+        if total_scans > 0:
+            st.write(f"**{collection} Collection**")
         # Layout for collection details
 
         col1, col2, col3, col4 = st.columns(4)
