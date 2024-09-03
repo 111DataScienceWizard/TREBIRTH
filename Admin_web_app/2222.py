@@ -321,9 +321,7 @@ if selected_options:
         ax.set_title('Scans by Device Across Collections')
         ax.legend(title='Device', bbox_to_anchor=(1.05, 1), loc='upper left')
         fig.autofmt_xdate()  # Rotate date labels
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.pyplot(fig)
+        st.pyplot(fig)
 
     # Styled box for comments
     most_active_device = "Sloth's Katana"
