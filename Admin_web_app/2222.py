@@ -272,7 +272,7 @@ if selected_options:
                 device_data[device_name][date_key]['Infected'] += 1
 
     # Layout for the first row (4 columns)
-    col1, col2, col3, col4 = st.columns(4)
+    col1, col2, col3 = st.columns(3)
 
     # Pie chart for combined data across all selected collections
     if total_healthy + total_infected > 0:
@@ -304,32 +304,6 @@ if selected_options:
         ax.set_title('Infected Scans by Collection (Most to Least)')
         col3.pyplot(fig)
 
-    # Styled box for comments
-    most_active_device = "Sloth's Katana"
-    total_infected_trees = 456
-
-    with col4:
-        st.markdown(f"""
-            <div style="
-                padding: 10px;
-                background-color: #f5f5f5;
-                border-radius: 10px;
-                box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-                font-family: 'Arial', sans-serif;
-                color: #333333;
-                width: 100%;  /* Take full column width */
-                margin-top: 20px;
-            ">
-               <h4 style="color: #007ACC; margin-bottom: 10px;">Comments</h4>
-                <hr style="border: none; height: 1px; background-color: #007ACC; margin-bottom: 10px;">
-                <p style="font-size: 14px; margin: 5px 0;">
-                    <strong>Most Active Device:</strong> {most_active_device}
-                </p>
-                <p style="font-size: 14px; margin: 5px 0;">
-                    <strong>Total Infected Trees Detected by Team TREBIRTH:</strong> {total_infected_trees}
-                </p>
-            </div>
-        """, unsafe_allow_html=True)
 
     # Layout for the second row (Vertical Bar Chart)
     if device_data:
@@ -351,6 +325,43 @@ if selected_options:
         with col1:
             st.pyplot(fig)
 
+    # Styled box for comments
+    most_active_device = "Sloth's Katana"
+    least_active_device = "Proto 2"
+    total_infected_trees = 456
+    most_infected_plot = "Devmode"
+    least_infected_plot = "testing"
+
+    st.markdown(f"""
+        <div style="
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            font-family: 'Arial', sans-serif;
+            color: #333333;
+            width: 100%;  /* Take full column width */
+            margin-top: 20px;
+        ">
+            <h4 style="color: #007ACC; margin-bottom: 10px;">Comments</h4>
+            <hr style="border: none; height: 1px; background-color: #007ACC; margin-bottom: 10px;">
+            <p style="font-size: 14px; margin: 5px 0;">
+                <strong>Most Active Device:</strong> {most_active_device}
+            </p>
+            <p style="font-size: 14px; margin: 5px 0;">
+                <strong>Least Active Device:</strong> {least_active_device}
+            </p>
+            <p style="font-size: 14px; margin: 5px 0;">
+                <strong>Total Infected Trees Detected by Team TREBIRTH:</strong> {total_infected_trees}
+            </p>
+            <p style="font-size: 14px; margin: 5px 0;">
+                <strong>Most Infected Plot:</strong> {most_infected_plot}
+            </p>
+            <p style="font-size: 14px; margin: 5px 0;">
+                <strong>Least Infected plot:</strong> {least_infected_plot}
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
     # Process and analyze the retrieved documents
     # Process and analyze the retrieved documents
     for collection in selected_collections.keys():
@@ -395,7 +406,7 @@ if selected_options:
         with col1:
             # Display farmer image
             farmer_image = farmer_images.get(collection, 'default.png')
-            st.image(farmer_image, width=60, use_column_width=True, caption=collection)
+            st.image(farmer_image, width=60, use_column_width=True)
     
         with col2:
             # Display scan counts
