@@ -290,6 +290,7 @@ if selected_options:
             fig, ax = plt.subplots(figsize=(3, 2))  # Small plot size
             ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
             ax.axis('equal')
+            st.write("**Data Share by Each Collection**")
             col2.pyplot(fig)
 
     # Bar chart showing collections with most infected scans
@@ -303,6 +304,7 @@ if selected_options:
         ax.set_xlabel('Number of Infected Scans')
         ax.set_ylabel('Collection')
         ax.set_title('Infected Scans by Collection (Most to Least)')
+        st.write("**Most Infected Plot to Least Infected**")
         col3.pyplot(fig)
 
 
