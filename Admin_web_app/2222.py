@@ -46,12 +46,7 @@ def get_firestore_data(query):
 st.set_page_config(layout="wide")
 st.title("Farm Analytics")
 
-# Initialize Firestore DB
-def initialize_firestore():
-    db = firestore.Client.from_service_account_json(
-        "WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json"
-    )
-    return db
+db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
 
 # Fetch the most recent scan data from the "demo_db" collection
 def get_most_recent_scan(db):
@@ -138,7 +133,6 @@ def fig_to_bytesio(fig):
     return buffer
 
 def main():
-    db = initialize_firestore()
     radar_raw, timestamp = get_most_recent_scan(db)
 
     if radar_raw is not None:
