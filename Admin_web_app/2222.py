@@ -117,7 +117,6 @@ def main():
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            st.subheader("Time Domain")
             time_fig = plot_time_domain(radar_data)
             time_buffer = fig_to_bytesio(time_fig)
             st.download_button(
@@ -128,7 +127,6 @@ def main():
             )
 
         with col2:
-            st.subheader("Frequency Domain")
             freq_fig = plot_frequency_domain(radar_data)
             freq_buffer = fig_to_bytesio(freq_fig)
             st.download_button(
@@ -139,7 +137,6 @@ def main():
             )
 
         with col3:
-            st.subheader("Statistics")
             stats_df = calculate_statistics(df_radar)
             stats_fig = plot_statistics(stats_df)
             stats_buffer = fig_to_bytesio(stats_fig)
