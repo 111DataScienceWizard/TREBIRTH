@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from io import BytesIO
-from scipy.signal import welch
+from scipy.stats import skew, kurtosis
 from datetime import datetime
 from google.cloud import firestore
 
@@ -42,6 +42,24 @@ def preprocess_data(radar_raw):
     df_radar.fillna(df_radar.mean(), inplace=True)
     return df_radar
 
+# Function to calculate statistics
+def calculate_statistics(df):
+    df = df.apply(pd.to_numeric, errors='coerce')
+    df.fillna(df.mean(), inplace=True)
+    stats = {
+        'Column': df.columns,
+        'Mean': df.mean(),
+        'Median': df.median(),
+        'Std Deviation': df.std(),
+        'PTP': df.apply(lambda x: np.ptp(x)),
+        'Skewness': skew(df),
+        'Kurtosis': kurtosis(df),
+        'Min': df.min(),
+        'Max': df.max()
+    }
+    stats_df = pd.DataFrame(stats)
+    return stats_df
+
 def plot_time_domain(data):
     st.write("## Time Domain")
     fig, ax = plt.subplots()
@@ -67,6 +85,16 @@ def plot_frequency_domain(data):
     st.pyplot(fig)
     return fig
 
+# Function to plot statistics
+def plot_statistics(stats_df):
+    st.write("## Radar Column Statistics")
+    fig, ax = plt.subplots(figsize=(10, 6))
+    stats_df.plot(kind='bar', ax=ax)
+    ax.set_title('Statistics of Radar Column')
+    ax.set_ylabel('Values')
+    st.pyplot(fig)
+    return fig
+
 # Function to convert matplotlib figure to BytesIO for download
 def fig_to_bytesio(fig):
     buffer = BytesIO()
@@ -85,8 +113,8 @@ def main():
         # Display timestamp information
         st.markdown(f"**Timestamp of Latest Scan:** {timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
 
-        # Create two columns for plots
-        col1, col2 = st.columns(2)
+        # Create three columns for plots
+        col1, col2, col3 = st.columns(3)
 
         with col1:
             st.subheader("Time Domain")
@@ -107,6 +135,18 @@ def main():
                 label="Download Frequency Domain Plot",
                 data=freq_buffer,
                 file_name="frequency_domain_plot.png",
+                mime="image/png"
+            )
+
+        with col3:
+            st.subheader("Statistics")
+            stats_df = calculate_statistics(df_radar)
+            stats_fig = plot_statistics(stats_df)
+            stats_buffer = fig_to_bytesio(stats_fig)
+            st.download_button(
+                label="Download Statistics Plot",
+                data=stats_buffer,
+                file_name="statistics_plot.png",
                 mime="image/png"
             )
     else:
