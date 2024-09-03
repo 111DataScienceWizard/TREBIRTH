@@ -42,30 +42,35 @@ def preprocess_data(radar_raw):
     df_radar.fillna(df_radar.mean(), inplace=True)
     return df_radar
 
-# Plot time domain
-def plot_time_domain(data, sampling_rate=100):
-    time_seconds = np.arange(len(data)) / sampling_rate  # Assuming 100 samples per second
-    fig, ax = plt.subplots(figsize=(12, 6))
-    ax.plot(time_seconds, data, color='blue', linewidth=1)
-    ax.set_xlabel('Time (s)', fontsize=12)
-    ax.set_ylabel('Amplitude', fontsize=12)
-    ax.set_title('Time Domain Plot', fontsize=16)
-    ax.grid(True)
-    st.pyplot(fig)
-    return fig
+def plot_time_domain(data):
+    columns = data.columns
+    for column in columns:
+        st.write(f"## {column} - Time Domain")
+        fig, ax = plt.subplots()
+        # Calculate time in seconds based on sampling rate
+        time_seconds = np.arange(len(data[column])) / sampling_rate
+        ax.plot(time_seconds, data[column].values)
+        ax.set_xlabel('Time (s)')
+        ax.set_ylabel('Signal')
+        st.pyplot(fig)
+        save_button(fig, f"{column}_time_domain.png")
 
-# Plot frequency domain
-def plot_frequency_domain(data, sampling_rate=100):
-    # Calculate power spectral density using Welch's method
-    freq, power = welch(data, fs=sampling_rate, nperseg=1024)
-    fig, ax = plt.subplots(figsize=(12, 6))
-    ax.semilogy(freq, power, color='red', linewidth=1)
-    ax.set_xlabel('Frequency (Hz)', fontsize=12)
-    ax.set_ylabel('Power Spectrum Density', fontsize=12)
-    ax.set_title('Frequency Domain Plot', fontsize=16)
-    ax.grid(True)
-    st.pyplot(fig)
-    return fig
+# Function to plot signals in frequency domain
+def plot_frequency_domain(data):
+    columns = data.columns
+    for column in columns:
+        st.write(f"## {column} - Frequency Domain")
+        sensor_name = column.split()[0]  # Get the sensor name (e.g., 'Radar', 'ADXL', etc.)
+        frequencies = np.fft.fftfreq(len(data[column]), d=1/100)
+        fft_values = np.fft.fft(data[column])
+        powers = np.abs(fft_values) / len(data[column])
+        powers_db = 20 * np.log10(powers)  
+        fig, ax = plt.subplots()
+        ax.plot(frequencies[:len(frequencies)//2], powers_db[:len(frequencies)//2])  
+        ax.set_xlabel('Frequency (Hz)')
+        ax.set_ylabel('Power Spectrum (dB)')
+        st.pyplot(fig)
+        save_button(fig, f"{sensor_name}_frequency_domain.png")
 
 # Function to convert matplotlib figure to BytesIO for download
 def fig_to_bytesio(fig):
