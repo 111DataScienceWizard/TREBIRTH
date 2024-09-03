@@ -406,7 +406,7 @@ if selected_options:
         with col3:
         # Plot pie chart for healthy vs infected scans
             if total_scans > 0:
-                fig, ax = plt.subplots(figsize=(3, 2))  # Small plot size
+                fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
                 ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
                 ax.axis('equal')
                 st.pyplot(fig)
