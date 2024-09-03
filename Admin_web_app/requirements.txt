@@ -6,7 +6,6 @@ google-auth
 firebase_admin==6.1.0
 google-cloud-firestore
 numpy
-scikit-learn==1.2.2
 plotly
 pydeck 
 Pillow
