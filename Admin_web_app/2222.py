@@ -451,3 +451,7 @@ if selected_options:
             ax.legend(loc='upper right', title='Devices')
         
             st.pyplot(fig)
+
+
+    if st.button('Web App to download the data'):
+        st.markdown(f"[Click here to visit the web app](https://webbapptrebirth-dxf7mxdthdtwclmx6d2mcx.streamlit.app/)")
