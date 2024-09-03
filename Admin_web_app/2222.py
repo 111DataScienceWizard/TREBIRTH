@@ -453,5 +453,24 @@ if selected_options:
             st.pyplot(fig)
 
 
-    if st.button('Web App to download the data'):
-        st.markdown(f"[Click here to visit the web app](https://webbapptrebirth-dxf7mxdthdtwclmx6d2mcx.streamlit.app/)")
+    # Add a button in the middle of the app with larger size
+    button_html = """
+        <div style="display: flex; justify-content: center; align-items: center; height: 100px;">
+            <a href="https://webbapptrebirth-dxf7mxdthdtwclmx6d2mcx.streamlit.app/" target="_blank" style="
+                display: inline-block;
+                padding: 20px 40px;
+                font-size: 24px;
+                font-weight: bold;
+                background-color: #007ACC;
+                color: white;
+                text-align: center;
+                text-decoration: none;
+                border-radius: 10px;
+                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            ">
+                Go to Next Web App
+            </a>
+        </div>
+    """
+
+    st.markdown(button_html, unsafe_allow_html=True)
