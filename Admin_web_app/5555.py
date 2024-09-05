@@ -629,11 +629,6 @@ if selected_options:
             plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
             legend_title_text="Devices",
             height =300,
-            xaxis=dict(
-            tickvals=dates,
-            ticktext=[date.strftime('%Y-%m-%d') for date in dates],
-            tickangle=45  # Rotate date labels if needed
-        )
         )
 
         # Plot the figure in Streamlit
