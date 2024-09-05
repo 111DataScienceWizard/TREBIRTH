@@ -14,6 +14,8 @@ import random
 from google.api_core.exceptions import ResourceExhausted, RetryError
 from collections import defaultdict
 import matplotlib.dates as mdates
+import plotly.express as px
+import plotly.graph_objectes as go
 
 def exponential_backoff(retries):
     base_delay = 1
@@ -97,20 +99,36 @@ def calculate_statistics(df):
 # Plot multiple scans in time domain
 def plot_multiple_time_domain(data_list, timestamps):
     st.write("## Time Domain")
-    fig, ax = plt.subplots()
-    colors = ['r', 'g', 'b']  # Assign different colors to each scan
-    sampling_rate = 100  # Assuming a sampling rate of 100 Hz
-
-    for i, data in enumerate(data_list):
-        #time_seconds = np.arange(len(data)) / sampling_rate
-        ax.plot(data, label=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}', color=colors[i])
+    # Initialize the Plotly figure with a dark template
+    fig = go.Figure()
     
-    ax.set_xlabel('Time (s)')
-    ax.set_ylabel('Signal')
-    ax.legend()
-    st.pyplot(fig)
-    return fig
+    # Define colors for the three different scans
+    colors = ['red', 'green', 'blue']
+    
+    # Add traces (lines) for each scan
+    for i, data in enumerate(data_list):
+        fig.add_trace(go.Scatter(
+            y=data,  # Plot the raw index data on the y-axis
+            mode='lines',
+            name=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}',
+            line=dict(color=colors[i])
+        ))
+    
+    # Update layout for dark background and white labels
+    fig.update_layout(
+        template='plotly_dark',  # Dark background
+        xaxis_title="Index",  # Raw index numbers
+        yaxis_title="Signal",
+        legend_title="Scans",
+        font=dict(color="white"),  # White text labels
+        plot_bgcolor='black',  # Background color of the plot area
+        paper_bgcolor='black'  # Background color of the chart area (paper)
+    )
 
+    # Render the plot using Streamlit
+    st.plotly_chart(fig)
+    return fig
+    
 # Plot multiple scans in frequency domain
 def plot_multiple_frequency_domain(data_list, timestamps):
     st.write("## Frequency Domain")
