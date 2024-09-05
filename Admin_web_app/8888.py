@@ -231,8 +231,11 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-
+st.markdown(f"**Timestamps of 2 Recent Scans:** {', '.join([ts.strftime('%Y-%m-%d %H:%M:%S') for ts in timestamps])}")
+st.write(f"**Farmer Name:** Dananjay Yadav", color='white')
+st.write(f"**Farm Location:** Rahuri Nashik", color='white')
+st.write(f"**Farm Age:** 7 Years", color='white')
+st.write(f"**Plot Size:** 2.5 Acre", color='white')
 
 # Mapping collections to farmer images
 farmer_images = {
@@ -267,7 +270,7 @@ farm_locations = {
     'debugging': 'Kundwadi Niphad',
     'testing': 'Pathardi',
     'QDIC_test': 'Niphad - Pimpalgaon',
-    'demo_db': 'Rahuri Nashik'
+    'demo_db': 'Rahuri Nashik'     
 }
 
 # Plot size mapping
@@ -282,6 +285,17 @@ plot_sizes = {
     'demo_db': '2.5 Acre'
 }
 
+#How old is the farm
+farm_ages = {
+    'TechDemo': '8 Years',
+    'Mr.Arjun': '13 Years',
+    'DevOps': '6 Years',
+    'DevMode': '9 Years',
+    'debugging': '11 Years',
+    'testing': '8 Years',
+    'QDIC_test': '10 Years',
+    'demo_db': '7 Years'
+}
 # Collection dates mapping (using original date format)
 collection_dates = {
     'TechDemo': ['2024-02-28', '2024-02-29'],
@@ -567,6 +581,7 @@ if selected_options:
             location = farm_locations.get(collection, 'Unknown Location')
             plot_size = plot_sizes.get(collection, 'Unknown Plot Size')
             st.write(f"**Farm Location:** {location}", color='white')
+            st.write(f"**Farm Age:** {farm_age}", color='white')
             st.write(f"**Plot Size:** {plot_size}", color='white')
 
         with col3:
