@@ -431,8 +431,19 @@ if selected_options:
         dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys()))
 
         for device in device_names:
-            counts = [device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Healthy'] +
-                      device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Infected'] for date in dates]
+            healthy_counts = []
+            infected_counts = []
+            
+            for date in dates:
+                # Safely get the healthy and infected counts for each device on each date
+                healthy_count = device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Healthy']
+                infected_count = device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Infected']
+            
+                # Append the counts to the respective lists
+                healthy_counts.append(healthy_count)
+                infected_counts.append(infected_count)
+
+            # Add healthy counts for the device
             fig.add_trace(go.Bar(
                 x=dates,
                 y=healthy_counts,
