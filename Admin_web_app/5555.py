@@ -96,40 +96,34 @@ def calculate_statistics(df):
     stats_df = pd.DataFrame(stats)
     return stats_df
 
-# Plot multiple scans in time domain
 def plot_multiple_time_domain(data_list, timestamps):
     st.write("## Time Domain")
-    # Initialize the Plotly figure with a dark template
     fig = go.Figure()
     
-    # Define colors for the three different scans
     colors = ['#E24E42', '#59C3C3', '#E9B44C']
     
-    # Add traces (lines) for each scan
     for i, data in enumerate(data_list):
         fig.add_trace(go.Scatter(
-            y=data,  # Plot the raw index data on the y-axis
+            y=data,
             mode='lines',
             name=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}',
             line=dict(color=colors[i])
         ))
     
-    # Update layout for dark background and white labels
     fig.update_layout(
-        template='plotly_dark',  # Dark background
-        xaxis_title="Index",  # Raw index numbers
+        template='plotly_white',  # Light background
+        xaxis_title="Index",
         yaxis_title="Signal",
         legend_title="Scans",
-        font=dict(color="#F0F0F0"),  # White text labels
-        plot_bgcolor='#1E1E1E',  # Background color of the plot area
-        paper_bgcolor='#1E1E1E'  # Background color of the chart area (paper)
+        font=dict(color="#000000"),  # Black text labels
+        plot_bgcolor='white',  # Background color of the plot area
+        paper_bgcolor='white'  # Background color of the chart area (paper)
     )
 
-    # Render the plot using Streamlit
     st.plotly_chart(fig)
     return fig
+
     
-# Plot multiple scans in frequency domain using Plotly
 def plot_multiple_frequency_domain(data_list, timestamps):
     st.write("## Frequency Domain")
     fig = go.Figure()
@@ -137,13 +131,11 @@ def plot_multiple_frequency_domain(data_list, timestamps):
     colors = ['red', 'green', 'blue']
 
     for i, data in enumerate(data_list):
-        # Perform FFT
         frequencies = np.fft.fftfreq(len(data), d=1/100)
         fft_values = np.fft.fft(data)
         powers = np.abs(fft_values) / len(data)
         powers_db = 20 * np.log10(powers)
 
-        # Add trace to the Plotly figure
         fig.add_trace(go.Scatter(
             x=frequencies[:len(frequencies)//2], 
             y=powers_db[:len(powers_db)//2], 
@@ -152,21 +144,19 @@ def plot_multiple_frequency_domain(data_list, timestamps):
             line=dict(color=colors[i])
         ))
 
-    # Update layout for a dark background
     fig.update_layout(
-        template='plotly_dark',
+        template='plotly_white',
         xaxis_title="Frequency (Hz)",
         yaxis_title="Power Spectrum (dB)",
         legend_title="Scans",
-        font=dict(color="white"),
-        plot_bgcolor='black',
-        paper_bgcolor='black'
+        font=dict(color="black"),
+        plot_bgcolor='white',
+        paper_bgcolor='white'
     )
 
     st.plotly_chart(fig)
     return fig
-
-# Plot statistics for multiple scans using Plotly
+    
 def plot_multiple_statistics(stats_dfs, timestamps):
     st.write("## Radar Column Statistics")
     
@@ -179,20 +169,19 @@ def plot_multiple_statistics(stats_dfs, timestamps):
         for measure in stats_measures:
             fig.add_trace(go.Bar(
                 x=stats_measures,
-                y=[stats_df[measure].values[0] for measure in stats_measures],  # Assuming one radar column
+                y=[stats_df[measure].values[0] for measure in stats_measures],
                 name=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}',
                 marker_color=colors[i],
             ))
 
-    # Update layout for a dark background
     fig.update_layout(
         barmode='group',
-        template='plotly_dark',
+        template='plotly_white',
         xaxis_title="Statistics",
         yaxis_title="Values",
-        font=dict(color="white"),
-        plot_bgcolor='black',
-        paper_bgcolor='black',
+        font=dict(color="black"),
+        plot_bgcolor='white',
+        paper_bgcolor='white',
         legend_title="Scans"
     )
 
