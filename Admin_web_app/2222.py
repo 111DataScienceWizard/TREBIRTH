@@ -135,10 +135,17 @@ def plot_multiple_statistics(stats_dfs, timestamps):
     st.write("## Radar Column Statistics")
     fig, ax = plt.subplots(figsize=(10, 6))
     colors = ['r', 'g', 'b']
+    markers = ['o', 's', 'D']  # Different marker styles for each scan
     
     for i, stats_df in enumerate(stats_dfs):
-        stats_df.plot(kind='line', ax=ax, marker='o', linestyle='-', color=colors[i], label=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}')
-    
+        stats_df.plot(kind='line', ax=ax, 
+                      marker=markers[i], 
+                      markersize=8,  # Increase marker size
+                      linestyle='-', 
+                      linewidth=2,  # Increase line width
+                      color=colors[i], 
+                      label=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}')
+        
     ax.set_title('Statistics of Radar Column')
     ax.set_ylabel('Values')
     ax.legend()
