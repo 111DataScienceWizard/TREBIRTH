@@ -470,6 +470,7 @@ if selected_options:
             plot_bgcolor='rgba(0,0,0,0)',
             legend_title_text="Devices",  # Add a title to the legend
             xaxis=dict(tickangle=-45),  # Rotate x-axis labels for better readability
+            height = 300
         )
         st.plotly_chart(fig, use_container_width=True)
 
