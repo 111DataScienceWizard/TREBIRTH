@@ -133,22 +133,45 @@ def plot_multiple_frequency_domain(data_list, timestamps):
 # Function to plot statistics for multiple scans
 def plot_multiple_statistics(stats_dfs, timestamps):
     st.write("## Radar Column Statistics")
-    fig, ax = plt.subplots(figsize=(10, 6))
-    colors = ['r', 'g', 'b']
-    markers = ['o', 's', 'D']  # Different marker styles for each scan
     
-    for i, stats_df in enumerate(stats_dfs):
-        stats_df.plot(kind='line', ax=ax, 
-                      marker=markers[i], 
-                      markersize=8,  # Increase marker size
-                      linestyle='-', 
-                      linewidth=2,  # Increase line width
-                      color=colors[i], 
-                      label=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}')
-        
-    ax.set_title('Statistics of Radar Column')
+    # Initialize the figure and axes
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Define colors and labels for each scan
+    colors = ['r', 'g', 'b']  # Different colors for each scan
+    labels = [f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}' for i in range(len(stats_dfs))]
+    
+    # Prepare data for the grouped bar chart
+    stats_measures = ['Mean', 'Median', 'PTP', 'Min', 'Max']
+    num_measures = len(stats_measures)
+    num_scans = len(stats_dfs)
+    
+    # Extract statistics for each scan into a list
+    stats_values = {measure: [] for measure in stats_measures}
+    for stats_df in stats_dfs:
+        for measure in stats_measures:
+            stats_values[measure].append(stats_df[measure].values[0])  # Assuming one radar column, get the value
+    
+    # Define the bar width and positions
+    bar_width = 0.2
+    index = np.arange(num_measures)  # X-axis locations for the measures
+    bar_positions = [index + i * bar_width for i in range(num_scans)]  # Positions for each scan's bars
+    
+    # Plot bars for each scan's statistics
+    for i in range(num_scans):
+        ax.bar(bar_positions[i], [stats_values[measure][i] for measure in stats_measures], 
+               bar_width, label=labels[i], color=colors[i])
+    
+    # Set X-axis labels and ticks
+    ax.set_xticks(index + bar_width)  # Position the ticks in the middle of the groups
+    ax.set_xticklabels(stats_measures)  # Set the labels for each measure
+    
+    # Add labels, title, and legend
     ax.set_ylabel('Values')
+    ax.set_title('Grouped Statistics of Radar Columns (Three Recent Scans)')
     ax.legend()
+    
+    # Show the plot
     st.pyplot(fig)
     return fig
 
