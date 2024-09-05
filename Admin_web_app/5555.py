@@ -625,7 +625,6 @@ if selected_options:
             font=dict(color='white'),  # White font for dark background
             paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
             plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
-            font=dict(color='white'),
             legend_title_text="Devices",
             height=300
         )
