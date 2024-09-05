@@ -80,10 +80,10 @@ def calculate_statistics(df):
         'Column': df.columns,
         'Mean': df.mean(),
         'Median': df.median(),
-        'Std Deviation': df.std(),
+        #'Std Deviation': df.std(),
         'PTP': df.apply(lambda x: np.ptp(x)),
-        'Skewness': skew(df),
-        'Kurtosis': kurtosis(df),
+        #'Skewness': skew(df),
+        #'Kurtosis': kurtosis(df),
         'Min': df.min(),
         'Max': df.max()
     }
