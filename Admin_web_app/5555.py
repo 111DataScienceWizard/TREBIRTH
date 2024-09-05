@@ -15,7 +15,7 @@ from google.api_core.exceptions import ResourceExhausted, RetryError
 from collections import defaultdict
 import matplotlib.dates as mdates
 import plotly.express as px
-import plotly.graph_objectes as go
+import plotly.graph_objects as go
 
 def exponential_backoff(retries):
     base_delay = 1
