@@ -369,61 +369,83 @@ if selected_options:
 
     # Pie chart for combined data across all selected collections
     if total_healthy + total_infected > 0:
-        fig, ax = plt.subplots(figsize=(3, 2))  # Small plot size
-        fig.patch.set_alpha(0)  # Transparent figure background
-        ax.pie([total_healthy, total_infected], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
-        ax.axis('equal')
-        ax.set_title('Combined Healthy vs Infected Scans')
-        ax.set_facecolor('none')  # Transparent plot background
-        col1.pyplot(fig)
+        fig = go.Figure(data=[go.Pie(
+            labels=['Healthy', 'Infected'],
+            values=[total_healthy, total_infected],
+            hole=0.3,  # To make it a donut chart if desired
+            marker=dict(colors=['#00FF00', '#FF0000'])
+        )])
+        fig.update_layout(
+            title_text="Combined Healthy vs Infected Scans",
+            font=dict(color='white'),
+            paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
+            plot_bgcolor='rgba(0,0,0,0)'
+        )
+        col1.plotly_chart(fig)
 
-    # Pie chart showing data share by each collection
-    if collection_scan_counts:
-        total_scans_all_collections = sum(collection_scan_counts.values())
-        if total_scans_all_collections > 0:
-            scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
-            fig, ax = plt.subplots(figsize=(3, 2))  # Small plot size
-            fig.patch.set_alpha(0)  # Transparent figure background
-            ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
-            ax.axis('equal')
-            ax.set_title('Data Share by Each Collection')
-            ax.set_facecolor('none')  # Transparent plot background
-            col2.pyplot(fig)
+        # Pie chart showing data share by each collection
+        if collection_scan_counts:
+            total_scans_all_collections = sum(collection_scan_counts.values())
+            if total_scans_all_collections > 0:
+                scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
+                fig = go.Figure(data=[go.Pie(
+                    labels=list(collection_scan_counts.keys()),
+                    values=scan_shares,
+                    hole=0.3
+                )])
+                fig.update_layout(
+                    title_text="Data Share by Each Collection",
+                    font=dict(color='white'),
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)'
+                )
+                col2.plotly_chart(fig)
+
     # Bar chart showing collections with most infected scans
     if total_infected > 0:
         sorted_collections = sorted(collection_scan_counts.items(), key=lambda item: item[1], reverse=True)
         collections = [item[0] for item in sorted_collections]
         infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collections]
 
-        fig, ax = plt.subplots(figsize=(3, 2))  # Small plot size
-        fig.patch.set_alpha(0)  # Transparent figure background
-        ax.barh(collections, infected_counts, color='#FF0000')
-        ax.set_xlabel('Number of Infected Scans')
-        ax.set_ylabel('Collection')
-        ax.set_title('Infected Scans by Collection (Most to Least)')
-        ax.set_facecolor('none')  # Transparent plot background
-        col3.pyplot(fig)
+        fig = go.Figure(data=[go.Bar(
+            y=collections,
+            x=infected_counts,
+            orientation='h',
+            marker=dict(color='#FF0000')
+        )])
+        fig.update_layout(
+            title_text="Infected Scans by Collection (Most to Least)",
+            xaxis_title="Number of Infected Scans",
+            yaxis_title="Collection",
+            font=dict(color='white'),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)'
+        )
+        col3.plotly_chart(fig)
 
 
     # Layout for the second row (Vertical Bar Chart)
     if device_data:
+        fig = go.Figure()
         device_names = list(device_data.keys())
         dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys()))
 
-        fig, ax = plt.subplots(figsize=(5, 3))  # Small plot size
-        fig.patch.set_alpha(0) 
         for device in device_names:
             counts = [device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Healthy'] +
                       device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Infected'] for date in dates]
-            ax.bar(dates, counts, label=device)
+            fig.add_trace(go.Bar(x=dates, y=counts, name=device))
+        
 
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Number of Scans')
-        ax.set_title('Scans by Device Across Collections')
-        ax.legend(title='Device', bbox_to_anchor=(1.05, 1), loc='upper left')
-        fig.autofmt_xdate()  # Rotate date labels
-        ax.set_facecolor('none')
-        st.pyplot(fig)
+        fig.update_layout(
+            barmode='stack',
+            title_text="Scans by Device Across Collections",
+            xaxis_title="Date",
+            yaxis_title="Number of Scans",
+            font=dict(color='white'),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)'
+        )
+        st.plotly_chart(fig)
 
     # Styled box for comments
     most_active_device = "Sloth's Katana"
@@ -508,57 +530,79 @@ if selected_options:
             farmer_image = farmer_images.get(collection, 'default.png')
             farmer_name = farmer_names.get(collection, 'Unknown Farmer')
             st.image(farmer_image, width=60, use_column_width=True)
-            st.write(f"**Farmer Name:** {farmer_name}")
+            st.write(f"**Farmer Name:** {farmer_name}", color='white')
     
         with col2:
             # Display scan counts
-            st.write(f"**Total Scans:** {total_scans}")
-            st.write(f"**Healthy Scans:** {healthy_count}")
-            st.write(f"**Infected Scans:** {infected_count}")
+            st.write(f"**Total Scans:** {total_scans}", color='white')
+            st.write(f"**Healthy Scans:** {healthy_count}", color='white')
+            st.write(f"**Infected Scans:** {infected_count}", color='white')
             location = farm_locations.get(collection, 'Unknown Location')
             plot_size = plot_sizes.get(collection, 'Unknown Plot Size')
-            st.write(f"**Farm Location:** {location}")
-            st.write(f"**Plot Size:** {plot_size}")
+            st.write(f"**Farm Location:** {location}", color='white')
+            st.write(f"**Plot Size:** {plot_size}", color='white')
 
         with col3:
         # Plot pie chart for healthy vs infected scans
             if total_scans > 0:
-                fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
-                fig.patch.set_alpha(0)  # Transparent figure background
-                ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
-                ax.axis('equal')
-                ax.set_facecolor('none')  # Transparent plot background
-                st.pyplot(fig)
+                fig = go.Figure(data=[go.Pie(
+                    labels=['Healthy', 'Infected'],
+                    values=[healthy_count, infected_count],
+                    hole=0.3,  # Donut chart style
+                    marker=dict(colors=['#00FF00', '#FF0000'])
+                )])
+                fig.update_layout(
+                    title_text=f'{collection} - Healthy vs Infected',
+                    font=dict(color='white'),
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)'
+                )
+                st.plotly_chart(fig)
 
         with col4:
             # Plot vertical bar chart for device scan counts
-            fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size for bar chart
-            fig.patch.set_alpha(0)  # Transparent figure background
+            fig = go.Figure()
+
             # Prepare data for the bar chart
             device_names = list(device_data.keys())
             dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys()))
-        
+
+            # Add data for each device
             for device_name in device_names:
-                counts = [device_data[device_name].get(date, {'Healthy': 0, 'Infected': 0})['Healthy'] +
-                          device_data[device_name].get(date, {'Healthy': 0, 'Infected': 0})['Infected'] for date in dates]
-                healthy_counts = [device_data[device_name].get(date, {'Healthy': 0, 'Infected': 0})['Healthy'] for date in dates]
-                infected_counts = [device_data[device_name].get(date, {'Healthy': 0, 'Infected': 0})['Infected'] for date in dates]
-            
-                # Plot bars for each device
-                ax.bar(dates, healthy_counts, width=0.4, label=f'{device_name} - Healthy', color='#00FF00')
-                ax.bar(dates, infected_counts, width=0.4, bottom=healthy_counts, label=f'{device_name} - Infected', color='#FF0000')
+                healthy_counts = [device_data[device_name].get(date, {'Healthy': 0})['Healthy'] for date in dates]
+                infected_counts = [device_data[device_name].get(date, {'Infected': 0})['Infected'] for date in dates]
         
-            # Configure x-axis to show dates
-            ax.set_xticks(dates)
-            ax.set_xticklabels(dates, rotation=45, ha='right')
-        
-            # Set labels and legend
-            ax.set_xlabel('Date')
-            ax.set_ylabel('Number of Scans')
-            ax.set_title(f'{collection} Collection - Device Scan Counts')
-            ax.legend(loc='upper right', title='Devices')
-            ax.set_facecolor('none')  # Transparent plot background
-            st.pyplot(fig)
+            # Plot healthy counts for the device
+            fig.add_trace(go.Bar(
+                x=dates,
+                y=healthy_counts,
+                name=f'{device_name} - Healthy',
+                marker=dict(color='#00FF00')  # Green for healthy
+            ))
+
+            # Plot infected counts for the device
+            fig.add_trace(go.Bar(
+                x=dates,
+                y=infected_counts,
+                name=f'{device_name} - Infected',
+                marker=dict(color='#FF0000'),  # Red for infected
+                base=healthy_counts  # Stack infected on top of healthy
+            ))
+
+        # Update layout for transparency and appropriate colors
+        fig.update_layout(
+            barmode='stack',  # Stack bars on top of each other
+            title_text=f'{collection} Collection - Device Scan Counts',
+            xaxis_title="Date",
+            yaxis_title="Number of Scans",
+            font=dict(color='white'),  # White font for dark background
+            paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
+            plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
+            legend_title_text="Devices"
+        )
+
+        # Plot the figure in Streamlit
+        st.plotly_chart(fig, use_container_width=True)
 
 
     # Add a button in the middle of the app with larger size
