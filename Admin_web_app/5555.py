@@ -605,6 +605,7 @@ if selected_options:
                 y=healthy_counts,
                 name=f'{device_name} - Healthy',
                 marker=dict(color='#00FF00')  # Green for healthy
+                width=0.1
             ))
 
             # Plot infected counts for the device
@@ -614,6 +615,7 @@ if selected_options:
                 name=f'{device_name} - Infected',
                 marker=dict(color='#FF0000'),  # Red for infected
                 base=healthy_counts  # Stack infected on top of healthy
+                width=0.1
             ))
 
         # Update layout for transparency and appropriate colors
@@ -626,6 +628,12 @@ if selected_options:
             paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
             plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
             legend_title_text="Devices",
+            height =300,
+            xaxis=dict(
+            tickvals=dates,
+            ticktext=[date.strftime('%Y-%m-%d') for date in dates],
+            tickangle=45  # Rotate date labels if needed
+        )
         )
 
         # Plot the figure in Streamlit
