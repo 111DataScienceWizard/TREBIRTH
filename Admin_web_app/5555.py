@@ -456,7 +456,7 @@ if selected_options:
             yaxis_title="Number of Scans",
             font=dict(color='white'),
             paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)'
+            plot_bgcolor='rgba(0,0,0,0)',
             legend_title_text="Devices",  # Add a title to the legend
             xaxis=dict(tickangle=-45),  # Rotate x-axis labels for better readability
         )
