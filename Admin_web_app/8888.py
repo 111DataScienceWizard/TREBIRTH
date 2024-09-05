@@ -580,6 +580,7 @@ if selected_options:
             st.write(f"**Infected Scans:** {infected_count}", color='white')
             location = farm_locations.get(collection, 'Unknown Location')
             plot_size = plot_sizes.get(collection, 'Unknown Plot Size')
+            farm_age = farm_ages.get(collection, 'Unknown farm age')
             st.write(f"**Farm Location:** {location}", color='white')
             st.write(f"**Farm Age:** {farm_age}", color='white')
             st.write(f"**Plot Size:** {plot_size}", color='white')
