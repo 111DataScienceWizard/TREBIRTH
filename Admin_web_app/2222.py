@@ -102,8 +102,8 @@ def plot_multiple_time_domain(data_list, timestamps):
     sampling_rate = 100  # Assuming a sampling rate of 100 Hz
 
     for i, data in enumerate(data_list):
-        time_seconds = np.arange(len(data)) / sampling_rate
-        ax.plot(time_seconds, data, label=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}', color=colors[i])
+        #time_seconds = np.arange(len(data)) / sampling_rate
+        ax.plot(data, label=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}', color=colors[i])
     
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('Signal')
@@ -137,7 +137,7 @@ def plot_multiple_statistics(stats_dfs, timestamps):
     colors = ['r', 'g', 'b']
     
     for i, stats_df in enumerate(stats_dfs):
-        stats_df.plot(kind='bar', ax=ax, alpha=0.6, color=colors[i], label=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}')
+        stats_df.plot(kind='line', ax=ax, marker='o', linestyle='-', color=colors[i], label=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}')
     
     ax.set_title('Statistics of Radar Column')
     ax.set_ylabel('Values')
