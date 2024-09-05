@@ -604,7 +604,7 @@ if selected_options:
                 x=dates,
                 y=healthy_counts,
                 name=f'{device_name} - Healthy',
-                marker=dict(color='#00FF00')  # Green for healthy
+                marker=dict(color='#00FF00'),  # Green for healthy
                 width=0.1
             ))
 
@@ -614,7 +614,7 @@ if selected_options:
                 y=infected_counts,
                 name=f'{device_name} - Infected',
                 marker=dict(color='#FF0000'),  # Red for infected
-                base=healthy_counts  # Stack infected on top of healthy
+                base=healthy_counts,  # Stack infected on top of healthy
                 width=0.1
             ))
 
