@@ -103,7 +103,7 @@ def plot_multiple_time_domain(data_list, timestamps):
     fig = go.Figure()
     
     # Define colors for the three different scans
-    colors = ['red', 'green', 'blue']
+    colors = ['#E24E42', '#59C3C3', '#E9B44C']
     
     # Add traces (lines) for each scan
     for i, data in enumerate(data_list):
@@ -120,85 +120,84 @@ def plot_multiple_time_domain(data_list, timestamps):
         xaxis_title="Index",  # Raw index numbers
         yaxis_title="Signal",
         legend_title="Scans",
-        font=dict(color="white"),  # White text labels
-        plot_bgcolor='black',  # Background color of the plot area
-        paper_bgcolor='black'  # Background color of the chart area (paper)
+        font=dict(color="#F0F0F0"),  # White text labels
+        plot_bgcolor='#1E1E1E',  # Background color of the plot area
+        paper_bgcolor='#1E1E1E'  # Background color of the chart area (paper)
     )
 
     # Render the plot using Streamlit
     st.plotly_chart(fig)
     return fig
     
-# Plot multiple scans in frequency domain
+# Plot multiple scans in frequency domain using Plotly
 def plot_multiple_frequency_domain(data_list, timestamps):
     st.write("## Frequency Domain")
-    fig, ax = plt.subplots()
-    colors = ['r', 'g', 'b']
+    fig = go.Figure()
+
+    colors = ['red', 'green', 'blue']
 
     for i, data in enumerate(data_list):
+        # Perform FFT
         frequencies = np.fft.fftfreq(len(data), d=1/100)
         fft_values = np.fft.fft(data)
         powers = np.abs(fft_values) / len(data)
         powers_db = 20 * np.log10(powers)
-        ax.plot(frequencies[:len(frequencies)//2], powers_db[:len(frequencies)//2], label=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}', color=colors[i])
-    
-    ax.set_xlabel('Frequency (Hz)')
-    ax.set_ylabel('Power Spectrum (dB)')
-    ax.legend()
-    st.pyplot(fig)
+
+        # Add trace to the Plotly figure
+        fig.add_trace(go.Scatter(
+            x=frequencies[:len(frequencies)//2], 
+            y=powers_db[:len(powers_db)//2], 
+            mode='lines',
+            name=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}',
+            line=dict(color=colors[i])
+        ))
+
+    # Update layout for a dark background
+    fig.update_layout(
+        template='plotly_dark',
+        xaxis_title="Frequency (Hz)",
+        yaxis_title="Power Spectrum (dB)",
+        legend_title="Scans",
+        font=dict(color="white"),
+        plot_bgcolor='black',
+        paper_bgcolor='black'
+    )
+
+    st.plotly_chart(fig)
     return fig
 
-# Function to plot statistics for multiple scans
+# Plot statistics for multiple scans using Plotly
 def plot_multiple_statistics(stats_dfs, timestamps):
     st.write("## Radar Column Statistics")
     
-    # Initialize the figure and axes
-    fig, ax = plt.subplots(figsize=(10, 6))
-    
-    # Define colors and labels for each scan
-    colors = ['r', 'g', 'b']  # Different colors for each scan
-    labels = [f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}' for i in range(len(stats_dfs))]
-    
-    # Prepare data for the grouped bar chart
-    stats_measures = ['Mean', 'Median', 'PTP', 'Min', 'Max']
-    num_measures = len(stats_measures)
-    num_scans = len(stats_dfs)
-    
-    # Extract statistics for each scan into a list
-    stats_values = {measure: [] for measure in stats_measures}
-    for stats_df in stats_dfs:
-        for measure in stats_measures:
-            stats_values[measure].append(stats_df[measure].values[0])  # Assuming one radar column, get the value
-    
-    # Define the bar width and positions
-    bar_width = 0.2
-    index = np.arange(num_measures)  # X-axis locations for the measures
-    bar_positions = [index + i * bar_width for i in range(num_scans)]  # Positions for each scan's bars
-    
-    # Plot bars for each scan's statistics
-    for i in range(num_scans):
-        ax.bar(bar_positions[i], [stats_values[measure][i] for measure in stats_measures], 
-               bar_width, label=labels[i], color=colors[i])
-    
-    # Set X-axis labels and ticks
-    ax.set_xticks(index + bar_width)  # Position the ticks in the middle of the groups
-    ax.set_xticklabels(stats_measures)  # Set the labels for each measure
-    
-    # Add labels, title, and legend
-    ax.set_ylabel('Values')
-    ax.set_title('Grouped Statistics of Radar Columns (Three Recent Scans)')
-    ax.legend()
-    
-    # Show the plot
-    st.pyplot(fig)
-    return fig
+    fig = go.Figure()
 
-# Function to convert matplotlib figure to BytesIO for download
-def fig_to_bytesio(fig):
-    buffer = BytesIO()
-    fig.savefig(buffer, format='png', bbox_inches='tight')
-    buffer.seek(0)
-    return buffer
+    stats_measures = ['Mean', 'Median', 'PTP', 'Min', 'Max']
+    colors = ['red', 'green', 'blue']
+
+    for i, stats_df in enumerate(stats_dfs):
+        for measure in stats_measures:
+            fig.add_trace(go.Bar(
+                x=stats_measures,
+                y=[stats_df[measure].values[0] for measure in stats_measures],  # Assuming one radar column
+                name=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}',
+                marker_color=colors[i],
+            ))
+
+    # Update layout for a dark background
+    fig.update_layout(
+        barmode='group',
+        template='plotly_dark',
+        xaxis_title="Statistics",
+        yaxis_title="Values",
+        font=dict(color="white"),
+        plot_bgcolor='black',
+        paper_bgcolor='black',
+        legend_title="Scans"
+    )
+
+    st.plotly_chart(fig)
+    return fig
 
 def main():
     radar_data_list, timestamps = get_recent_scans(db, num_scans=3)
