@@ -206,7 +206,8 @@ def main():
         processed_data_list = preprocess_multiple_scans(radar_data_list)
         
         # Display timestamps of scans
-        st.markdown(f"**Timestamps of Recent Scans:** {', '.join([ts.strftime('%Y-%m-%d %H:%M:%S') for ts in timestamps])}")
+        #st.markdown(f"**Timestamps of Recent Scans:** {', '.join([ts.strftime('%Y-%m-%d %H:%M:%S') for ts in timestamps])}")
+        st.markdown(f"**DATA ANALAYSIS OF 2 RECENT SCANS**")
 
         # Create three columns for plots
         col1, col2, col3 = st.columns(3)
@@ -231,7 +232,6 @@ def main():
 if __name__ == "__main__":
     main()
 
-st.markdown(f"**Timestamps of 2 Recent Scans:** {', '.join([ts.strftime('%Y-%m-%d %H:%M:%S') for ts in timestamps])}")
 st.write(f"**Farmer Name:** Dananjay Yadav", color='white')
 st.write(f"**Farm Location:** Rahuri Nashik", color='white')
 st.write(f"**Farm Age:** 7 Years", color='white')
