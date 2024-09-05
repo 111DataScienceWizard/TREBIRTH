@@ -196,6 +196,42 @@ farmer_images = {
     'demo_db': 'Admin_web_app/F8.png'
 }
 
+
+farmer_names = {
+    'TechDemo': 'Dipak Sangamnere',
+    'Mr.Arjun': 'Ramesh Kapre',
+    'DevOps': 'Arvind Khode',
+    'DevMode': 'Ravindra Sambherao',
+    'debugging': 'Prabhakr Shirsath',
+    'testing': 'Arjun Jachak',
+    'QDIC_test': 'Yash More',
+    'demo_db': 'Dananjay Yadav'
+}
+
+# Farm location mapping
+farm_locations = {
+    'TechDemo': 'Niphad - Kherwadi',
+    'Mr.Arjun': 'Niphad - Panchkeshwar',
+    'DevOps': 'Nashik - Indira Nagar',
+    'DevMode': 'Manori Khurd',
+    'debugging': 'Kundwadi Niphad',
+    'testing': 'Pathardi',
+    'QDIC_test': 'Niphad - Pimpalgaon',
+    'demo_db': 'Rahuri Nashik'
+}
+
+# Plot size mapping
+plot_sizes = {
+    'TechDemo': '1 Acre',
+    'Mr.Arjun': '3 Acre',
+    'DevOps': '1 Acre',
+    'DevMode': '1.5 Acre',
+    'debugging': '3 Acre',
+    'testing': '1 Acre',
+    'QDIC_test': '1 Acre',
+    'demo_db': '2.5 Acre'
+}
+
 # Collection dates mapping (using original date format)
 collection_dates = {
     'TechDemo': ['2024-02-28', '2024-02-29'],
@@ -213,16 +249,17 @@ collection_dates = {
 # Generate dropdown options with collection names and original date format
 dropdown_options = []
 for collection, dates in collection_dates.items():
+    farmer_name = farmer_names.get(collection, 'Unknown Farmer')
     if dates:
-        dropdown_options.extend([f"{collection} - {date}" for date in dates])
+        dropdown_options.extend([f"{farmer_name} - {date}" for date in dates])
     else:
-        dropdown_options.append(f"{collection} - No Dates")
+        dropdown_options.append(f"{farmer_name} - No Dates")
 
 # Sort dropdown options by newest to oldest
 dropdown_options = sorted(dropdown_options, key=lambda x: datetime.strptime(x.split(' - ')[1], '%Y-%m-%d') if 'No Dates' not in x else datetime.min, reverse=True)
 
 # Create dropdown menu
-selected_options = st.multiselect('Select Collection(s) with Dates', dropdown_options)
+selected_options = st.multiselect('Select farmer plots with Dates', dropdown_options)
 
 if selected_options:
     selected_collections = {}
@@ -232,7 +269,8 @@ if selected_options:
     device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
 
     for option in selected_options:
-        collection, date_str = option.split(' - ')
+        farmer_name, date_str = option.split(' - ')
+        collection = [key for key, value in farmer_names.items() if value == farmer_name][0]  # Find the collection based on farmer name
         if date_str == "No Dates":
             date_str = None
         if collection not in selected_collections:
@@ -403,7 +441,7 @@ if selected_options:
         total_scans = healthy_count + infected_count
 
         if total_scans > 0:
-            st.write(f"**{collection} Collection**")
+            st.write(f"**{farmer_name} Collection**")
         # Layout for collection details
 
         col1, col2, col3, col4 = st.columns(4)
@@ -418,6 +456,10 @@ if selected_options:
             st.write(f"**Total Scans:** {total_scans}")
             st.write(f"**Healthy Scans:** {healthy_count}")
             st.write(f"**Infected Scans:** {infected_count}")
+            location = farm_locations.get(collection, 'Unknown Location')
+            plot_size = plot_sizes.get(collection, 'Unknown Plot Size')
+            st.write(f"**Farm Location:** {location}")
+            st.write(f"**Plot Size:** {plot_size}")
 
         with col3:
         # Plot pie chart for healthy vs infected scans
