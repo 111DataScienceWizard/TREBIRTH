@@ -49,28 +49,32 @@ st.title("Farm Analytics")
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
 
 # Fetch the most recent scan data from the "demo_db" collection
-def get_most_recent_scan(db):
+def get_recent_scans(db, num_scans=3):
     docs = (
         db.collection('demo_db')
         .order_by('timestamp', direction=firestore.Query.DESCENDING)
-        .limit(1)
+        .limit(num_scans)
         .stream()
     )
+    radar_data_list = []
+    timestamps = []
     for doc in docs:
         data_dict = doc.to_dict()
         radar_raw = data_dict.get('RadarRaw', [])
         timestamp = data_dict.get('timestamp')
-        return radar_raw, timestamp
-    return None, None
+        radar_data_list.append(radar_raw)
+        timestamps.append(timestamp)
+    return radar_data_list, timestamps
 
-# Preprocess data
-def preprocess_data(radar_raw):
-    df_radar = pd.DataFrame(radar_raw, columns=['Radar'])
-    # Drop null values
-    df_radar.dropna(inplace=True)
-    # Impute missing values with mean if any
-    df_radar.fillna(df_radar.mean(), inplace=True)
-    return df_radar
+# Preprocess data for each scan
+def preprocess_multiple_scans(radar_data_list):
+    processed_data_list = []
+    for radar_raw in radar_data_list:
+        df_radar = pd.DataFrame(radar_raw, columns=['Radar'])
+        df_radar.dropna(inplace=True)
+        df_radar.fillna(df_radar.mean(), inplace=True)
+        processed_data_list.append(df_radar)
+    return processed_data_list
 
 # Function to calculate statistics
 def calculate_statistics(df):
@@ -90,38 +94,54 @@ def calculate_statistics(df):
     stats_df = pd.DataFrame(stats)
     return stats_df
 
-def plot_time_domain(data):
+# Plot multiple scans in time domain
+def plot_multiple_time_domain(data_list, timestamps):
     st.write("## Time Domain")
     fig, ax = plt.subplots()
+    colors = ['r', 'g', 'b']  # Assign different colors to each scan
     sampling_rate = 100  # Assuming a sampling rate of 100 Hz
-    time_seconds = np.arange(len(data)) / sampling_rate
-    ax.plot(time_seconds, data)
+
+    for i, data in enumerate(data_list):
+        time_seconds = np.arange(len(data)) / sampling_rate
+        ax.plot(time_seconds, data, label=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}', color=colors[i])
+    
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('Signal')
+    ax.legend()
     st.pyplot(fig)
     return fig
 
-# Function to plot signals in the frequency domain
-def plot_frequency_domain(data):
+# Plot multiple scans in frequency domain
+def plot_multiple_frequency_domain(data_list, timestamps):
     st.write("## Frequency Domain")
-    frequencies = np.fft.fftfreq(len(data), d=1/100)
-    fft_values = np.fft.fft(data)
-    powers = np.abs(fft_values) / len(data)
-    powers_db = 20 * np.log10(powers)
     fig, ax = plt.subplots()
-    ax.plot(frequencies[:len(frequencies)//2], powers_db[:len(frequencies)//2])
+    colors = ['r', 'g', 'b']
+
+    for i, data in enumerate(data_list):
+        frequencies = np.fft.fftfreq(len(data), d=1/100)
+        fft_values = np.fft.fft(data)
+        powers = np.abs(fft_values) / len(data)
+        powers_db = 20 * np.log10(powers)
+        ax.plot(frequencies[:len(frequencies)//2], powers_db[:len(frequencies)//2], label=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}', color=colors[i])
+    
     ax.set_xlabel('Frequency (Hz)')
     ax.set_ylabel('Power Spectrum (dB)')
+    ax.legend()
     st.pyplot(fig)
     return fig
 
-# Function to plot statistics
-def plot_statistics(stats_df):
+# Function to plot statistics for multiple scans
+def plot_multiple_statistics(stats_dfs, timestamps):
     st.write("## Radar Column Statistics")
     fig, ax = plt.subplots(figsize=(10, 6))
-    stats_df.plot(kind='bar', ax=ax)
+    colors = ['r', 'g', 'b']
+    
+    for i, stats_df in enumerate(stats_dfs):
+        stats_df.plot(kind='bar', ax=ax, alpha=0.6, color=colors[i], label=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}')
+    
     ax.set_title('Statistics of Radar Column')
     ax.set_ylabel('Values')
+    ax.legend()
     st.pyplot(fig)
     return fig
 
@@ -133,20 +153,21 @@ def fig_to_bytesio(fig):
     return buffer
 
 def main():
-    radar_raw, timestamp = get_most_recent_scan(db)
+    radar_data_list, timestamps = get_recent_scans(db, num_scans=3)
 
-    if radar_raw is not None:
-        df_radar = preprocess_data(radar_raw)
-        radar_data = df_radar['Radar'].values
-
-        # Display timestamp information
-        st.markdown(f"**Timestamp of Latest Scan:** {timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
+    if radar_data_list:
+        # Preprocess data for each scan
+        processed_data_list = preprocess_multiple_scans(radar_data_list)
+        
+        # Display timestamps of scans
+        st.markdown(f"**Timestamps of Recent Scans:** {', '.join([ts.strftime('%Y-%m-%d %H:%M:%S') for ts in timestamps])}")
 
         # Create three columns for plots
         col1, col2, col3 = st.columns(3)
 
+        # Time domain plot for multiple scans
         with col1:
-            time_fig = plot_time_domain(radar_data)
+            time_fig = plot_multiple_time_domain([df['Radar'].values for df in processed_data_list], timestamps)
             time_buffer = fig_to_bytesio(time_fig)
             st.download_button(
                 label="Download Time Domain Plot",
@@ -155,8 +176,9 @@ def main():
                 mime="image/png"
             )
 
+        # Frequency domain plot for multiple scans
         with col2:
-            freq_fig = plot_frequency_domain(radar_data)
+            freq_fig = plot_multiple_frequency_domain([df['Radar'].values for df in processed_data_list], timestamps)
             freq_buffer = fig_to_bytesio(freq_fig)
             st.download_button(
                 label="Download Frequency Domain Plot",
@@ -165,9 +187,10 @@ def main():
                 mime="image/png"
             )
 
+        # Statistics plot for multiple scans
         with col3:
-            stats_df = calculate_statistics(df_radar)
-            stats_fig = plot_statistics(stats_df)
+            stats_dfs = [calculate_statistics(df) for df in processed_data_list]
+            stats_fig = plot_multiple_statistics(stats_dfs, timestamps)
             stats_buffer = fig_to_bytesio(stats_fig)
             st.download_button(
                 label="Download Statistics Plot",
