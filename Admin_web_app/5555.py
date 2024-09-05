@@ -370,9 +370,11 @@ if selected_options:
     # Pie chart for combined data across all selected collections
     if total_healthy + total_infected > 0:
         fig, ax = plt.subplots(figsize=(3, 2))  # Small plot size
+        fig.patch.set_alpha(0)  # Transparent figure background
         ax.pie([total_healthy, total_infected], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
         ax.axis('equal')
         ax.set_title('Combined Healthy vs Infected Scans')
+        ax.set_facecolor('none')  # Transparent plot background
         col1.pyplot(fig)
 
     # Pie chart showing data share by each collection
@@ -381,11 +383,12 @@ if selected_options:
         if total_scans_all_collections > 0:
             scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
             fig, ax = plt.subplots(figsize=(3, 2))  # Small plot size
+            fig.patch.set_alpha(0)  # Transparent figure background
             ax.pie(scan_shares, labels=collection_scan_counts.keys(), autopct='%1.1f%%', startangle=90)
             ax.axis('equal')
             ax.set_title('Data Share by Each Collection')
+            ax.set_facecolor('none')  # Transparent plot background
             col2.pyplot(fig)
-
     # Bar chart showing collections with most infected scans
     if total_infected > 0:
         sorted_collections = sorted(collection_scan_counts.items(), key=lambda item: item[1], reverse=True)
@@ -393,10 +396,12 @@ if selected_options:
         infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collections]
 
         fig, ax = plt.subplots(figsize=(3, 2))  # Small plot size
+        fig.patch.set_alpha(0)  # Transparent figure background
         ax.barh(collections, infected_counts, color='#FF0000')
         ax.set_xlabel('Number of Infected Scans')
         ax.set_ylabel('Collection')
         ax.set_title('Infected Scans by Collection (Most to Least)')
+        ax.set_facecolor('none')  # Transparent plot background
         col3.pyplot(fig)
 
 
@@ -406,6 +411,7 @@ if selected_options:
         dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys()))
 
         fig, ax = plt.subplots(figsize=(5, 3))  # Small plot size
+        fig.patch.set_alpha(0) 
         for device in device_names:
             counts = [device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Healthy'] +
                       device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Infected'] for date in dates]
@@ -416,6 +422,7 @@ if selected_options:
         ax.set_title('Scans by Device Across Collections')
         ax.legend(title='Device', bbox_to_anchor=(1.05, 1), loc='upper left')
         fig.autofmt_xdate()  # Rotate date labels
+        ax.set_facecolor('none')
         st.pyplot(fig)
 
     # Styled box for comments
@@ -517,14 +524,16 @@ if selected_options:
         # Plot pie chart for healthy vs infected scans
             if total_scans > 0:
                 fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size
+                fig.patch.set_alpha(0)  # Transparent figure background
                 ax.pie([healthy_count, infected_count], labels=['Healthy', 'Infected'], autopct='%1.1f%%', startangle=90, colors=['#00FF00', '#FF0000'])
                 ax.axis('equal')
+                ax.set_facecolor('none')  # Transparent plot background
                 st.pyplot(fig)
 
         with col4:
             # Plot vertical bar chart for device scan counts
             fig, ax = plt.subplots(figsize=(3, 3))  # Small plot size for bar chart
-        
+            fig.patch.set_alpha(0)  # Transparent figure background
             # Prepare data for the bar chart
             device_names = list(device_data.keys())
             dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys()))
@@ -548,7 +557,7 @@ if selected_options:
             ax.set_ylabel('Number of Scans')
             ax.set_title(f'{collection} Collection - Device Scan Counts')
             ax.legend(loc='upper right', title='Devices')
-        
+            ax.set_facecolor('none')  # Transparent plot background
             st.pyplot(fig)
 
 
