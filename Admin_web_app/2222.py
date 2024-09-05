@@ -441,7 +441,7 @@ if selected_options:
         total_scans = healthy_count + infected_count
 
         if total_scans > 0:
-            st.write(f"**{farmer_name} Collection**")
+            st.write(f"**{collection} Collection**")
         # Layout for collection details
 
         col1, col2, col3, col4 = st.columns(4)
@@ -449,7 +449,9 @@ if selected_options:
         with col1:
             # Display farmer image
             farmer_image = farmer_images.get(collection, 'default.png')
+            farmer_name = farmer_names.get(collection, 'Unknown Farmer')
             st.image(farmer_image, width=60, use_column_width=True)
+            st.write(f"**Farmer Name:** {farmer_name}")
     
         with col2:
             # Display scan counts
