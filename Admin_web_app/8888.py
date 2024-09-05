@@ -103,7 +103,7 @@ def plot_multiple_time_domain(data_list, timestamps):
     fig = go.Figure()
     
     # Define colors for the different scans
-    colors = ['#E24E42', '#59C3C3', '#E9B44C']
+    colors = ['#E24E42', '#59C3C3']
     
     # Add traces (lines) for each scan
     for i, data in enumerate(data_list):
@@ -134,7 +134,7 @@ def plot_multiple_frequency_domain(data_list, timestamps):
     st.write("## Frequency Domain")
     fig = go.Figure()
 
-    colors = ['red', 'green', 'blue']
+    colors = ['green', 'blue']
 
     for i, data in enumerate(data_list):
         # Perform FFT
@@ -173,7 +173,7 @@ def plot_multiple_statistics(stats_dfs, timestamps):
     fig = go.Figure()
 
     stats_measures = ['Mean', 'Median', 'PTP', 'Min', 'Max']
-    colors = ['red', 'green', 'blue']
+    colors = ['green', 'blue']
 
     for i, stats_df in enumerate(stats_dfs):
         for measure in stats_measures:
@@ -199,7 +199,7 @@ def plot_multiple_statistics(stats_dfs, timestamps):
     return fig
 
 def main():
-    radar_data_list, timestamps = get_recent_scans(db, num_scans=3)
+    radar_data_list, timestamps = get_recent_scans(db, num_scans=2)
 
     if radar_data_list:
         # Preprocess data for each scan
