@@ -216,20 +216,17 @@ def main():
         # Time domain plot for multiple scans
         with col1:
             time_fig = plot_multiple_time_domain([df['Radar'].values for df in processed_data_list], timestamps)
-            time_buffer = fig_to_bytesio(time_fig)
             
 
         # Frequency domain plot for multiple scans
         with col2:
             freq_fig = plot_multiple_frequency_domain([df['Radar'].values for df in processed_data_list], timestamps)
-            freq_buffer = fig_to_bytesio(freq_fig)
             
 
         # Statistics plot for multiple scans
         with col3:
             stats_dfs = [calculate_statistics(df) for df in processed_data_list]
             stats_fig = plot_multiple_statistics(stats_dfs, timestamps)
-            stats_buffer = fig_to_bytesio(stats_fig)
     else:
         st.error("No data available in the 'Dananjay Yadav' collection.")
 
