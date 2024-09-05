@@ -433,9 +433,22 @@ if selected_options:
         for device in device_names:
             counts = [device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Healthy'] +
                       device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Infected'] for date in dates]
-            fig.add_trace(go.Bar(x=dates, y=counts, name=device))
-        
+            fig.add_trace(go.Bar(
+                x=dates,
+                y=healthy_counts,
+                name=f'{device} - Healthy',
+                marker=dict(color='#00FF00')  # Green for healthy
+            ))
 
+            # Add infected counts for the device
+            fig.add_trace(go.Bar(
+                x=dates,
+                y=infected_counts,
+                name=f'{device} - Infected',
+                marker=dict(color='#FF0000'),  # Red for infected
+                base=healthy_counts  # Stack infected on top of healthy
+            ))
+            
         fig.update_layout(
             barmode='stack',
             title_text="Scans by Device Across Collections",
@@ -444,8 +457,10 @@ if selected_options:
             font=dict(color='white'),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)'
+            legend_title_text="Devices",  # Add a title to the legend
+            xaxis=dict(tickangle=-45),  # Rotate x-axis labels for better readability
         )
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
     # Styled box for comments
     most_active_device = "Sloth's Katana"
