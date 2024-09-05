@@ -217,37 +217,21 @@ def main():
         with col1:
             time_fig = plot_multiple_time_domain([df['Radar'].values for df in processed_data_list], timestamps)
             time_buffer = fig_to_bytesio(time_fig)
-            st.download_button(
-                label="Download Time Domain Plot",
-                data=time_buffer,
-                file_name="time_domain_plot.png",
-                mime="image/png"
-            )
+            
 
         # Frequency domain plot for multiple scans
         with col2:
             freq_fig = plot_multiple_frequency_domain([df['Radar'].values for df in processed_data_list], timestamps)
             freq_buffer = fig_to_bytesio(freq_fig)
-            st.download_button(
-                label="Download Frequency Domain Plot",
-                data=freq_buffer,
-                file_name="frequency_domain_plot.png",
-                mime="image/png"
-            )
+            
 
         # Statistics plot for multiple scans
         with col3:
             stats_dfs = [calculate_statistics(df) for df in processed_data_list]
             stats_fig = plot_multiple_statistics(stats_dfs, timestamps)
             stats_buffer = fig_to_bytesio(stats_fig)
-            st.download_button(
-                label="Download Statistics Plot",
-                data=stats_buffer,
-                file_name="statistics_plot.png",
-                mime="image/png"
-            )
     else:
-        st.error("No data available in the 'demo_db' collection.")
+        st.error("No data available in the 'Dananjay Yadav' collection.")
 
 if __name__ == "__main__":
     main()
