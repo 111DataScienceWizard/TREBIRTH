@@ -621,12 +621,10 @@ if selected_options:
             title_text=f'{collection} Collection - Device Scan Counts',
             xaxis_title="Date",
             yaxis_title="Number of Scans",
-            xaxis=dict(tickvals=dates, ticktext=[date.strftime('%Y-%m-%d') for date in dates]),
             font=dict(color='white'),  # White font for dark background
             paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
             plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
             legend_title_text="Devices",
-            height=300
         )
 
         # Plot the figure in Streamlit
