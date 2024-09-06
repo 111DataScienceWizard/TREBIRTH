@@ -483,7 +483,7 @@ if selected_options:
     st.markdown(f"""
         <div style="
             padding: 10px;
-            background-color: #F9BB6E;
+            background-color: #FFFFCC;
             border-radius: 10px;
             box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
             font-family: 'Arial', sans-serif;
