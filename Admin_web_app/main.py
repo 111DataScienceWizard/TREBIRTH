@@ -81,7 +81,7 @@ st.markdown("""
  """, 
 unsafe_allow_html=True)
 
-image = Image.open('Farmer face in a circle.png')
+image = Image.open('Admin_web_app/Farmer face in a circle.png')
 new_image = image.resize((200, 200))
 
 st.markdown("""
