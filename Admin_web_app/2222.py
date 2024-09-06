@@ -383,78 +383,87 @@ if selected_options:
 
 
     # Bar chart showing collections with most infected scans
-    if total_infected > 0:
-        sorted_collections = sorted(collection_scan_counts.items(), key=lambda item: item[1], reverse=True)
-        collections = [item[0] for item in sorted_collections]
+    if collection_scan_counts:
+        collections = list(collection_scan_counts.keys())
+
+        # Calculate healthy and infected counts for each collection
+        healthy_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Healthy') for collection in collections]
         infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collections]
 
-        fig = go.Figure(data=[go.Bar(
-            y=collections,
-            x=infected_counts,
-            orientation='h',
-            marker=dict(color='#FF0000')
-        )])
+        fig = go.Figure()
+
+        # Add healthy counts for each collection
+        fig.add_trace(go.Bar(
+            x=collections,
+            y=healthy_counts,
+            name='Healthy',
+            marker=dict(color='#00FF00'),  # Green for healthy
+        ))
+
+        # Add infected counts for each collection
+        fig.add_trace(go.Bar(
+            x=collections,
+            y=infected_counts,
+            name='Infected',
+            marker=dict(color='#FF0000'),  # Red for infected
+        ))
+
         fig.update_layout(
-            title_text="Infected Scans by Collection (Most to Least)",
-            xaxis_title="Number of Infected Scans",
-            yaxis_title="Collection",
+            title_text="Healthy and Infected Scans by Collection",
+            xaxis_title="Collection",
+            yaxis_title="Number of Scans",
+            barmode='group',  # Side-by-side grouping
+            bargap=0.2,  # Gap between bars (adjust as needed)
             font=dict(color='white'),
             paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)'
+            plot_bgcolor='rgba(0,0,0,0)',
+            height=300
         )
-        col1.plotly_chart(fig)
 
+        col1.plotly_chart(fig, use_container_width=True)
 
     # Layout for the second row (Vertical Bar Chart)
     if device_data:
         fig = go.Figure()
-        device_names = list(device_data.keys())
-        dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys()))
 
-        for device in device_names:
-            healthy_counts = []
-            infected_counts = []
-            
-            for date in dates:
-                # Safely get the healthy and infected counts for each device on each date
-                healthy_count = device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Healthy']
-                infected_count = device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Infected']
-            
-                # Append the counts to the respective lists
-                healthy_counts.append(healthy_count)
-                infected_counts.append(infected_count)
+        device_names = set(device_name for device_name in device_data.keys())  # Collect all device names from selected collections
+        collections = list(selected_collections.keys())  # Get the selected collections
 
-            # Add healthy counts for the device
+        # For each collection, plot the number of scans by device
+        for collection in collections:
+            # Get the color for this collection (you can define more colors if needed)
+            color = '#%06X' % (0xFFFFFF & hash(collection))
+
+            # Prepare data for each device
+            device_scan_counts = {device: 0 for device in device_names}  # Initialize with 0 scans for each device
+            for doc in db.collection(collection).stream():
+                doc_data = doc.to_dict()
+                device_name = doc_data.get('DeviceName:')
+                if device_name:
+                    inf_stat = doc_data.get('InfStat', 'Unknown')
+                    device_scan_counts[device_name] += 1  # Count total scans (healthy + infected)
+
+            # Plot the device counts for this collection
             fig.add_trace(go.Bar(
-                x=dates,
-                y=healthy_counts,
-                name=f'{device} - Healthy',
-                marker=dict(color='#00FF00')  # Green for healthy
+                x=list(device_scan_counts.keys()),  # Device names
+                y=list(device_scan_counts.values()),  # Number of scans
+                name=f'{collection}',  # Collection name in the legend
+                marker=dict(color=color),  # Assign a unique color for each collection
             ))
 
-            # Add infected counts for the device
-            fig.add_trace(go.Bar(
-                x=dates,
-                y=infected_counts,
-                name=f'{device} - Infected',
-                marker=dict(color='#FF0000'),  # Red for infected
-                base=healthy_counts  # Stack infected on top of healthy
-            ))
-            
         fig.update_layout(
-            barmode='stack',
-            title_text="Scans by Device Across Collections",
-            xaxis_title="Date",
+            title_text="Scans by Device (Grouped by Collection)",
+            xaxis_title="Device Name",
             yaxis_title="Number of Scans",
+            barmode='group',  # Group devices by collection
             font=dict(color='white'),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            legend_title_text="Devices",  # Add a title to the legend
-            xaxis=dict(tickangle=-45),  # Rotate x-axis labels for better readability
-            height = 300
+            legend_title_text="Collections",  # Add a title to the legend
+            height=300
         )
-        col2.plotly_chart(fig, use_container_width=True)
 
+        col2.plotly_chart(fig, use_container_width=True)
 
     # Calculate percentages for combined collection
     if total_healthy + total_infected > 0:
