@@ -670,8 +670,7 @@ if selected_options:
             </a>
         </div>
     """
-
-st.markdown(button_html, unsafe_allow_html=True)
+    st.markdown(button_html, unsafe_allow_html=True)
 
     # Add a button in the middle of the app with larger size
     # Add a button aligned to the left with a small, soft light blue style
@@ -693,5 +692,4 @@ st.markdown(button_html, unsafe_allow_html=True)
             </a>
         </div>
     """
-
-st.markdown(button_html, unsafe_allow_html=True)
+    st.markdown(button_html, unsafe_allow_html=True)
