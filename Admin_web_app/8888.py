@@ -653,14 +653,14 @@ if selected_options:
 
     # Add a button aligned to the left with a small, soft light blue style
     button_html = """
-        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; height: 50px;">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 30px; height: 50px;">
             <a href="https://webbapptrebirth-dxf7mxdthdtwclmx6d2mcx.streamlit.app/" target="_blank" style="
                 display: inline-block;
                 padding: 10px 20px;
                 font-size: 16px;
                 font-weight: normal;
                 background-color: #ADD8E6;
-                color: white;
+                color: black;
                 text-align: center;
                 text-decoration: none;
                 border-radius: 5px;
@@ -674,7 +674,7 @@ if selected_options:
                 font-size: 16px;
                 font-weight: normal;
                 background-color: #ADD8E6;
-                color: white;
+                color: black;
                 text-align: center;
                 text-decoration: none;
                 border-radius: 5px;
