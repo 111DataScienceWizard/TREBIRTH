@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from io import BytesIO
-from scipy.stats import skew, kurtosis
+from scipy.stats import skew, kurtosis 
 from google.cloud import firestore
 from google.cloud.firestore import FieldFilter
 from datetime import datetime, timedelta
