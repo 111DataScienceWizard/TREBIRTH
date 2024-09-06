@@ -653,7 +653,7 @@ if selected_options:
 
     # Add a button aligned to the left with a small, soft light blue style
     button_html = """
-        <div style="display: flex; justify-content: flex-start; align-items: center; height: 50px;">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; height: 50px;">
             <a href="https://webbapptrebirth-dxf7mxdthdtwclmx6d2mcx.streamlit.app/" target="_blank" style="
                 display: inline-block;
                 padding: 10px 20px;
@@ -661,21 +661,13 @@ if selected_options:
                 font-weight: normal;
                 background-color: #ADD8E6;
                 color: white;
-                text-align: right;
+                text-align: center;
                 text-decoration: none;
                 border-radius: 5px;
                 box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
             ">
                 Detailed Scan Analysis
             </a>
-        </div>
-    """
-    st.markdown(button_html, unsafe_allow_html=True)
-
-    # Add a button in the middle of the app with larger size
-    # Add a button aligned to the left with a small, soft light blue style
-    button_html = """
-        <div style="display: flex; justify-content: flex-start; align-items: center; height: 50px;">
             <a href="https://webbapptrebirth-dxf7mxdthdtwclmx6d2mcx.streamlit.app/" target="_blank" style="
                 display: inline-block;
                 padding: 10px 20px;
@@ -683,7 +675,7 @@ if selected_options:
                 font-weight: normal;
                 background-color: #ADD8E6;
                 color: white;
-                text-align: left;
+                text-align: center;
                 text-decoration: none;
                 border-radius: 5px;
                 box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
