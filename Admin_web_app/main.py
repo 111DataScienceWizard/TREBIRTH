@@ -230,7 +230,7 @@ with col2:
  #st.markdown('##')
 
 
- image2 = Image.open("Frame_4_2.jpg")
+ image2 = Image.open("Admin_web_app/Frame_4_2.jpg")
  new_image2 = image2.resize((800, 500))
  st.image(new_image2);
 
