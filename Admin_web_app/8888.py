@@ -483,7 +483,7 @@ if selected_options:
     st.markdown(f"""
         <div style="
             padding: 10px;
-            background-color: rgba(0, 0, 0, 0);
+            background-color: #d4f7d4;
             border-radius: 10px;
             box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
             font-family: 'Arial', sans-serif;
@@ -491,8 +491,8 @@ if selected_options:
             width: 100%;  /* Take full column width */
             margin-top: 10px;
         ">
-            <h4 style="color: #007ACC; margin-bottom: 10px;">Comments</h4>
-            <hr style="border: none; height: 1px; background-color: #007ACC; margin-bottom: 10px;">
+            <h4 style="color: #007ACC; margin-bottom: 5px;">Comments</h4>
+            <hr style="border: none; height: 1px; background-color: #007ACC; margin-bottom: 5px;">
             <p style="font-size: 14px; margin: 5px 0;">
                 <strong>Combined Collection:</strong> Infection status: {infection_percentage:.2f}%, Healthy status: {healthy_percentage:.2f}%
             </p>
