@@ -379,41 +379,8 @@ if selected_options:
                 device_data[device_name][date_key]['Infected'] += 1
 
     # Layout for the first row (4 columns)
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
 
-    # Pie chart for combined data across all selected collections
-    if total_healthy + total_infected > 0:
-        fig = go.Figure(data=[go.Pie(
-            labels=['Healthy', 'Infected'],
-            values=[total_healthy, total_infected],
-            hole=0.3,  # To make it a donut chart if desired
-            marker=dict(colors=['#00FF00', '#FF0000'])
-        )])
-        fig.update_layout(
-            title_text="Combined Healthy vs Infected Scans",
-            font=dict(color='white'),
-            paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
-            plot_bgcolor='rgba(0,0,0,0)'
-        )
-        col1.plotly_chart(fig)
-
-        # Pie chart showing data share by each collection
-        if collection_scan_counts:
-            total_scans_all_collections = sum(collection_scan_counts.values())
-            if total_scans_all_collections > 0:
-                scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
-                fig = go.Figure(data=[go.Pie(
-                    labels=list(collection_scan_counts.keys()),
-                    values=scan_shares,
-                    hole=0.3
-                )])
-                fig.update_layout(
-                    title_text="Data Share by Each Collection",
-                    font=dict(color='white'),
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)'
-                )
-                col2.plotly_chart(fig)
 
     # Bar chart showing collections with most infected scans
     if total_infected > 0:
@@ -435,7 +402,7 @@ if selected_options:
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)'
         )
-        col3.plotly_chart(fig)
+        col1.plotly_chart(fig)
 
 
     # Layout for the second row (Vertical Bar Chart)
@@ -486,7 +453,25 @@ if selected_options:
             xaxis=dict(tickangle=-45),  # Rotate x-axis labels for better readability
             height = 300
         )
-        st.plotly_chart(fig, use_container_width=True)
+        col2.plotly_chart(fig, use_container_width=True)
+
+
+    # Calculate percentages for combined collection
+    if total_healthy + total_infected > 0:
+        infection_percentage = (total_infected / (total_healthy + total_infected)) * 100
+        healthy_percentage = (total_healthy / (total_healthy + total_infected)) * 100
+    else:
+        infection_percentage = 0
+        healthy_percentage = 0
+
+    # Calculate data share by each collection
+    data_share_text = ""
+    if collection_scan_counts:
+        total_scans_all_collections = sum(collection_scan_counts.values())
+        if total_scans_all_collections > 0:
+            for collection, count in collection_scan_counts.items():
+                share_percentage = (count / total_scans_all_collections) * 100
+                data_share_text += f"<p><strong>{collection}:</strong> {share_percentage:.2f}%</p>"
 
     # Styled box for comments
     most_active_device = "Sloth's Katana"
@@ -498,16 +483,23 @@ if selected_options:
     st.markdown(f"""
         <div style="
             padding: 10px;
-            background-color: #f5f5f5;
+            background-color: rgba(0, 0, 0, 0);
             border-radius: 10px;
             box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
             font-family: 'Arial', sans-serif;
             color: #333333;
             width: 100%;  /* Take full column width */
-            margin-top: 20px;
+            margin-top: 10px;
         ">
             <h4 style="color: #007ACC; margin-bottom: 10px;">Comments</h4>
             <hr style="border: none; height: 1px; background-color: #007ACC; margin-bottom: 10px;">
+            <p style="font-size: 14px; margin: 5px 0;">
+                <strong>Combined Collection:</strong> Infection status: {infection_percentage:.2f}%, Healthy status: {healthy_percentage:.2f}%
+            </p>
+            <p style="font-size: 14px; margin: 5px 0;">
+                <strong>Data Share by Each Collection:</strong>
+            </p>
+            {data_share_text}
             <p style="font-size: 14px; margin: 5px 0;">
                 <strong>Most Active Device:</strong> {most_active_device}
             </p>
