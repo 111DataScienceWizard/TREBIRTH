@@ -466,13 +466,14 @@ if selected_options:
 
     # Calculate data share by each collection
     data_share_text = ""
+    
     if collection_scan_counts:
         total_scans_all_collections = sum(collection_scan_counts.values())
         if total_scans_all_collections > 0:
             for collection, count in collection_scan_counts.items():
                 share_percentage = (count / total_scans_all_collections) * 100
                 farmer_name = farmer_names.get(collection, 'Unknown Farmer')
-                data_share_text += f"{farmer_name}: {share_percentage:.2f}%"
+                data_share_text += f"{farmer_name}: {share_percentage:.2f}%<br>"
 
     # Styled box for comments
     most_active_device = "Sloth's Katana"
