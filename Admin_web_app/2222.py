@@ -431,16 +431,6 @@ if selected_options:
         device_names = set(device_name for device_name in device_data.keys())  # Collect all device names from selected collections
         collections = list(selected_collections.keys())  # Get the selected collections
 
-        # Function to extract device name
-        def extract_device_name(full_device_name):
-        # Check if the device name contains a MAC address-like pattern
-            if re.match(r'([0-9A-Fa-f]{2}:){5}[0-9A-Fa-f]{2}', full_device_name):
-            # If a MAC address is present, extract the part inside parentheses
-                match = re.search(r'\(([^)]+)\)', full_device_name)
-                if match:
-                    return match.group(1)  # Return the name inside parentheses
-            return full_device_name  # Return the full name if no MAC address is found
-        
         # For each collection, plot the number of scans by device
         for collection in collections:
             # Get the color for this collection (you can define more colors if needed)
@@ -451,11 +441,9 @@ if selected_options:
             for doc in db.collection(collection).stream():
                 doc_data = doc.to_dict()
                 device_name = doc_data.get('DeviceName:')
-                if full_device_name:
-                # Extract the actual device name
-                    device_name = extract_device_name(full_device_name)
+                if device_name:
                     inf_stat = doc_data.get('InfStat', 'Unknown')
-                    device_scan_counts[device_name] += 1# Count total scans (healthy + infected)
+                    device_scan_counts[device_name] += 1  # Count total scans (healthy + infected)
 
             # Plot the device counts for this collection
             fig.add_trace(go.Bar(
