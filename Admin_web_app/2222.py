@@ -385,17 +385,16 @@ if selected_options:
 
     # Bar chart showing collections with most infected scans
     if collection_scan_counts:
-        collections = list(collection_scan_counts.keys())
-
+        farmer_names_list = [farmer_names.get(collection, 'Unknown Farmer') for collection in collection_scan_counts.keys()]
         # Calculate healthy and infected counts for each collection
-        healthy_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Healthy') for collection in collections]
-        infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collections]
+        healthy_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Healthy') for collection in collection_scan_counts.keys()]
+        infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collection_scan_counts.keys()]
 
         fig = go.Figure()
 
         # Add healthy counts for each collection
         fig.add_trace(go.Bar(
-            x=collections,
+            x=farmer_names_list,
             y=healthy_counts,
             name='Healthy',
             marker=dict(color='#00FF00'),  # Green for healthy
@@ -403,7 +402,7 @@ if selected_options:
 
         # Add infected counts for each collection
         fig.add_trace(go.Bar(
-            x=collections,
+            x=farmer_names_list,
             y=infected_counts,
             name='Infected',
             marker=dict(color='#FF0000'),  # Red for infected
@@ -431,9 +430,10 @@ if selected_options:
         collections = list(selected_collections.keys())  # Get the selected collections
 
         # For each collection, plot the number of scans by device
-        for collection in collections:
+        for collection in selected_collections_list:
             # Get the color for this collection (you can define more colors if needed)
-            color = '#%06X' % (0xFFFFFF & hash(collection))
+            farmer_name = farmer_names.get(collection, 'Unknown Farmer')
+            color = '#%06X' % (0xFFFFFF & hash(farmer_name))
 
             # Prepare data for each device
             device_scan_counts = {device: 0 for device in device_names}  # Initialize with 0 scans for each device
@@ -448,7 +448,6 @@ if selected_options:
             fig.add_trace(go.Bar(
                 x=list(device_scan_counts.keys()),  # Device names
                 y=list(device_scan_counts.values()),  # Number of scans
-                farmer_name = farmer_names.get(collection, 'Unknown Farmer'),
                 name=f'{farmer_name}',  # Collection name in the legend
                 marker=dict(color=color),  # Assign a unique color for each collection
             ))
