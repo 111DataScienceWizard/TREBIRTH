@@ -448,7 +448,7 @@ if selected_options:
             fig.add_trace(go.Bar(
                 x=list(device_scan_counts.keys()),  # Device names
                 y=list(device_scan_counts.values()),  # Number of scans
-                farmer_name = farmer_names.get(collection, 'Unknown Farmer')
+                farmer_name = farmer_names.get(collection, 'Unknown Farmer'),
                 name=f'{farmer_name}',  # Collection name in the legend
                 marker=dict(color=color),  # Assign a unique color for each collection
             ))
