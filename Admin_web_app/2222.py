@@ -430,7 +430,7 @@ if selected_options:
         collections = list(selected_collections.keys())  # Get the selected collections
 
         # For each collection, plot the number of scans by device
-        for collection in selected_collections_list:
+        for collection in collections:
             # Get the color for this collection (you can define more colors if needed)
             farmer_name = farmer_names.get(collection, 'Unknown Farmer')
             color = '#%06X' % (0xFFFFFF & hash(farmer_name))
