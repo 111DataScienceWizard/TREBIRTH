@@ -112,7 +112,7 @@ db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20e
 row_number = st.text_input('Enter Row number')
 tree_number = st.text_input('Enter Tree number')
 scan_number = st.text_input('Enter Scan number')
-bucket_number = st.text_input('Enter Bucket number')
+bucket_number = st.text_input('Enter Bucket number', 'All')
 
 # Dropdown for InfStat label selection
 label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], index=0)
