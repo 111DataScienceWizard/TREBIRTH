@@ -121,7 +121,7 @@ label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], ind
 selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Columns Comparison'], default=['Raw Data', 'Metadata'])
 
 # Create a reference to the Firestore collection
-query = db.collection('demo_db')
+query = db.collection('demo_db') 
 
 # Apply filters based on user input
 if row_number:
