@@ -158,7 +158,7 @@ def plot_multiple_frequency_domain(data_list, timestamps):
         xaxis_title="Frequency (Hz)",
         yaxis_title="Power Spectrum (dB)",
         legend_title="Scans",
-        font=dict(color="black"),
+        font=dict(color="white"),
         plot_bgcolor='rgba(0,0,0,0)',  # Transparent background
         paper_bgcolor='rgba(0,0,0,0)'  # Transparent background
     )
@@ -190,7 +190,7 @@ def plot_multiple_statistics(stats_dfs, timestamps):
         template='plotly_white',
         xaxis_title="Statistics",
         yaxis_title="Values",
-        font=dict(color="black"),
+        font=dict(color="white"),
         plot_bgcolor='rgba(0,0,0,0)',  # Transparent background
         paper_bgcolor='rgba(0,0,0,0)'  # Transparent background
     )
@@ -618,42 +618,49 @@ if selected_options:
             device_names = list(device_data.keys())
             dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys()))
 
-            # Add data for each device
-            for device_name in device_names:
-                healthy_counts = [device_data[device_name].get(date, {'Healthy': 0})['Healthy'] for date in dates]
-                infected_counts = [device_data[device_name].get(date, {'Infected': 0})['Infected'] for date in dates]
-        
-            # Plot healthy counts for the device
-            fig.add_trace(go.Bar(
-                x=dates,
-                y=healthy_counts,
-                name=f'{device_name} - Healthy',
-                marker=dict(color='#00FF00'),  # Green for healthy
-                width=0.1
-            ))
+            # Loop through each date to plot healthy and infected scan counts for each device
+            for date in dates:
+                for device_name in device_names:
+                    healthy_counts = device_data[device_name].get(date, {'Healthy': 0})['Healthy']
+                    infected_counts = device_data[device_name].get(date, {'Infected': 0})['Infected']
 
-            # Plot infected counts for the device
-            fig.add_trace(go.Bar(
-                x=dates,
-                y=infected_counts,
-                name=f'{device_name} - Infected',
-                marker=dict(color='#FF0000'),  # Red for infected
-                base=healthy_counts,  # Stack infected on top of healthy
-                width=0.1
-            ))
+                    # Plot healthy counts
+                    fig.add_trace(go.Bar(
+                        x=[date],
+                        y=[healthy_counts],
+                        name=f'{device_name} - Healthy',
+                        marker=dict(color='#00FF00'),  # Green for healthy
+                        text=device_name,  # Add device name
+                        textposition='auto',
+                        width=0.2,  # Adjust bar width
+                        offsetgroup=device_name  # Group bars by device
+                    ))
 
-        # Update layout for transparency and appropriate colors
-        fig.update_layout(
-            barmode='stack',  # Stack bars on top of each other
-            title_text=f'{collection} Collection - Device Scan Counts',
-            xaxis_title="Date",
-            yaxis_title="Number of Scans",
-            font=dict(color='white'),  # White font for dark background
-            paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
-            plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
-            legend_title_text="Devices",
-            height =300,
-        )
+                    # Plot infected counts
+                    fig.add_trace(go.Bar(
+                        x=[date],
+                        y=[infected_counts],
+                        name=f'{device_name} - Infected',
+                        marker=dict(color='#FF0000'),  # Red for infected
+                        text=device_name,  # Add device name
+                        textposition='auto',
+                        width=0.2,  # Adjust bar width
+                        offsetgroup=device_name  # Group bars by device
+                    ))
 
-        # Plot the figure in Streamlit
-        st.plotly_chart(fig)
+            # Update layout for better appearance
+            fig.update_layout(
+                barmode='group',  # Group healthy and infected bars for each device side by side
+                title_text=f'{collection} Collection - Device Scan Counts by Date',
+                xaxis_title="Date",
+                yaxis_title="Number of Scans",
+                font=dict(color='white'),  # White font for dark background
+                paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
+                plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
+                legend_title_text="Devices",
+                height=300,
+                xaxis=dict(tickformat='%Y-%m-%d'),  # Only show the date in 'YYYY-MM-DD' format
+            )
+
+            # Plot the figure in Streamlit
+            st.plotly_chart(fig)
