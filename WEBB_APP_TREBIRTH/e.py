@@ -1,59 +1,83 @@
-/home/adminuser/venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/exec_code.py:88 in exec_func_with_error_handling                         
-  /home/adminuser/venv/lib/python3.12/site-packages/streamlit/runtime/scriptrunner/script_runner.py:590 in code_to_exec                                     
-/mount/src/trebirth/WEBB_APP_TREBIRTH/w2.py:186 in <module>                   
-183 │   │   │   processed_list.append(df)                                   
-    184 │   │   return pd.concat(processed_list, axis=1)                        
-  ❱ 186 │   df_radar = process_data(radar_data, 'Radar ')                       
-    187 │   #df_adxl = process_data(adxl_data, 'ADXL ')                         
-    188 │   df_ax = process_data(ax_data, 'Ax ')                                
-    189 │   df_ay = process_data(ay_data, 'Ay ')                                
-/mount/src/trebirth/WEBB_APP_TREBIRTH/w2.py:182 in process_data               
-    179 │   │   │   df = pd.DataFrame(data).dropna()                            
-    180 │   │   │   df.fillna(df.mean(), inplace=True)                          
-    181 │   │   │   new_columns = [f'{prefix}{i}']                              
-  ❱ 182 │   │   │   df.columns = new_columns                                    
-    183 │   │   │   processed_list.append(df)                                   
-    184 │   │   return pd.concat(processed_list, axis=1)                        
-    185                                                                         
-  /home/adminuser/venv/lib/python3.12/site-packages/pandas/core/generic.py:631  
-  3 in __setattr__                                                              
-     6310 │   │                                                                 
-     6311 │   │   try:                                                          
-     6312 │   │   │   object.__getattribute__(self, name)                       
-  ❱  6313 │   │   │   return object.__setattr__(self, name, value)              
-     6314 │   │   except AttributeError:                                        
-     6315 │   │   │   pass                                                      
-     6316                                                                       
-  in pandas._libs.properties.AxisProperty.__set__:69                            
-  /home/adminuser/venv/lib/python3.12/site-packages/pandas/core/generic.py:814  
-  in _set_axis                                                                  
-      811 │   │   directly, e.g. `series.index = [1, 2, 3]`.                    
-      812 │   │   """                                                           
-      813 │   │   labels = ensure_index(labels)                                 
-  ❱   814 │   │   self._mgr.set_axis(axis, labels)                              
-      815 │   │   self._clear_item_cache()                                      
-      816 │                                                                     
-      817 │   @final                                                            
-  /home/adminuser/venv/lib/python3.12/site-packages/pandas/core/internals/mana  
-  gers.py:238 in set_axis                                                       
-     235 │                                                                      
-     236 │   def set_axis(self, axis: AxisInt, new_labels: Index) -> None:      
-     237 │   │   # Caller is responsible for ensuring we have an Index object.  
-  ❱  238 │   │   self._validate_set_axis(axis, new_labels)                      
-     239 │   │   self.axes[axis] = new_labels                                   
-     240 │                                                                      
-     241 │   @property                                                          
-  /home/adminuser/venv/lib/python3.12/site-packages/pandas/core/internals/base  
-  .py:98 in _validate_set_axis                                                  
+/home/adminuser/venv/lib/python3.12/site-packages/streamlit/runtime/scriptru  
 
-     95 │   │   │   pass                                                        
-     96 │   │                                                                   
-     97 │   │   elif new_len != old_len:                                        
-  ❱  98 │   │   │   raise ValueError(                                           
-     99 │   │   │   │   f"Length mismatch: Expected axis has {old_len} element  
-    100 │   │   │   │   f"values have {new_len} elements"                       
-    101 │   │   │   )                                                           
+  nner/exec_code.py:88 in exec_func_with_error_handling                         
+
+                                                                                
+
+  /home/adminuser/venv/lib/python3.12/site-packages/streamlit/runtime/scriptru  
+
+  nner/script_runner.py:590 in code_to_exec                                     
+
+                                                                                
+
+  /mount/src/trebirth/WEBB_APP_TREBIRTH/w2.py:348 in <module>                   
+
+                                                                                
+
+    345 │                                                                       
+
+    346 │   # Add data for each scan to the filtered columns dictionary         
+
+    347 │   for i in range(10):  # Assuming there are 10 scans                  
+
+  ❱ 348 │   │   filtered_radar_columns[f'Radar {i}'] = df_combined_detrended[f  
+
+    349 │   │   #filtered_adxl_columns[f'ADXL {i}'] = df_combined_detrended[f'  
+
+    350 │                                                                       
+
+    351 │   # Apply the process function on each column                         
+
+                                                                                
+
+  /home/adminuser/venv/lib/python3.12/site-packages/pandas/core/frame.py:4102   
+
+  in __getitem__                                                                
+
+                                                                                
+
+     4099 │   │   if is_single_key:                                             
+
+     4100 │   │   │   if self.columns.nlevels > 1:                              
+
+     4101 │   │   │   │   return self._getitem_multilevel(key)                  
+
+  ❱  4102 │   │   │   indexer = self.columns.get_loc(key)                       
+
+     4103 │   │   │   if is_integer(indexer):                                   
+
+     4104 │   │   │   │   indexer = [indexer]                                   
+
+     4105 │   │   else:                                                         
+
+                                                                                
+
+  /home/adminuser/venv/lib/python3.12/site-packages/pandas/core/indexes/base.p  
+
+  y:3812 in get_loc                                                             
+
+                                                                                
+
+    3809 │   │   │   │   and any(isinstance(x, slice) for x in casted_key)      
+
+    3810 │   │   │   ):                                                         
+
+    3811 │   │   │   │   raise InvalidIndexError(key)                           
+
+  ❱ 3812 │   │   │   raise KeyError(key) from err                               
+
+    3813 │   │   except TypeError:                                              
+
+    3814 │   │   │   # If we have a listlike key, _check_indexing_error will r  
+
+    3815 │   │   │   #  InvalidIndexError. Otherwise we fall through and re-ra  
+
 ────────────────────────────────────────────────────────────────────────────────
-ValueError: Length mismatch: Expected axis has 0 elements, new values have 1 
-elements
-2024-09-09 11:58:19.812 503 GET /script-health-check (127.0.0.1) 3691.55ms
+
+KeyError: 'Radar 4'
+
+2024-09-09 13:44:43.955 503 GET /script-health-check (127.0.0.1) 60039.18ms
+
+2024-09-09 13:45:44.311 503 GET /script-health-check (127.0.0.1) 60080.40ms
+
+2024-09-09 13:46:44.742 503 GET /script-health-check (127.0.0.1) 60099.09ms
