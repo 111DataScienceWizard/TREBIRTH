@@ -664,3 +664,60 @@ if selected_options:
 
             # Plot the figure in Streamlit
             st.plotly_chart(fig)
+
+
+
+
+
+
+
+
+
+
+        with col4:
+            # Plot vertical bar chart for device scan counts
+            fig = go.Figure()
+
+            # Prepare data for the bar chart
+            device_names = list(device_data.keys())
+            dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys()))
+
+            # Add data for each device
+            for device_name in device_names:
+                healthy_counts = [device_data[device_name].get(date, {'Healthy': 0})['Healthy'] for date in dates]
+                infected_counts = [device_data[device_name].get(date, {'Infected': 0})['Infected'] for date in dates]
+        
+            # Plot healthy counts for the device
+            fig.add_trace(go.Bar(
+                x=dates,
+                y=healthy_counts,
+                name=f'{device_name} - Healthy',
+                marker=dict(color='#00FF00'),  # Green for healthy
+                width=0.1
+            ))
+
+            # Plot infected counts for the device
+            fig.add_trace(go.Bar(
+                x=dates,
+                y=infected_counts,
+                name=f'{device_name} - Infected',
+                marker=dict(color='#FF0000'),  # Red for infected
+                base=healthy_counts,  # Stack infected on top of healthy
+                width=0.1
+            ))
+
+        # Update layout for transparency and appropriate colors
+        fig.update_layout(
+            barmode='stack',  # Stack bars on top of each other
+            title_text=f'{collection} Collection - Device Scan Counts',
+            xaxis_title="Date",
+            yaxis_title="Number of Scans",
+            font=dict(color='white'),  # White font for dark background
+            paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
+            plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
+            legend_title_text="Devices",
+            height =300,
+        )
+
+        # Plot the figure in Streamlit
+        st.plotly_chart(fig)
