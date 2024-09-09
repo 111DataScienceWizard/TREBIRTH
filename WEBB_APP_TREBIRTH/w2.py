@@ -147,7 +147,7 @@ if not query_results:
 else:
     # Create empty lists to store data
     radar_data = []
-    adxl_data = []
+    #adxl_data = []
     ax_data = []
     ay_data = []
     az_data = []
@@ -161,7 +161,7 @@ else:
 
     for doc in query_results:
         radar_data.append(slice_data(doc.get('RadarRaw', [])))
-        adxl_data.append(slice_data(doc.get('ADXLRaw', [])))
+        #adxl_data.append(slice_data(doc.get('ADXLRaw', [])))
         ax_data.append(slice_data(doc.get('Ax', [])))
         ay_data.append(slice_data(doc.get('Ay', [])))
         az_data.append(slice_data(doc.get('Az', [])))
@@ -184,13 +184,14 @@ else:
         return pd.concat(processed_list, axis=1)
 
     df_radar = process_data(radar_data, 'Radar ')
-    df_adxl = process_data(adxl_data, 'ADXL ')
+    #df_adxl = process_data(adxl_data, 'ADXL ')
     df_ax = process_data(ax_data, 'Ax ')
     df_ay = process_data(ay_data, 'Ay ')
     df_az = process_data(az_data, 'Az ')
 
     # Concatenate all DataFrames column-wise
-    df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
+    df_combined = pd.concat([df_radar, df_ax, df_ay, df_az], axis=1)
+    #df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
 
     filtered_data_df = pd.DataFrame({col: process(coefLPF50Hz, df_combined[col].values) for col in df_combined.columns})
 
@@ -209,9 +210,9 @@ else:
 
     # Construct file name based on user inputs
     file_name_parts = []
-    if row_number != 'All':
+    if row_number:
         file_name_parts.append(f'R{row_number}')
-    if tree_number != 'All':
+    if tree_number:
         file_name_parts.append(f'T{tree_number}')
     if scan_number != 'All':
         file_name_parts.append(f'S{scan_number}')
@@ -309,28 +310,30 @@ else:
     # Apply the selected filter only to Radar and ADXL columns
     # List to hold all Radar and ADXL column names
     radar_columns = [f'Radar {i}' for i in range(30)]  # Assuming there are 10 scans
-    adxl_columns = [f'ADXL {i}' for i in range(30)]  # Assuming there are 10 scans
+    #adxl_columns = [f'ADXL {i}' for i in range(30)]  # Assuming there are 10 scans
 
     # Dictionary to hold the filtered data columns for Radar and ADXL
     filtered_radar_columns = {}
-    filtered_adxl_columns = {}
+    #filtered_adxl_columns = {}
 
     # Add data for each scan to the filtered columns dictionary
     for i in range(10):  # Assuming there are 10 scans
         filtered_radar_columns[f'Radar {i}'] = df_combined_detrended[f'Radar {i}']
-        filtered_adxl_columns[f'ADXL {i}'] = df_combined_detrended[f'ADXL {i}']
+        #filtered_adxl_columns[f'ADXL {i}'] = df_combined_detrended[f'ADXL {i}']
 
     # Apply the process function on each column
     if filter_type == 'Band Pass Filter (BPF)':
         filtered_radar_data_low = pd.DataFrame({col: process(filter_coef_low, data.values) for col, data in filtered_radar_columns.items()})
         filtered_radar_data = pd.DataFrame({col: process(filter_coef_high, data.values) for col, data in filtered_radar_data_low.items()})
-        filtered_adxl_data_low = pd.DataFrame({col: process(filter_coef_low, data.values) for col, data in filtered_adxl_columns.items()})
-        filtered_adxl_data = pd.DataFrame({col: process(filter_coef_high, data.values) for col, data in filtered_adxl_data_low.items()})
+        #filtered_adxl_data_low = pd.DataFrame({col: process(filter_coef_low, data.values) for col, data in filtered_adxl_columns.items()})
+        #filtered_adxl_data = pd.DataFrame({col: process(filter_coef_high, data.values) for col, data in filtered_adxl_data_low.items()})
     else:
         filtered_radar_data = pd.DataFrame({col: process(filter_coef, data.values) for col, data in filtered_radar_columns.items()})
-        filtered_adxl_data = pd.DataFrame({col: process(filter_coef, data.values) for col, data in filtered_adxl_columns.items()})
+        #filtered_adxl_data = pd.DataFrame({col: process(filter_coef, data.values) for col, data in filtered_adxl_columns.items()})
 
-filtered_data = pd.concat([filtered_radar_data, filtered_adxl_data], axis=1)
+filtered_data = pd.concat([filtered_radar_data], axis=1)
+#filtered_data = pd.concat([filtered_radar_data, filtered_adxl_data], axis=1)
+
 
 # Multi-select box to select desired sheets
 selected_sheets = st.multiselect('Select Sheets to Download', ['Filtered Data', 'Time Domain Features', 'Columns Comparison'])
