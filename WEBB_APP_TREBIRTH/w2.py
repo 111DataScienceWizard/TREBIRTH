@@ -338,14 +338,15 @@ else:
     # List to hold all Radar and ADXL column names
     radar_columns = [f'Radar {i+1}' for i in range(30)]  # Assuming there are 10 scans
     #adxl_columns = [f'ADXL {i}' for i in range(30)]  # Assuming there are 10 scans
+    available_radar_columns = [col for col in df_combined_detrended.columns if col.startswith('Radar')]
 
     # Dictionary to hold the filtered data columns for Radar and ADXL
     filtered_radar_columns = {}
     #filtered_adxl_columns = {}
 
     # Add data for each scan to the filtered columns dictionary
-    for i in range(1, 11):  # Assuming there are 10 scans
-        filtered_radar_columns[f'Radar {i+1}'] = df_combined_detrended[f'Radar {i+1}']
+    for i, radar_col in enumerate(available_radar_columns):
+        filtered_radar_columns[f'Radar {i+1}'] = df_combined_detrended[radar_col]
         #filtered_adxl_columns[f'ADXL {i}'] = df_combined_detrended[f'ADXL {i}']
 
     # Apply the process function on each column
