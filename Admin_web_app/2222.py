@@ -618,39 +618,40 @@ if selected_options:
             device_names = list(device_data.keys())
             dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys()))
 
-            # Loop through each date to plot healthy and infected scan counts for each device
-            for date in dates:
-                for device_name in device_names:
-                    healthy_counts = device_data[device_name].get(date, {'Healthy': 0})['Healthy']
-                    infected_counts = device_data[device_name].get(date, {'Infected': 0})['Infected']
+            # Assign different colors to each device
+            color_palette = ['#00FF00', '#FF0000', '#0000FF', '#FFA500', '#FFFF00', '#800080']  # Add more colors as needed
+            device_color_map = {device_name: color_palette[i % len(color_palette)] for i, device_name in enumerate(device_names)}
 
-                    # Plot healthy counts
-                    fig.add_trace(go.Bar(
-                        x=[date],
-                        y=[healthy_counts],
-                        name=f'{device_name} - Healthy',
-                        marker=dict(color='#00FF00'),  # Green for healthy
-                        text=device_name,  # Add device name
-                        textposition='auto',
-                        width=0.2,  # Adjust bar width
-                        offsetgroup=device_name  # Group bars by device
-                    ))
+            # Add data for each device, separate for healthy and infected
+            for device_name in device_names:
+                healthy_counts = [device_data[device_name].get(date, {'Healthy': 0})['Healthy'] for date in dates]
+                infected_counts = [device_data[device_name].get(date, {'Infected': 0})['Infected'] for date in dates]
 
-                    # Plot infected counts
-                    fig.add_trace(go.Bar(
-                        x=[date],
-                        y=[infected_counts],
-                        name=f'{device_name} - Infected',
-                        marker=dict(color='#FF0000'),  # Red for infected
-                        text=device_name,  # Add device name
-                        textposition='auto',
-                        width=0.2,  # Adjust bar width
-                        offsetgroup=device_name  # Group bars by device
-                    ))
+                # Plot healthy counts for the device
+                fig.add_trace(go.Bar(
+                    x=dates,
+                    y=healthy_counts,
+                    name=f'{device_name} - Healthy',
+                    marker=dict(color=device_color_map[device_name]),  # Unique color for each device
+                    width=0.2,  # Adjust the width of the bars
+                    text=f'{device_name} - Healthy',  # Display device and status as text
+                    hoverinfo='text+y'  # Hover text and y value
+                ))
 
-            # Update layout for better appearance
+                # Plot infected counts for the device
+                fig.add_trace(go.Bar(
+                    x=dates,
+                    y=infected_counts,
+                    name=f'{device_name} - Infected',
+                    marker=dict(color=device_color_map[device_name], line=dict(color='#FF0000', width=2)),  # Red outline for infected
+                    width=0.2,
+                    text=f'{device_name} - Infected',  # Display device and status as text
+                    hoverinfo='text+y'
+                ))
+
+            # Update layout for transparency and appropriate colors
             fig.update_layout(
-                barmode='group',  # Group healthy and infected bars for each device side by side
+                barmode='group',  # Group bars side by side, not stacked
                 title_text=f'{collection} Collection - Device Scan Counts by Date',
                 xaxis_title="Date",
                 yaxis_title="Number of Scans",
@@ -659,7 +660,7 @@ if selected_options:
                 plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
                 legend_title_text="Devices",
                 height=300,
-                xaxis=dict(tickformat='%Y-%m-%d'),  # Only show the date in 'YYYY-MM-DD' format
+                xaxis=dict(tickformat='%Y-%m-%d'),  # Display only the date
             )
 
             # Plot the figure in Streamlit
