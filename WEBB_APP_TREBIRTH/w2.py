@@ -249,7 +249,7 @@ else:
 
     # Download button for selected sheets and metadata
     st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
-    st.write("Columns in df_combined_detrended:", df_combined_detrended.columns)
+    #st.write("Columns in df_combined_detrended:", df_combined_detrended.columns)
 
     def download_filtered_data_and_stats():
         filtered_data_dict = {}
