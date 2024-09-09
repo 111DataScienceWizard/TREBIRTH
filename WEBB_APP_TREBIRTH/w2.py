@@ -193,12 +193,12 @@ else:
             df.fillna(df.mean(), inplace=True)
         
             if df.empty:
-                st.warning(f"No data available for {prefix}{i}. Skipping.")
+                st.warning(f"No data available for {prefix}{i+1}. Skipping.")
                 continue
         
-            new_columns = [f'{prefix}{i}'] * df.shape[1]  # Ensure new_columns matches the number of DataFrame columns
+            new_columns = [f'{prefix}{i+1}'] * df.shape[1]  # Ensure new_columns matches the number of DataFrame columns
             if len(new_columns) != df.shape[1]:
-                st.warning(f"Column mismatch for {prefix}{i}. Expected {df.shape[1]} columns, got {len(new_columns)}.")
+                st.warning(f"Column mismatch for {prefix}{i+1}. Expected {df.shape[1]} columns, got {len(new_columns)}.")
                 continue
         
             df.columns = new_columns
