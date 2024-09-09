@@ -173,15 +173,42 @@ else:
         metadata_list.append(metadata)
 
     # Process each scan's data individually and concatenate later
+    #def process_data(data_list, prefix):
+        #processed_list = []
+        #for i, data in enumerate(data_list):
+            #df = pd.DataFrame(data).dropna()
+            #df.fillna(df.mean(), inplace=True)
+            #new_columns = [f'{prefix}{i}']
+            #df.columns = new_columns
+            #processed_list.append(df)
+        #return pd.concat(processed_list, axis=1)
+
     def process_data(data_list, prefix):
         processed_list = []
         for i, data in enumerate(data_list):
+            if not data:  # Skip empty data
+                continue
+        
             df = pd.DataFrame(data).dropna()
             df.fillna(df.mean(), inplace=True)
-            new_columns = [f'{prefix}{i}']
+        
+            if df.empty:
+                st.warning(f"No data available for {prefix}{i}. Skipping.")
+                continue
+        
+            new_columns = [f'{prefix}{i}'] * df.shape[1]  # Ensure new_columns matches the number of DataFrame columns
+            if len(new_columns) != df.shape[1]:
+                st.warning(f"Column mismatch for {prefix}{i}. Expected {df.shape[1]} columns, got {len(new_columns)}.")
+                continue
+        
             df.columns = new_columns
             processed_list.append(df)
-        return pd.concat(processed_list, axis=1)
+        
+        if processed_list:
+            return pd.concat(processed_list, axis=1)
+        else:
+            st.warning("No data processed. Returning empty DataFrame.")
+            return pd.DataFrame()  # Return an empty DataFrame if no data was processed
 
     df_radar = process_data(radar_data, 'Radar ')
     #df_adxl = process_data(adxl_data, 'ADXL ')
