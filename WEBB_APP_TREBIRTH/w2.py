@@ -111,7 +111,7 @@ db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20e
 # User input for Row No., Tree No., Scan No., and Label
 row_number = st.text_input('Enter Row number')
 tree_number = st.text_input('Enter Tree number')
-scan_number = st.text_input('Enter Scan number')
+scan_number = st.text_input('Enter Scan number', 'All')
 bucket_number = st.text_input('Enter Bucket number', 'All')
 
 # Dropdown for InfStat label selection
@@ -128,7 +128,7 @@ if row_number:
     query = query.where('RowNo', '==', int(row_number))
 if tree_number:
     query = query.where('TreeNo', '==', int(tree_number))
-if scan_number:
+if scan_number != 'All':
     query = query.where('ScanNo', '==', int(scan_number))
 if bucket_number != 'All':
     query = query.where('BucketID', '==', int(bucket_number))
