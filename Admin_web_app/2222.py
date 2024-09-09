@@ -305,14 +305,14 @@ collection_dates = {
     'DevMode': ['2024-02-22', '2024-02-23', '2024-02-24', '2024-02-25', '2024-02-26', '2024-02-28'],
     'debugging': ['2024-06-10', '2024-06-13', '2024-06-14'],
     'testing': ['2024-06-13'],
-    'demo_db': ['2024-08-23', '2024-08-24'],
+    'demo_db': [],
     'QDIC_test': ['2024-09-03']
     
 }
 
 
 # Generate dropdown options with collection names and original date format
-dropdown_options = []
+dropdown_options = ['Dananjay Yadav']
 for collection, dates in collection_dates.items():
     farmer_name = farmer_names.get(collection, 'Unknown Farmer')
     if dates:
@@ -321,7 +321,7 @@ for collection, dates in collection_dates.items():
         dropdown_options.append(f"{farmer_name} - No Dates")
 
 # Sort dropdown options by newest to oldest
-dropdown_options = sorted(dropdown_options, key=lambda x: datetime.strptime(x.split(' - ')[1], '%Y-%m-%d') if 'No Dates' not in x else datetime.min, reverse=True)
+dropdown_options[1:] = sorted(dropdown_options[1:], key=lambda x: datetime.strptime(x.split(' - ')[1], '%Y-%m-%d') if 'No Dates' not in x else datetime.min, reverse=True)
 
 # Create dropdown menu
 selected_options = st.multiselect('Select farmer plots with Dates', dropdown_options)
@@ -334,24 +334,28 @@ if selected_options:
     device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
 
     for option in selected_options:
-        farmer_name, date_str = option.split(' - ')
-        collection = [key for key, value in farmer_names.items() if value == farmer_name][0]  # Find the collection based on farmer name
-        if date_str == "No Dates":
-            date_str = None
-        if collection not in selected_collections:
-            selected_collections[collection] = []
-        selected_collections[collection].append(date_str)
+        if option == 'Dananjay Yadav':  # If Dananjay Yadav is selected
+            collection = 'demo_db'
+            selected_collections[collection] = [None]  # No specific dates
+        else:
+            farmer_name, date_str = option.split(' - ')
+            collection = [key for key, value in farmer_names.items() if value == farmer_name][0]  # Find the collection based on farmer name
+            if date_str == "No Dates":
+                date_str = None
+            if collection not in selected_collections:
+                selected_collections[collection] = []
+            selected_collections[collection].append(date_str)
 
     # Fetch data and plot charts
     for collection, dates in selected_collections.items():
-        if "No Dates" in dates or not dates[0]:
+        if collection == 'demo_db' or "No Dates" in dates or not dates[0]:  # Retrieve all scans for Dananjay Yadav
             docs = db.collection(collection).stream()
         else:
             docs = []
             for date_str in dates:
-                date_obj = datetime.strptime(date_str, '%Y-%m-%d')
-                start_datetime = datetime.combine(date_obj, datetime.min.time())
-                end_datetime = datetime.combine(date_obj, datetime.max.time())
+                date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d')
+                start_datetime = datetime.datetime.combine(date_obj, datetime.datetime.min.time())
+                end_datetime = datetime.datetime.combine(date_obj, datetime.datetime.max.time())
                 docs.extend(db.collection(collection)
                             .where('timestamp', '>=', start_datetime)
                             .where('timestamp', '<=', end_datetime)
