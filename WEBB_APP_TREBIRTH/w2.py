@@ -109,10 +109,10 @@ def get_firestore_data(query):
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
 
 # User input for Row No., Tree No., Scan No., and Label
-row_number = st.text_input('Enter Row number', 'All')
-tree_number = st.text_input('Enter Tree number', 'All')
-scan_number = st.text_input('Enter Scan number', 'All')
-bucket_number = st.text_input('Enter Bucket number', 'All')
+row_number = st.text_input('Enter Row number')
+tree_number = st.text_input('Enter Tree number')
+scan_number = st.text_input('Enter Scan number')
+bucket_number = st.text_input('Enter Bucket number')
 
 # Dropdown for InfStat label selection
 label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], index=0)
@@ -124,13 +124,13 @@ selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data',
 query = db.collection('demo_db')
 
 # Apply filters based on user input
-if row_number != 'All':
+if row_number:
     query = query.where('RowNo', '==', int(row_number))
-if tree_number != 'All':
+if tree_number:
     query = query.where('TreeNo', '==', int(tree_number))
-if scan_number != 'All':
+if scan_number:
     query = query.where('ScanNo', '==', int(scan_number))
-if bucket_number != 'All':
+if bucket_number:
     query = query.where('BucketID', '==', int(bucket_number))
 if label_infstat != 'All':
     query = query.where('InfStat', '==', label_infstat)
