@@ -587,7 +587,10 @@ if selected_options:
             # Display farmer image
             farmer_image = farmer_images.get(collection, 'default.png')
             farmer_name = farmer_names.get(collection, 'Unknown Farmer')
-            st.image(farmer_image, width=60, use_column_width=True)
+            st.image(farmer_image, use_column_width=True)
+            st.markdown(f"<div style='height: 150px;'>"
+                        f"<img src='{farmer_image}' style='height: 150px;' alt='Farmer Image'></div>",
+                        unsafe_allow_html=True)
             st.write(f"**Farmer Name:** {farmer_name}", color='white')
     
         with col2:
@@ -599,12 +602,14 @@ if selected_options:
             plot_size = plot_sizes.get(collection, 'Unknown Plot Size')
             farm_age = farm_ages.get(collection, 'Unknown farm age')
             st.markdown(f"<div style='text-align: center; color: white;'>"
-                        f"**Total Scans:** {total_scans}<br>"
-                        f"**Healthy Scans:** {healthy_count}<br>"
-                        f"**Infected Scans:** {infected_count}<br>"
-                        f"**Farm Location:** {location}<br>"
-                        f"**Farm Age:** {farm_age}<br>"
-                        f"**Plot Size:** {plot_size}</div>", unsafe_allow_html=True)
+                        f"<br>"
+                        f"<br>"
+                        f"Total Scans:{total_scans}<br>"
+                        f"Healthy Scans:{healthy_count}<br>"
+                        f"Infected Scans:{infected_count}<br>"
+                        f"Farm Location:{location}<br>"
+                        f"Farm Age:{farm_age}<br>"
+                        f"Plot Size:{plot_size}</div>", unsafe_allow_html=True)
             #st.write(f"**Farm Location:** {location}", color='white')
             #st.write(f"**Farm Age:** {farm_age}", color='white')
             #st.write(f"**Plot Size:** {plot_size}", color='white')
