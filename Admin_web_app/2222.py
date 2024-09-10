@@ -353,9 +353,9 @@ if selected_options:
         else:
             docs = []
             for date_str in dates:
-                date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d')
-                start_datetime = datetime.datetime.combine(date_obj, datetime.datetime.min.time())
-                end_datetime = datetime.datetime.combine(date_obj, datetime.datetime.max.time())
+                date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+                start_datetime = datetime.combine(date_obj, datetime.datetime.min.time())
+                end_datetime = datetime.combine(date_obj, datetime.datetime.max.time())
                 docs.extend(db.collection(collection)
                             .where('timestamp', '>=', start_datetime)
                             .where('timestamp', '<=', end_datetime)
