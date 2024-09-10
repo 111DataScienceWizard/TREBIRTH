@@ -652,7 +652,7 @@ if selected_options:
 
         # Prepare data for the bar chart
         device_names = list(device_data.keys())
-        dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys()))
+        dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys() if date in selected_dates))
 
         # Define a color palette for both healthy and infected bars
         color_palette_healthy = ['#00FF00', '#1E90FF', '#FFA500', '#FFFF00', '#800080', '#FF69B4']  # Colors for healthy scans
@@ -671,7 +671,7 @@ if selected_options:
                     y=[healthy_count],
                     name=f'{device_name} - Healthy',
                     marker=dict(color=color_palette_healthy[i % len(color_palette_healthy)]),  # Unique color for healthy
-                    width=0.35,  # Adjust bar thickness
+                    width=1,  # Adjust bar thickness
                     offsetgroup=device_name,  # Group by device to align healthy/infected bars together
                     hoverinfo='y'
                 ))
