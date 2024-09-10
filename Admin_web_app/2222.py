@@ -587,7 +587,7 @@ if selected_options:
             # Display farmer image
             farmer_image = farmer_images.get(collection, 'default.png')
             farmer_name = farmer_names.get(collection, 'Unknown Farmer')
-            st.image(farmer_image, width= 30, use_column_width=True)
+            st.image(farmer_image, width= 10, use_column_width=True)
             st.write(f"**Farmer Name:** {farmer_name}", color='white')
     
         with col2:
