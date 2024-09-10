@@ -437,7 +437,7 @@ if selected_options:
                 doc_data = doc.to_dict()
                 device_name = doc_data.get('DeviceName:')  # Fetch device name properly
                 if device_name:
-                    device_names.add(device_name)
+                    device_names.add(device_name.strip())
                     
         # Ensure we handle any device names properly, even if missing or malformed
         device_names = list(device_names)  # Convert to list for iteration
@@ -455,8 +455,9 @@ if selected_options:
                 doc_data = doc.to_dict()
                 device_name = doc_data.get('DeviceName:')
                 if device_name:
-                    device_scan_counts[device_name] += 1  # Count total scans for each device
-
+                    device_name = device_name.strip()  # Remove any leading or trailing whitespace
+                    if device_name in device_scan_counts:  # Ensure the device name is in the counts dictionary
+                        device_scan_counts[device_name] += 1 
             # Plot the device counts for this collection
             fig.add_trace(go.Bar(
                 x=list(device_scan_counts.keys()),  # Device names
