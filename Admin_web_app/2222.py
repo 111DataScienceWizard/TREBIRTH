@@ -625,7 +625,7 @@ if selected_options:
                     font=dict(color='white'),
                     paper_bgcolor='rgba(0,0,0,0)',
                     plot_bgcolor='rgba(0,0,0,0)',
-                    height= 400
+                    height= 350
                 )
                 st.plotly_chart(fig)
         # Add a new row for the bar chart
