@@ -587,10 +587,7 @@ if selected_options:
             # Display farmer image
             farmer_image = farmer_images.get(collection, 'default.png')
             farmer_name = farmer_names.get(collection, 'Unknown Farmer')
-            st.image(farmer_image, use_column_width=True)
-            st.markdown(f"<div style='height: 150px;'>"
-                        f"<img src='{farmer_image}' style='height: 50px;'></div>",
-                        unsafe_allow_html=True)
+            st.image(farmer_image, width= 30, use_column_width=True)
             st.write(f"**Farmer Name:** {farmer_name}", color='white')
     
         with col2:
