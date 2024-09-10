@@ -598,15 +598,25 @@ if selected_options:
             location = farm_locations.get(collection, 'Unknown Location')
             plot_size = plot_sizes.get(collection, 'Unknown Plot Size')
             farm_age = farm_ages.get(collection, 'Unknown farm age')
-            st.markdown(f"<div style='text-align: center; color: white;'>"
-                        f"<br>"
-                        f"<br>"
-                        f"Total Scans:{total_scans}<br>"
-                        f"Healthy Scans:{healthy_count}<br>"
-                        f"Infected Scans:{infected_count}<br>"
-                        f"Farm Location:{location}<br>"
-                        f"Farm Age:{farm_age}<br>"
-                        f"Plot Size:{plot_size}</div>", unsafe_allow_html=True)
+            st.markdown(f"""
+                <div style='
+                    text-align: justify; 
+                    color: white; 
+                    background-color: rgba(0, 128, 0, 0.1); 
+                    border: 2px solid white; 
+                    padding: 10px; 
+                    border-radius: 10px;
+                    margin: 10px auto;
+                    width: 80%;'>
+                    <br><br>
+                    <b>Total Scans:</b> {total_scans}<br>
+                    <b>Healthy Scans:</b> {healthy_count}<br>
+                    <b>Infected Scans:</b> {infected_count}<br>
+                    <b>Farm Location:</b> {location}<br>
+                    <b>Farm Age:</b> {farm_age}<br>
+                    <b>Plot Size:</b> {plot_size}
+                </div>
+                """, unsafe_allow_html=True)
             #st.write(f"**Farm Location:** {location}", color='white')
             #st.write(f"**Farm Age:** {farm_age}", color='white')
             #st.write(f"**Plot Size:** {plot_size}", color='white')
