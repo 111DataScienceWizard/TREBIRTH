@@ -600,6 +600,14 @@ if selected_options:
             farm_age = farm_ages.get(collection, 'Unknown farm age')
             st.markdown(f"""
                 <div style='
+                    text-align: center; 
+                    color: white; 
+                    font-size: 24px;
+                    font-weight: bold;
+                    margin-bottom: 10px;'>
+                    Farm Details
+                </div>
+                <div style='
                     text-align: justify; 
                     color: white; 
                     background-color: rgba(0, 128, 0, 0.1); 
@@ -608,7 +616,7 @@ if selected_options:
                     border-radius: 10px;
                     margin: 10px auto;
                     width: 80%;'>
-                    <br><br>
+                    <br>
                     <b>Total Scans:</b> {total_scans}<br>
                     <b>Healthy Scans:</b> {healthy_count}<br>
                     <b>Infected Scans:</b> {infected_count}<br>
