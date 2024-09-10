@@ -430,23 +430,32 @@ if selected_options:
     if device_data:
         fig = go.Figure()
 
-        device_names = set(device_name for device_name in device_data.keys())  # Collect all device names from selected collections
+        # Collect all device names from selected collections
+        device_names = set()
+        for collection in selected_collections:
+            for doc in db.collection(collection).stream():
+                doc_data = doc.to_dict()
+                device_name = doc_data.get('DeviceName:')  # Fetch device name properly
+                if device_name:
+                    device_names.add(device_name)
+                    
+        # Ensure we handle any device names properly, even if missing or malformed
+        device_names = list(device_names)  # Convert to list for iteration
         collections = list(selected_collections.keys())  # Get the selected collections
 
         # For each collection, plot the number of scans by device
         for collection in collections:
-            # Get the color for this collection (you can define more colors if needed)
             farmer_name = farmer_names.get(collection, 'Unknown Farmer')
             color = '#%06X' % (0xFFFFFF & hash(farmer_name))
 
+            
             # Prepare data for each device
             device_scan_counts = {device: 0 for device in device_names}  # Initialize with 0 scans for each device
             for doc in db.collection(collection).stream():
                 doc_data = doc.to_dict()
                 device_name = doc_data.get('DeviceName:')
                 if device_name:
-                    inf_stat = doc_data.get('InfStat', 'Unknown')
-                    device_scan_counts[device_name] += 1  # Count total scans (healthy + infected)
+                    device_scan_counts[device_name] += 1  # Count total scans for each device
 
             # Plot the device counts for this collection
             fig.add_trace(go.Bar(
