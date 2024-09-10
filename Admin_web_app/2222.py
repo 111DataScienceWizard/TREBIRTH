@@ -669,9 +669,8 @@ if selected_options:
                 y=healthy_counts,
                 name=f'{device_name} - Healthy',
                 marker=dict(color=device_color_map[device_name]),  # Unique color for each device
-                width=0.2,  # Adjust the width of the bars
-                text=f'{device_name} - Healthy',  # Display device and status as text
-                hoverinfo='text+y'  # Hover text and y value
+                width=0.35,  # Adjust the width of the bars
+                hoverinfo='y'  # Hover text and y value
             ))
 
             # Plot infected counts for the device
@@ -679,15 +678,16 @@ if selected_options:
                 x=dates,
                 y=infected_counts,
                 name=f'{device_name} - Infected',
-                marker=dict(color=device_color_map[device_name], line=dict(color='#FF0000', width=2)),  # Red outline for infected
-                width=0.2,
-                text=f'{device_name} - Infected',  # Display device and status as text
-                hoverinfo='text+y'
+                marker=dict(color='#FF0000', line=dict(color='#FF0000', width=2)),  # Red outline for infected
+                width=0.35,
+                hoverinfo='y'
             ))
 
         # Update layout for transparency and appropriate colors
         fig.update_layout(
             barmode='group',  # Group bars side by side, not stacked
+            bargap=0.2,
+            bargroupgap=0.4,
             title_text=f'{farmer_name} Collection - Device Scan Counts by Date',
             xaxis_title="Date",
             yaxis_title="Number of Scans",
