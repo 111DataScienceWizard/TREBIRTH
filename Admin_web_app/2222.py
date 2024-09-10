@@ -628,9 +628,6 @@ if selected_options:
                     height= 350
                 )
                 st.plotly_chart(fig)
-        # Add a new row for the bar chart
-        st.write("")  # Blank space for separation
-        st.markdown("<hr>", unsafe_allow_html=True)  # Horizontal line for visual separation
         
         # Plot vertical bar chart for device scan counts
         fig = go.Figure()
