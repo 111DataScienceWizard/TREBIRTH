@@ -650,6 +650,10 @@ if selected_options:
         # Plot vertical bar chart for device scan counts
         fig = go.Figure()
 
+        selected_dates = set()
+        for dates in selected_collections.values():
+            if dates:
+                selected_dates.update(dates)
         # Prepare data for the bar chart
         device_names = list(device_data.keys())
         dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys() if date in selected_dates))
