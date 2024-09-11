@@ -16,6 +16,7 @@ from collections import defaultdict
 import matplotlib.dates as mdates
 import plotly.express as px
 import plotly.graph_objects as go
+import re
 
 def exponential_backoff(retries):
     base_delay = 1
@@ -437,7 +438,8 @@ if selected_options:
                 doc_data = doc.to_dict()
                 device_name = doc_data.get('DeviceName:')  # Fetch device name properly
                 if device_name:
-                    device_names.add(device_name.strip())
+                    device_name = re.sub(r'\s+', ' ', device_name.strip())  # Clean up spaces and ensure uniformity
+                    device_names.add(device_name)  # Add all valid device names
                     
         # Ensure we handle any device names properly, even if missing or malformed
         device_names = list(device_names)  # Convert to list for iteration
@@ -455,9 +457,11 @@ if selected_options:
                 doc_data = doc.to_dict()
                 device_name = doc_data.get('DeviceName:')
                 if device_name:
-                    device_name = device_name.strip()  # Remove any leading or trailing whitespace
+                # Clean up device name to ensure it matches the keys in device_scan_counts
+                    device_name = re.sub(r'\s+', ' ', device_name.strip())  # Handle whitespace and special characters
                     if device_name in device_scan_counts:  # Ensure the device name is in the counts dictionary
-                        device_scan_counts[device_name] += 1 
+                        device_scan_counts[device_name] += 1  # Count total scans for each device
+
             # Plot the device counts for this collection
             fig.add_trace(go.Bar(
                 x=list(device_scan_counts.keys()),  # Device names
