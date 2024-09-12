@@ -652,22 +652,17 @@ if selected_options:
         
         # Plot vertical bar chart for device scan counts
         fig = go.Figure()
-
-        device_names = list(device_data.keys())
-        selected_dates = set()
-        for dates in selected_collections.values():
-            if dates:
-                selected_dates.update(dates)
-        # Prepare data for the bar chart
-        dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys() if date in selected_dates))
-
+        selected_dates = sorted({doc_data['timestamp'].strftime('%Y-%m-%d') for doc in docs})
+        
+        
         # Define a color palette for both healthy and infected bars
         color_palette_healthy = ['#00FF00', '#1E90FF', '#FFA500', '#FFFF00', '#800080', '#FF69B4']  # Colors for healthy scans
         color_palette_infected = ['#FF6347', '#DC143C', '#8B0000', '#FF4500', '#FF1493', '#C71585']  # Colors for infected scans
 
+        device_names = list(device_data.keys())
         # Add data for each date, grouping healthy and infected bars side by side for each device
         for i, device_name in enumerate(device_names):
-            for date in dates:
+            for date in selected_dates:
                 # Get healthy and infected scan counts for the current date and device
                 healthy_count = device_data[device_name].get(date, {'Healthy': 0})['Healthy']
                 infected_count = device_data[device_name].get(date, {'Infected': 0})['Infected']
@@ -710,7 +705,7 @@ if selected_options:
                         x=1.02,  # Move it outside the chart area, on the right
                         xanchor='left'),  # Anchor the legend to the left of the plot
             height=400,
-            xaxis=dict(tickformat='%Y-%m-%d', tickmode='array', tickvals=dates),  # Display only the date
+            xaxis=dict(tickformat='%Y-%m-%d'),  # Display only the date
         )
 
         # Plot the figure in Streamlit
