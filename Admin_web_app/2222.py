@@ -375,7 +375,7 @@ if selected_options:
         df_metadata = pd.DataFrame(metadata_list)
 
         # Filter out the required columns including DeviceName
-        desired_columns = ['DeviceName:', 'InfStat', 'timestamp']
+        desired_columns = ['DeviceName', 'InfStat', 'timestamp']
         df_metadata_filtered = df_metadata[desired_columns]
 
         # Sum up counts based on 'InfStat' for healthy and infected
@@ -390,7 +390,7 @@ if selected_options:
 
         # Collect device data
         for _, row in df_metadata_filtered.iterrows():
-            device_name = row['DeviceName:']
+            device_name = row['DeviceName']
             if pd.isna(device_name):
                 continue  # Skip if DeviceName is missing
             date_key = row['timestamp'].strftime('%Y-%m-%d')
@@ -563,7 +563,7 @@ if selected_options:
         for doc in docs:
             doc_data = doc.to_dict()
             inf_stat = doc_data.get('InfStat', 'Unknown')
-            device_name = doc_data.get('DeviceName:')
+            device_name = doc_data.get('DeviceName')
             timestamp = doc_data.get('timestamp', None)
         
             if not timestamp or not device_name:
