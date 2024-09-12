@@ -568,7 +568,7 @@ if selected_options:
         
             if not timestamp or not device_name:
                 continue
-            date_key = timestamp.date().strftime('%Y-%m-%d')
+            date_key = timestamp.strftime('%Y-%m-%d')
 
             # Update counts
             if inf_stat == 'Healthy':
@@ -653,12 +653,12 @@ if selected_options:
         # Plot vertical bar chart for device scan counts
         fig = go.Figure()
 
+        device_names = list(device_data.keys())
         selected_dates = set()
         for dates in selected_collections.values():
             if dates:
                 selected_dates.update(dates)
         # Prepare data for the bar chart
-        device_names = list(device_data.keys())
         dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys() if date in selected_dates))
 
         # Define a color palette for both healthy and infected bars
@@ -710,7 +710,7 @@ if selected_options:
                         x=1.02,  # Move it outside the chart area, on the right
                         xanchor='left'),  # Anchor the legend to the left of the plot
             height=400,
-            xaxis=dict(tickformat='%Y-%m-%d'),  # Display only the date
+            xaxis=dict(tickformat='%Y-%m-%d', tickmode='array', tickvals=dates),  # Display only the date
         )
 
         # Plot the figure in Streamlit
