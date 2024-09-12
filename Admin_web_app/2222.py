@@ -322,7 +322,7 @@ for collection, dates in collection_dates.items():
         dropdown_options.append(f"{farmer_name} - No Dates")
 
 # Sort dropdown options by newest to oldest
-dropdown_options[1:] = sorted(dropdown_options[1:], key=lambda x: datetime.datetime.strptime(x.split(' - ')[1], '%Y-%m-%d') if 'No Dates' not in x else datetime.datetime.min, reverse=True)
+dropdown_options[1:] = sorted(dropdown_options[1:], key=lambda x: datetime.strptime(x.split(' - ')[1], '%Y-%m-%d') if 'No Dates' not in x else datetime.min, reverse=True)
 
 # Create dropdown menu
 selected_options = st.multiselect('Select farmer plots with Dates', dropdown_options)
@@ -354,9 +354,9 @@ if selected_options:
         else:
             docs = []
             for date_str in dates:
-                date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d')
-                start_datetime = datetime.datetime.combine(date_obj, datetime.datetime.min.time())
-                end_datetime = datetime.datetime.combine(date_obj, datetime.datetime.max.time())
+                date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+                start_datetime = datetime.combine(date_obj, datetime.min.time())
+                end_datetime = datetime.combine(date_obj, datetime.max.time())
                 docs.extend(db.collection(collection)
                             .where('timestamp', '>=', start_datetime)
                             .where('timestamp', '<=', end_datetime)
