@@ -322,7 +322,7 @@ for collection, dates in collection_dates.items():
         dropdown_options.append(f"{farmer_name} - No Dates")
 
 # Sort dropdown options by newest to oldest
-dropdown_options[1:] = sorted(dropdown_options[1:], key=lambda x: datetime.strptime(x.split(' - ')[1], '%Y-%m-%d') if 'No Dates' not in x else datetime.min, reverse=True)
+dropdown_options[1:] = sorted(dropdown_options[1:], key=lambda x: datetime.datetime.strptime(x.split(' - ')[1], '%Y-%m-%d') if 'No Dates' not in x else datetime.datetime.min, reverse=True)
 
 # Create dropdown menu
 selected_options = st.multiselect('Select farmer plots with Dates', dropdown_options)
@@ -354,9 +354,9 @@ if selected_options:
         else:
             docs = []
             for date_str in dates:
-                date_obj = datetime.strptime(date_str, '%Y-%m-%d')
-                start_datetime = datetime.combine(date_obj, datetime.min.time())
-                end_datetime = datetime.combine(date_obj, datetime.max.time())
+                date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d')
+                start_datetime = datetime.datetime.combine(date_obj, datetime.datetime.min.time())
+                end_datetime = datetime.datetime.combine(date_obj, datetime.datetime.max.time())
                 docs.extend(db.collection(collection)
                             .where('timestamp', '>=', start_datetime)
                             .where('timestamp', '<=', end_datetime)
@@ -377,6 +377,7 @@ if selected_options:
             device_name = doc_data.get('DeviceName:')
             if not device_name:
                 continue  # Skip if DeviceName is missing
+            device_name = re.sub(r'\s+', ' ', device_name.strip())  # Clean device name
             date_key = doc_data['timestamp'].date().strftime('%Y-%m-%d')
             inf_stat = doc_data.get('InfStat', 'Unknown')
             if inf_stat == 'Healthy':
@@ -431,54 +432,37 @@ if selected_options:
     if device_data:
         fig = go.Figure()
 
+        device_names = list(device_data.keys())
         # Collect all device names from selected collections
-        device_names = set()
-        for collection in selected_collections:
-            for doc in db.collection(collection).stream():
-                doc_data = doc.to_dict()
-                device_name = doc_data.get('DeviceName:')  # Fetch device name properly
-                if device_name:
-                    device_name = re.sub(r'\s+', ' ', device_name.strip())  # Clean up spaces and ensure uniformity
-                    device_names.add(device_name)  # Add all valid device names
-                    
-        # Ensure we handle any device names properly, even if missing or malformed
-        device_names = list(device_names)  # Convert to list for iteration
-        collections = list(selected_collections.keys())  # Get the selected collections
+        for device_name in device_names:
+            healthy_values = [device_data[device_name][date]['Healthy'] for date in device_data[device_name].keys()]
+            infected_values = [device_data[device_name][date]['Infected'] for date in device_data[device_name].keys()]
+            dates = list(device_data[device_name].keys())  # Fetch dates associated with each device
 
-        # For each collection, plot the number of scans by device
-        for collection in collections:
-            farmer_name = farmer_names.get(collection, 'Unknown Farmer')
-            color = '#%06X' % (0xFFFFFF & hash(farmer_name))
-
-            
-            # Prepare data for each device
-            device_scan_counts = {device: 0 for device in device_names}  # Initialize with 0 scans for each device
-            for doc in db.collection(collection).stream():
-                doc_data = doc.to_dict()
-                device_name = doc_data.get('DeviceName:')
-                if device_name:
-                # Clean up device name to ensure it matches the keys in device_scan_counts
-                    device_name = re.sub(r'\s+', ' ', device_name.strip())  # Handle whitespace and special characters
-                    if device_name in device_scan_counts:  # Ensure the device name is in the counts dictionary
-                        device_scan_counts[device_name] += 1  # Count total scans for each device
-
-            # Plot the device counts for this collection
+            # Plot healthy scans
             fig.add_trace(go.Bar(
-                x=list(device_scan_counts.keys()),  # Device names
-                y=list(device_scan_counts.values()),  # Number of scans
-                name=f'{farmer_name}',  # Collection name in the legend
-                marker=dict(color=color),  # Assign a unique color for each collection
+                x=dates,
+                y=healthy_values,
+                name=f'{device_name} - Healthy',
+                marker=dict(color='#00FF00'),  # Green for healthy
             ))
 
+            # Plot infected scans
+            fig.add_trace(go.Bar(
+                x=dates,
+                y=infected_values,
+                name=f'{device_name} - Infected',
+                marker=dict(color='#FF0000'),  # Red for infected
+            ))
+        
         fig.update_layout(
             title_text="Scans by Device (Grouped by Collection)",
-            xaxis_title="Device Name",
+            xaxis_title="Date",
             yaxis_title="Number of Scans",
             barmode='group',  # Group devices by collection
             font=dict(color='white'),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            legend_title_text="Collections",  # Add a title to the legend
             height=300
         )
 
@@ -569,7 +553,7 @@ if selected_options:
         
             if not timestamp:
                 continue
-        
+            device_name = re.sub(r'\s+', ' ', device_name.strip())
             date_key = timestamp.date().strftime('%Y-%m-%d')
 
             # Update counts
@@ -680,7 +664,7 @@ if selected_options:
                     y=[healthy_count],
                     name=f'{device_name} - Healthy',
                     marker=dict(color=color_palette_healthy[i % len(color_palette_healthy)]),  # Unique color for healthy
-                    width=1,  # Adjust bar thickness
+                    width=0.35,  # Adjust bar thickness
                     offsetgroup=device_name,  # Group by device to align healthy/infected bars together
                     hoverinfo='y'
                 ))
