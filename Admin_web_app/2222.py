@@ -16,7 +16,6 @@ from collections import defaultdict
 import matplotlib.dates as mdates
 import plotly.express as px
 import plotly.graph_objects as go
-import re
 
 def exponential_backoff(retries):
     base_delay = 1
@@ -362,8 +361,26 @@ if selected_options:
                             .where('timestamp', '<=', end_datetime)
                             .stream())
 
-        healthy_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Healthy')
-        infected_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Infected')
+        # Process documents and retrieve device names using the DataFrame method
+        metadata_list = []
+        for doc in docs:
+            doc_data = doc.to_dict()
+            # Convert datetime values to timezone-unaware
+            for key, value in doc_data.items():
+                if isinstance(value, datetime):
+                    doc_data[key] = value.replace(tzinfo=None)
+            metadata_list.append(doc_data)
+
+        # Convert list of dictionaries to DataFrame
+        df_metadata = pd.DataFrame(metadata_list)
+
+        # Filter out the required columns including DeviceName
+        desired_columns = ['DeviceName:', 'InfStat', 'timestamp']
+        df_metadata_filtered = df_metadata[desired_columns]
+
+        # Sum up counts based on 'InfStat' for healthy and infected
+        healthy_count = df_metadata_filtered[df_metadata_filtered['InfStat'] == 'Healthy'].shape[0]
+        infected_count = df_metadata_filtered[df_metadata_filtered['InfStat'] == 'Infected'].shape[0]
         total_scans = healthy_count + infected_count
 
         # Accumulate counts for combined and data share pie charts
@@ -372,19 +389,17 @@ if selected_options:
         collection_scan_counts[collection] = total_scans
 
         # Collect device data
-        for doc in docs:
-            doc_data = doc.to_dict()
-            device_name = doc_data.get('DeviceName:')
-            if not device_name:
+        for _, row in df_metadata_filtered.iterrows():
+            device_name = row['DeviceName:']
+            if pd.isna(device_name):
                 continue  # Skip if DeviceName is missing
-            device_name = re.sub(r'\s+', ' ', device_name.strip())  # Clean device name
-            date_key = doc_data['timestamp'].date().strftime('%Y-%m-%d')
-            inf_stat = doc_data.get('InfStat', 'Unknown')
+            date_key = row['timestamp'].strftime('%Y-%m-%d')
+            inf_stat = row['InfStat']
             if inf_stat == 'Healthy':
                 device_data[device_name][date_key]['Healthy'] += 1
             elif inf_stat == 'Infected':
                 device_data[device_name][date_key]['Infected'] += 1
-
+                
     # Layout for the first row (4 columns)
     col1, col2 = st.columns(2)
 
@@ -551,9 +566,8 @@ if selected_options:
             device_name = doc_data.get('DeviceName:')
             timestamp = doc_data.get('timestamp', None)
         
-            if not timestamp:
+            if not timestamp or not device_name:
                 continue
-            device_name = re.sub(r'\s+', ' ', device_name.strip())
             date_key = timestamp.date().strftime('%Y-%m-%d')
 
             # Update counts
