@@ -652,17 +652,18 @@ if selected_options:
         
         # Plot vertical bar chart for device scan counts
         fig = go.Figure()
-        selected_dates = sorted({doc_data['timestamp'].strftime('%Y-%m-%d') for doc in docs})
+
+        device_names = list(device_data.keys())
+        dates = sorted(set(date for device in device_data.values() for date in device.keys()))
         
         
         # Define a color palette for both healthy and infected bars
         color_palette_healthy = ['#00FF00', '#1E90FF', '#FFA500', '#FFFF00', '#800080', '#FF69B4']  # Colors for healthy scans
         color_palette_infected = ['#FF6347', '#DC143C', '#8B0000', '#FF4500', '#FF1493', '#C71585']  # Colors for infected scans
 
-        device_names = list(device_data.keys())
         # Add data for each date, grouping healthy and infected bars side by side for each device
         for i, device_name in enumerate(device_names):
-            for date in selected_dates:
+            for date in dates:
                 # Get healthy and infected scan counts for the current date and device
                 healthy_count = device_data[device_name].get(date, {'Healthy': 0})['Healthy']
                 infected_count = device_data[device_name].get(date, {'Infected': 0})['Infected']
