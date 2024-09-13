@@ -334,7 +334,7 @@ collection_file_paths = {
 }
 
 
-# Generate dropdown options with collection names and original date format
+# Dropdown options with collection names and original date format
 dropdown_options = ['Dananjay Yadav']
 for collection, dates in collection_dates.items():
     farmer_name = farmer_names.get(collection, 'Unknown Farmer')
@@ -353,7 +353,7 @@ if selected_options:
     selected_collections = {}
     total_healthy = 0
     total_infected = 0
-    collection_scan_counts = {}
+    collection_scan_counts = defaultdict(int)
     device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
 
     for option in selected_options:
@@ -369,121 +369,130 @@ if selected_options:
                 selected_collections[collection] = []
             selected_collections[collection].append(date_str)
 
-    # Fetch data and plot charts
+    # Process data for selected collections
     for collection, dates in selected_collections.items():
         if collection == 'demo_db':
-            docs = db.collection(collection).stream()
-            metadata_list = [doc.to_dict() for doc in docs]
-            df_metadata = pd.DataFrame(metadata_list)
-            df_metadata['timestamp'] = pd.to_datetime(df_metadata['timestamp'])
-            desired_columns = ['DeviceName', 'InfStat', 'timestamp']
-            df_filtered = df_metadata[desired_columns]
-            healthy_count = df_filtered[df_filtered['InfStat'] == 'Healthy'].shape[0]
-            infected_count = df_filtered[df_filtered['InfStat'] == 'Infected'].shape[0]
-        else:
-            # For XLSX collections
-            xlsx_url = collection_files.get(collection)
-            df_metadata = pd.read_excel(xlsx_url, index_col=0)
-            df_metadata['Date of Scans'] = pd.to_datetime(df_metadata['Date of Scans'])
-            healthy_count = df_metadata['Total Healthy Scan']
-            infected_count = df_metadata['Total Infected Scan']
+            # Retrieve data from Firestore for demo_db
+            if "No Dates" in dates or not dates[0]:  # Retrieve all scans for Dananjay Yadav
+                docs = db.collection(collection).stream()
+            else:
+                docs = []
+                for date_str in dates:
+                    date_obj = datetime.strptime(date_str, '%Y-%m-%d')
+                    start_datetime = datetime.combine(date_obj, datetime.min.time())
+                    end_datetime = datetime.combine(date_obj, datetime.max.time())
+                    docs.extend(db.collection(collection)
+                                .where('timestamp', '>=', start_datetime)
+                                .where('timestamp', '<=', end_datetime)
+                                .stream())
+            
+            # Process Firestore documents for demo_db
+            metadata_list = []
+            for doc in docs:
+                doc_data = doc.to_dict()
+                # Convert datetime values to timezone-unaware
+                for key, value in doc_data.items():
+                    if isinstance(value, datetime):
+                        doc_data[key] = value.replace(tzinfo=None)
+                metadata_list.append(doc_data)
 
-         # Accumulate data
-        total_healthy += healthy_count
-        total_infected += infected_count
-        total_scans = healthy_count + infected_count
-        collection_scan_counts[collection] = total_scans
-        
-        # Device-level data processing
-        for _, row in df_metadata.iterrows():
-            device_name = row['Device Name']
-            if pd.isna(device_name):
-                continue
-            date_key = row['Date of Scans'].strftime('%Y-%m-%d')
-            device_data[device_name][date_key]['Healthy'] += row['Total Healthy Scan']
-            device_data[device_name][date_key]['Infected'] += row['Total Infected Scan']
-           
+            df_metadata = pd.DataFrame(metadata_list)
+            desired_columns = ['DeviceName', 'InfStat', 'timestamp']
+            df_metadata_filtered = df_metadata[desired_columns]
+
+        else:
+            # Retrieve data from Excel files for other collections
+            file_path = collection_file_paths.get(collection, None)
+            if file_path:
+                df_metadata = pd.read_excel(file_path)
+                df_metadata_filtered = df_metadata[['Device Name', 'Total Healthy Scan', 'Total Infected Scan', 'Date of Scans']]
+                
+                # Extract unique dates for dropdowns
+                unique_dates = pd.to_datetime(df_metadata['Date of Scans']).dt.date.unique()
+                collection_dates[collection] = sorted([date.strftime('%Y-%m-%d') for date in unique_dates], reverse=True)
+
+                # Process data directly from Excel
+                for _, row in df_metadata_filtered.iterrows():
+                    date_key = row['Date of Scans'].date()
+                    device_name = row['Device Name']
+                    healthy_count = row['Total Healthy Scan']
+                    infected_count = row['Total Infected Scan']
+
+                    total_scans = healthy_count + infected_count
+                    collection_scan_counts[collection] += total_scans
+
+                    device_data[device_name][date_key]['Healthy'] += healthy_count
+                    device_data[device_name][date_key]['Infected'] += infected_count
+
+                    total_healthy += healthy_count
+                    total_infected += infected_count
+
     # Layout for the first row (4 columns)
     col1, col2 = st.columns(2)
-
 
     # Bar chart showing collections with most infected scans
     if collection_scan_counts:
         farmer_names_list = [farmer_names.get(collection, 'Unknown Farmer') for collection in collection_scan_counts.keys()]
-        # Calculate healthy and infected counts for each collection
-        healthy_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Healthy') for collection in collection_scan_counts.keys()]
-        infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collection_scan_counts.keys()]
+        healthy_counts = [df_metadata[df_metadata['Device Name'].isin(device_data.keys())]['Total Healthy Scan'].sum() for collection in collection_scan_counts.keys()]
+        infected_counts = [df_metadata[df_metadata['Device Name'].isin(device_data.keys())]['Total Infected Scan'].sum() for collection in collection_scan_counts.keys()]
 
         fig = go.Figure()
-
-        # Add healthy counts for each collection
         fig.add_trace(go.Bar(
             x=farmer_names_list,
             y=healthy_counts,
             name='Healthy',
             marker=dict(color='#00FF00'),  # Green for healthy
         ))
-
-        # Add infected counts for each collection
         fig.add_trace(go.Bar(
             x=farmer_names_list,
             y=infected_counts,
             name='Infected',
             marker=dict(color='#FF0000'),  # Red for infected
         ))
-
         fig.update_layout(
             title_text="Healthy and Infected Scans by Collection",
             xaxis_title="Collection",
             yaxis_title="Number of Scans",
-            barmode='group',  # Side-by-side grouping
-            bargap=0.2,  # Gap between bars (adjust as needed)
+            barmode='group',
+            bargap=0.2,
             font=dict(color='white'),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             height=300
         )
-
         col1.plotly_chart(fig, use_container_width=True)
 
     # Layout for the second row (Vertical Bar Chart)
     if device_data:
         fig = go.Figure()
+        for device_name, dates_data in device_data.items():
+            dates = list(dates_data.keys())
+            healthy_values = [dates_data[date]['Healthy'] for date in dates]
+            infected_values = [dates_data[date]['Infected'] for date in dates]
 
-        device_names = list(device_data.keys())
-        # Collect all device names from selected collections
-        for device_name in device_names:
-            healthy_values = [device_data[device_name][date]['Healthy'] for date in device_data[device_name].keys()]
-            infected_values = [device_data[device_name][date]['Infected'] for date in device_data[device_name].keys()]
-            dates = list(device_data[device_name].keys())  # Fetch dates associated with each device
-
-            # Plot healthy scans
             fig.add_trace(go.Bar(
                 x=dates,
                 y=healthy_values,
                 name=f'{device_name} - Healthy',
-                marker=dict(color='#00FF00'),  # Green for healthy
+                marker=dict(color='#00FF00'),
             ))
-
-            # Plot infected scans
             fig.add_trace(go.Bar(
                 x=dates,
                 y=infected_values,
                 name=f'{device_name} - Infected',
-                marker=dict(color='#FF0000'),  # Red for infected
+                marker=dict(color='#FF0000'),
             ))
         
         fig.update_layout(
             title_text="Scans by Device (Grouped by Collection)",
             xaxis_title="Date",
             yaxis_title="Number of Scans",
-            barmode='group',  # Group devices by collection
+            barmode='group',
             font=dict(color='white'),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
             height=300
         )
-
         col2.plotly_chart(fig, use_container_width=True)
 
     # Calculate percentages for combined collection
