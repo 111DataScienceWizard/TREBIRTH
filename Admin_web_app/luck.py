@@ -26,7 +26,8 @@ collection_data = {
 # Function to load the data from the imported variables
 @st.cache_data
 def load_collection(collection_name):
-    df = collection_data[collection_name]
+    data = collection_data[collection_name]
+    df = pd.DataFrame(data)
     return df
 
 # App title
@@ -46,7 +47,7 @@ if collections:
 
     for collection in collections:
         df = load_collection(collection)
-        all_data = pd.concat([all_data, df])
+        all_data = pd.concat([all_data, df], ignore_index=True)
     
     # Extract unique dates for the selected collections
     all_data['Date of Scans'] = pd.to_datetime(all_data['Date of Scans'])
@@ -61,6 +62,7 @@ if collections:
 
     if selected_dates:
         # Filter the data by the selected dates
+        selected_dates = pd.to_datetime(selected_dates)  # Convert dates to datetime
         filtered_data = all_data[all_data['Date of Scans'].dt.date.isin(selected_dates)]
 
         # Display the filtered data
