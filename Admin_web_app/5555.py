@@ -16,6 +16,7 @@ from collections import defaultdict
 import matplotlib.dates as mdates
 import plotly.express as px
 import plotly.graph_objects as go
+import openpyxl
 
 def exponential_backoff(retries):
     base_delay = 1
