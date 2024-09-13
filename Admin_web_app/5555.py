@@ -336,109 +336,90 @@ collection_file_paths = {
 
 collection_dates = {collection: [] for collection in collection_file_paths.keys()}
 
-# Populate collection_dates with actual dates from XLSX files
 for collection, file_path in collection_file_paths.items():
     df_metadata = pd.read_excel(file_path)
     unique_dates = pd.to_datetime(df_metadata['Date of Scans']).dt.date.unique()
     collection_dates[collection] = sorted([date.strftime('%Y-%m-%d') for date in unique_dates], reverse=True)
 
-# Dropdown options with collection names and original date format
-dropdown_options = ['Dananjay Yadav']
+# Create dropdown options for collections
+dropdown_options = ['Dananjay Yadav']  # Always include demo_db at the top
 for collection, dates in collection_dates.items():
     farmer_name = farmer_names.get(collection, 'Unknown Farmer')
-    if dates:
-        dropdown_options.extend([f"{farmer_name} - {date}" for date in dates])
+    dropdown_options.append(f"{farmer_name}")
+
+# Create dropdown for collection selection
+selected_collections = st.multiselect('Select Farmer Collection', dropdown_options)
+
+# Create the second dropdown based on the selected collection
+selected_collection = st.selectbox('Select Date', options=['Select a collection first'])
+
+if selected_collections:
+    if 'Dananjay Yadav' in selected_collections:
+        # If demo_db is selected, set an empty list for dates
+        selected_dates = []
     else:
-        dropdown_options.append(f"{farmer_name} - No Dates")
+        # Extract the selected collection
+        selected_farmers = [opt for opt in selected_collections if opt != 'Dananjay Yadav']
+        if selected_farmers:
+            selected_collection = selected_farmers[0]  # Assuming only one collection is selected at a time
+            collection = [key for key, value in farmer_names.items() if value == selected_collection][0]
+            selected_dates = collection_dates.get(collection, [])
+        else:
+            selected_dates = []
 
-# Sort dropdown options by newest to oldest
-dropdown_options[1:] = sorted(dropdown_options[1:], key=lambda x: datetime.strptime(x.split(' - ')[1], '%Y-%m-%d') if 'No Dates' not in x else datetime.min, reverse=True)
+    # Create the second dropdown with dates
+    if selected_dates:
+        selected_date = st.selectbox('Select Date', options=selected_dates)
+    else:
+        st.selectbox('Select Date', options=['No dates available'])
 
-# Create dropdown menu
-selected_options = st.multiselect('Select farmer plots with Dates', dropdown_options)
+# Processing and displaying the data based on selected collections and dates
+if selected_collections:
+    selected_collections_dict = {collection: [] for collection in selected_collections if collection != 'Dananjay Yadav'}
 
-if selected_options:
-    selected_collections = {}
+    if selected_dates:
+        for collection, dates in selected_collections_dict.items():
+            selected_collections_dict[collection] = selected_dates
+
     total_healthy = 0
     total_infected = 0
     collection_scan_counts = defaultdict(int)
     device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
 
-    for option in selected_options:
-        if option == 'Dananjay Yadav':  # If Dananjay Yadav is selected
-            collection = 'demo_db'
-            selected_collections[collection] = [None]  # No specific dates
-        else:
-            farmer_name, date_str = option.split(' - ')
-            collection = [key for key, value in farmer_names.items() if value == farmer_name][0]  # Find the collection based on farmer name
-            if date_str == "No Dates":
-                date_str = None
-            if collection not in selected_collections:
-                selected_collections[collection] = []
-            selected_collections[collection].append(date_str)
-
-    # Process data for selected collections
-    for collection, dates in selected_collections.items():
+    # Process data for selected collections and dates
+    for collection, dates in selected_collections_dict.items():
         if collection == 'demo_db':
-            # Retrieve data from Firestore for demo_db
-            if "No Dates" in dates or not dates[0]:  # Retrieve all scans for Dananjay Yadav
-                docs = db.collection(collection).stream()
-            else:
-                docs = []
-                for date_str in dates:
-                    date_obj = datetime.strptime(date_str, '%Y-%m-%d')
-                    start_datetime = datetime.combine(date_obj, datetime.min.time())
-                    end_datetime = datetime.combine(date_obj, datetime.max.time())
-                    docs.extend(db.collection(collection)
-                                .where('timestamp', '>=', start_datetime)
-                                .where('timestamp', '<=', end_datetime)
-                                .stream())
-            
-            # Process Firestore documents for demo_db
+            docs = db.collection(collection).stream()
             metadata_list = []
             for doc in docs:
                 doc_data = doc.to_dict()
-                # Convert datetime values to timezone-unaware
                 for key, value in doc_data.items():
                     if isinstance(value, datetime):
                         doc_data[key] = value.replace(tzinfo=None)
                 metadata_list.append(doc_data)
-
             df_metadata = pd.DataFrame(metadata_list)
             desired_columns = ['DeviceName', 'InfStat', 'timestamp']
             df_metadata_filtered = df_metadata[desired_columns]
-
         else:
-            # Retrieve data from Excel files for other collections
             file_path = collection_file_paths.get(collection, None)
             if file_path:
                 df_metadata = pd.read_excel(file_path)
                 df_metadata_filtered = df_metadata[['Device Name', 'Total Healthy Scan', 'Total Infected Scan', 'Date of Scans']]
-                
-                # Extract unique dates for dropdowns
-                unique_dates = pd.to_datetime(df_metadata['Date of Scans']).dt.date.unique()
-                collection_dates[collection] = sorted([date.strftime('%Y-%m-%d') for date in unique_dates], reverse=True)
-
-                # Process data directly from Excel
                 for _, row in df_metadata_filtered.iterrows():
                     date_key = row['Date of Scans'].date()
-                    device_name = row['Device Name']
-                    healthy_count = row['Total Healthy Scan']
-                    infected_count = row['Total Infected Scan']
+                    if date_key in dates:
+                        device_name = row['Device Name']
+                        healthy_count = row['Total Healthy Scan']
+                        infected_count = row['Total Infected Scan']
+                        total_scans = healthy_count + infected_count
+                        collection_scan_counts[collection] += total_scans
+                        device_data[device_name][date_key]['Healthy'] += healthy_count
+                        device_data[device_name][date_key]['Infected'] += infected_count
+                        total_healthy += healthy_count
+                        total_infected += infected_count
 
-                    total_scans = healthy_count + infected_count
-                    collection_scan_counts[collection] += total_scans
-
-                    device_data[device_name][date_key]['Healthy'] += healthy_count
-                    device_data[device_name][date_key]['Infected'] += infected_count
-
-                    total_healthy += healthy_count
-                    total_infected += infected_count
-
-    # Layout for the first row (4 columns)
+    # Layout for the bar chart
     col1, col2 = st.columns(2)
-
-    # Bar chart showing collections with most infected scans
     if collection_scan_counts:
         farmer_names_list = [farmer_names.get(collection, 'Unknown Farmer') for collection in collection_scan_counts.keys()]
         healthy_counts = [df_metadata[df_metadata['Device Name'].isin(device_data.keys())]['Total Healthy Scan'].sum() for collection in collection_scan_counts.keys()]
@@ -470,7 +451,7 @@ if selected_options:
         )
         col1.plotly_chart(fig, use_container_width=True)
 
-    # Layout for the second row (Vertical Bar Chart)
+    # Layout for the vertical bar chart
     if device_data:
         fig = go.Figure()
         for device_name, dates_data in device_data.items():
