@@ -334,20 +334,18 @@ collection_file_paths = {
     'collection_12': 'Admin_web_app/collection_12.xlsx',
 }
 
-# Prepare dropdown options for collections
-dropdown_options = ['Dananjay Yadav']  # Ensure 'demo_db' is at the top
+# Dropdown for collections
+dropdown_options = ['Dananjay Yadav']  # 'demo_db' as the default
 dropdown_options.extend([f"{farmer_names[collection]} - Collection {collection[-1]}" for collection in collection_file_paths.keys()])
 
-# Display the dropdown menu for collections
 selected_collections = st.multiselect('Select collections', dropdown_options)
 
-# Prepare for dates dropdown based on selected collections
+# Dates dropdown based on selected collections
 dates_dropdown_options = []
 selected_collections_dict = {collection: [] for collection in collection_file_paths.keys()}
 
-# Populate the dates dropdown based on selected collections
 for option in selected_collections:
-    if option == 'Dananjay Yadav':  # If 'demo_db' is selected
+    if option == 'Dananjay Yadav':
         selected_collections_dict['demo_db'] = [None]
     else:
         collection = [key for key, value in farmer_names.items() if value == option.split(' - ')[0]][0]
@@ -355,90 +353,81 @@ for option in selected_collections:
 
 # Retrieve unique dates for the selected collections
 all_dates = set()
-for collection in selected_collections_dict.keys():
+for collection, dates in selected_collections_dict.items():
     if collection == 'demo_db':
-        # Assume Firestore data processing
-        # Fetch unique dates from Firestore (pseudo-code)
+        # Process Firestore data
         docs = db.collection(collection).stream()
         for doc in docs:
             date = doc.to_dict().get('Date of Scans')
             if date:
                 all_dates.add(date.strftime('%Y-%m-%d'))
     else:
-        # Retrieve Excel data
         file_path = collection_file_paths.get(collection)
         if file_path:
             df = pd.read_excel(file_path)
-            dates = df['Date of Scans'].dropna().dt.strftime('%Y-%m-%d').unique()
-            all_dates.update(dates)
+            # Debug: Print the actual column names from the Excel file
+            st.write("Column names in the file:", df.columns)
+            
+            # Ensure that columns exist
+            if 'Date of Scans' in df.columns:
+                dates = df['Date of Scans'].dropna().dt.strftime('%Y-%m-%d').unique()
+                all_dates.update(dates)
 
-# Sort and prepare dates dropdown options
-dates_dropdown_options = sorted(all_dates)
+# Sort and filter dates dropdown
+if 'Dananjay Yadav' in selected_collections:
+    dates_dropdown_options = []  # No date filter for Firestore data
+else:
+    dates_dropdown_options = sorted(all_dates)
 
-# Display the dropdown menu for dates
-selected_dates = st.multiselect('Select dates', dates_dropdown_options)
+if dates_dropdown_options:
+    selected_dates = st.multiselect('Select dates', dates_dropdown_options)
+else:
+    selected_dates = []
 
-# Retrieve and process data based on selected collections and dates
+# Continue processing based on selections
 total_healthy = 0
 total_infected = 0
 collection_scan_counts = {}
 device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
 
+# Example data retrieval logic (Firestore and Excel processing)
 for collection, dates in selected_collections_dict.items():
     if collection == 'demo_db':
         # Process Firestore data
         docs = db.collection(collection).stream()
     else:
-        # Retrieve Excel data
         docs = []
         for date in dates:
             if date:
                 date_obj = datetime.strptime(date, '%Y-%m-%d')
-                # Filter Excel rows by date if needed
             file_path = collection_file_paths.get(collection)
             if file_path:
                 df_metadata = pd.read_excel(file_path)
                 docs.append(df_metadata)
 
-    # Process the filtered data
     metadata_list = []
     for doc in docs:
-        if isinstance(doc, dict):  # Firestore documents
-            doc_data = doc
-            for key, value in doc_data.items():
-                if isinstance(value, datetime):
-                    doc_data[key] = value.replace(tzinfo=None)
-            metadata_list.append(doc_data)
-        elif isinstance(doc, pd.DataFrame):  # Excel DataFrame
+        if isinstance(doc, pd.DataFrame):  # Excel data
             metadata_list.append(doc)
 
-    # Convert list of dictionaries to DataFrame
-    df_metadata = pd.DataFrame(metadata_list)
+    df_metadata = pd.concat(metadata_list, ignore_index=True)
 
-    # Filter out the required columns based on the updated column names from the Excel files
-    desired_columns = ['Device Name', 'Total Scan', 'Total Infected Scan', 'Total Healthy Scan', 'Date of Scans']
-    df_metadata_filtered = df_metadata[desired_columns]
+    # Check and filter columns
+    expected_columns = ['Device Name', 'Total Scan', 'Total Infected Scan', 'Total Healthy Scan', 'Date of Scans']
+    missing_columns = [col for col in expected_columns if col not in df_metadata.columns]
+    if missing_columns:
+        st.error(f"Missing columns: {missing_columns}")
+    else:
+        df_metadata_filtered = df_metadata[expected_columns]
 
-    # Sum up counts based on 'Total Infected Scan' and 'Total Healthy Scan'
-    total_scans = df_metadata_filtered['Total Scan'].sum()
-    infected_count = df_metadata_filtered['Total Infected Scan'].sum()
-    healthy_count = df_metadata_filtered['Total Healthy Scan'].sum()
+        # Process and sum the data
+        total_scans = df_metadata_filtered['Total Scan'].sum()
+        infected_count = df_metadata_filtered['Total Infected Scan'].sum()
+        healthy_count = df_metadata_filtered['Total Healthy Scan'].sum()
 
-    # Accumulate counts for combined and data share pie charts
-    total_healthy += healthy_count
-    total_infected += infected_count
-    collection_scan_counts[collection] = total_scans
-
-    # Collect device data
-    for _, row in df_metadata_filtered.iterrows():
-        device_name = row['Device Name']
-        if pd.isna(device_name):
-            continue  # Skip if Device Name is missing
-        date_key = row['Date of Scans'].strftime('%Y-%m-%d')
-        if date_key in selected_dates:
-            device_data[device_name][date_key]['Healthy'] += row['Total Healthy Scan']
-            device_data[device_name][date_key]['Infected'] += row['Total Infected Scan']
-
+        total_healthy += healthy_count
+        total_infected += infected_count
+        collection_scan_counts[collection] = total_scans
 # Layout for the first row (4 columns)
 col1, col2 = st.columns(2)
 
