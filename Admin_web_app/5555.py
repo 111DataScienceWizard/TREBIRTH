@@ -331,6 +331,21 @@ collection_dates = {
 }
 
 
+collection_file_paths = {
+    'collection_1': 'Admin_web_app/collection_1.xlsx',
+    'collection_2': 'Admin_web_app/collection_2.xlsx',
+    'collection_3': 'Admin_web_app/collection_3.xlsx',
+    'collection_4': 'Admin_web_app/collection_4.xlsx',
+    'collection_5': 'Admin_web_app/collection_5.xlsx',
+    'collection_6': 'Admin_web_app/collection_6.xlsx',
+    'collection_7': 'Admin_web_app/collection_7.xlsx',
+    'collection_9': 'Admin_web_app/collection_9.xlsx',
+    'collection_10': 'Admin_web_app/collection_10.xlsx',
+    'collection_11': 'Admin_web_app/collection_11.xlsx',
+    'collection_12': 'Admin_web_app/collection_12.xlsx',
+}
+
+
 # Generate dropdown options with collection names and original date format
 dropdown_options = ['Dananjay Yadav']
 for collection, dates in collection_dates.items():
