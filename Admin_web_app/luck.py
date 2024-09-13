@@ -24,11 +24,8 @@ collection_data = {
 }
 
 # Function to load the data from the imported variables
-@st.cache_data
 def load_collection(collection_name):
-    data = collection_data[collection_name]
-    df = pd.DataFrame(data)
-    return df
+    return collection_data[collection_name]
 
 # App title
 st.title("Collection Data Viewer")
@@ -43,16 +40,20 @@ collections = st.multiselect(
 # Create a placeholder for the second dropdown
 if collections:
     # Load data for all selected collections
-    all_data = pd.DataFrame()
-
+    all_data = []
     for collection in collections:
-        df = load_collection(collection)
-        all_data = pd.concat([all_data, df], ignore_index=True)
+        data = load_collection(collection)
+        all_data.extend(data)
+    
+    # Convert list of dictionaries to DataFrame
+    df = pd.DataFrame(all_data)
+    
+    # Convert 'Date of Scans' to datetime
+    df['Date of Scans'] = pd.to_datetime(df['Date of Scans']).dt.date
     
     # Extract unique dates for the selected collections
-    all_data['Date of Scans'] = pd.to_datetime(all_data['Date of Scans'])
-    unique_dates = all_data['Date of Scans'].dt.date.unique()
-
+    unique_dates = df['Date of Scans'].unique()
+    
     # Multiselect for unique dates (Dropdown 2)
     selected_dates = st.multiselect(
         "Select unique date(s):",
@@ -62,14 +63,19 @@ if collections:
 
     if selected_dates:
         # Filter the data by the selected dates
-        selected_dates = pd.to_datetime(selected_dates)  # Convert dates to datetime
-        filtered_data = all_data[all_data['Date of Scans'].dt.date.isin(selected_dates)]
-
-        # Display the filtered data
+        filtered_data = df[df['Date of Scans'].isin(selected_dates)]
+        
+        # Display the filtered data in the desired format
         st.write("Filtered Data:")
-        st.dataframe(filtered_data)
-
-        # Print the columns based on the specific selection
-        st.write("Filtered Collection Details:")
-        st.write(filtered_data[['Device Name', 'Total Scan', 'Total Infected Scan', 'Total Healthy Scan', 
-                                'Total Trees', 'Total Infected Trees', 'Total Healthy Trees', 'Date of Scans']])
+        for date in selected_dates:
+            st.write(f"Date: {date}")
+            date_data = filtered_data[filtered_data['Date of Scans'] == date]
+            for index, row in date_data.iterrows():
+                st.write(f"Device Name: {row['Device Name']}")
+                st.write(f"Total Scan: {row['Total Scan']}")
+                st.write(f"Total Infected Scan: {row['Total Infected Scan']}")
+                st.write(f"Total Healthy Scan: {row['Total Healthy Scan']}")
+                st.write(f"Total Trees: {row['Total Trees']}")
+                st.write(f"Total Infected Trees: {row['Total Infected Trees']}")
+                st.write(f"Total Healthy Trees: {row['Total Healthy Trees']}")
+                st.write("---")  # Separator for each entry
