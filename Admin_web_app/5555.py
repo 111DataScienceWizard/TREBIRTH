@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from io import BytesIO
-from scipy.stats import skew, kurtosis
+from scipy.stats import skew, kurtosis 
 from google.cloud import firestore
 from google.cloud.firestore import FieldFilter
 from datetime import datetime, timedelta
@@ -51,7 +51,7 @@ st.title("Farm Analytics")
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
 
 # Fetch the most recent scan data from the "demo_db" collection
-def get_recent_scans(db, num_scans=3):
+def get_recent_scans(db, num_scans=2):
     docs = (
         db.collection('demo_db')
         .order_by('timestamp', direction=firestore.Query.DESCENDING)
@@ -103,7 +103,7 @@ def plot_multiple_time_domain(data_list, timestamps):
     fig = go.Figure()
     
     # Define colors for the different scans
-    colors = ['#E24E42', '#59C3C3', '#E9B44C']
+    colors = ['#E24E42', '#59C3C3']
     
     # Add traces (lines) for each scan
     for i, data in enumerate(data_list):
@@ -134,7 +134,7 @@ def plot_multiple_frequency_domain(data_list, timestamps):
     st.write("## Frequency Domain")
     fig = go.Figure()
 
-    colors = ['red', 'green', 'blue']
+    colors = ['green', 'blue']
 
     for i, data in enumerate(data_list):
         # Perform FFT
@@ -158,7 +158,7 @@ def plot_multiple_frequency_domain(data_list, timestamps):
         xaxis_title="Frequency (Hz)",
         yaxis_title="Power Spectrum (dB)",
         legend_title="Scans",
-        font=dict(color="black"),
+        font=dict(color="white"),
         plot_bgcolor='rgba(0,0,0,0)',  # Transparent background
         paper_bgcolor='rgba(0,0,0,0)'  # Transparent background
     )
@@ -173,7 +173,7 @@ def plot_multiple_statistics(stats_dfs, timestamps):
     fig = go.Figure()
 
     stats_measures = ['Mean', 'Median', 'PTP', 'Min', 'Max']
-    colors = ['red', 'green', 'blue']
+    colors = ['green', 'blue']
 
     for i, stats_df in enumerate(stats_dfs):
         for measure in stats_measures:
@@ -190,7 +190,7 @@ def plot_multiple_statistics(stats_dfs, timestamps):
         template='plotly_white',
         xaxis_title="Statistics",
         yaxis_title="Values",
-        font=dict(color="black"),
+        font=dict(color="white"),
         plot_bgcolor='rgba(0,0,0,0)',  # Transparent background
         paper_bgcolor='rgba(0,0,0,0)'  # Transparent background
     )
@@ -199,14 +199,15 @@ def plot_multiple_statistics(stats_dfs, timestamps):
     return fig
 
 def main():
-    radar_data_list, timestamps = get_recent_scans(db, num_scans=3)
+    radar_data_list, timestamps = get_recent_scans(db, num_scans=2)
 
     if radar_data_list:
         # Preprocess data for each scan
         processed_data_list = preprocess_multiple_scans(radar_data_list)
         
         # Display timestamps of scans
-        st.markdown(f"**Timestamps of Recent Scans:** {', '.join([ts.strftime('%Y-%m-%d %H:%M:%S') for ts in timestamps])}")
+        #st.markdown(f"**Timestamps of Recent Scans:** {', '.join([ts.strftime('%Y-%m-%d %H:%M:%S') for ts in timestamps])}")
+        st.markdown(f"**DATA ANALAYSIS OF 2 RECENT SCANS**")
 
         # Create three columns for plots
         col1, col2, col3 = st.columns(3)
@@ -231,57 +232,90 @@ def main():
 if __name__ == "__main__":
     main()
 
-
-
+st.write(f"**Farmer Name:** Dananjay Yadav", color='white')
+st.write(f"**Farm Location:** Rahuri Nashik", color='white')
+st.write(f"**Farm Age:** 7 Years", color='white')
+st.write(f"**Plot Size:** 2.5 Acre", color='white')
 
 # Mapping collections to farmer images
 farmer_images = {
-    'TechDemo': 'Admin_web_app/F1.png',
-    'Mr.Arjun': 'Admin_web_app/F2.png',
-    'DevOps': 'Admin_web_app/F6.png',
-    'DevMode': 'Admin_web_app/F4.png',
-    'debugging': 'Admin_web_app/F5.png',
-    'testing': 'Admin_web_app/F3.png',
-    'QDIC_test': 'Admin_web_app/F7.png',
-    'demo_db': 'Admin_web_app/F8.png'
+    'collection_1': 'Admin_web_app/F1.png',
+    'collection_2': 'Admin_web_app/F2.png',
+    'collection_3': 'Admin_web_app/F6.png',
+    'collection_4': 'Admin_web_app/F4.png',
+    'collection_5': 'Admin_web_app/F5.png',
+    'collection_6': 'Admin_web_app/F3.png',
+    'collection_7': 'Admin_web_app/F7.png',
+    'demo_db': 'Admin_web_app/F8.png',
+    'collection_9':
+    'collection_10':
+    'collection_11':
+    'collection_12':
 }
 
 
 farmer_names = {
-    'TechDemo': 'Dipak Sangamnere',
-    'Mr.Arjun': 'Ramesh Kapre',
-    'DevOps': 'Arvind Khode',
-    'DevMode': 'Ravindra Sambherao',
-    'debugging': 'Prabhakr Shirsath',
-    'testing': 'Arjun Jachak',
-    'QDIC_test': 'Yash More',
-    'demo_db': 'Dananjay Yadav'
+    'collection_1': 'Dipak Sangamnere',
+    'collection_2': 'Ramesh Kapre',
+    'collection_3': 'Arvind Khode',
+    'collection_4': 'Ravindra Sambherao',
+    'collection_5': 'Prabhakr Shirsath',
+    'collection_6': 'Arjun Jachak',
+    'collection_7': 'Yash More',
+    'demo_db': 'Dananjay Yadav',
+    'collection_9': 'Anant More',
+    'collection_10': 'Kiran Derle',
+    'collection_11': 'Nitin Gaidhani',
+    'collection_12': 'Umesh Khode'
 }
 
 # Farm location mapping
 farm_locations = {
-    'TechDemo': 'Niphad - Kherwadi',
-    'Mr.Arjun': 'Niphad - Panchkeshwar',
-    'DevOps': 'Nashik - Indira Nagar',
-    'DevMode': 'Manori Khurd',
-    'debugging': 'Kundwadi Niphad',
-    'testing': 'Pathardi',
-    'QDIC_test': 'Niphad - Pimpalgaon',
-    'demo_db': 'Rahuri Nashik'
+    'collection_1': 'Niphad - Kherwadi',
+    'collection_2': 'Niphad - Panchkeshwar',
+    'collection_3': 'Nashik - Indira Nagar',
+    'collection_4': 'Manori Khurd',
+    'collection_5': 'Kundwadi Niphad',
+    'collection_6': 'Pathardi',
+    'collection_7': 'Niphad - Pimpalgaon',
+    'demo_db': 'Rahuri Nashik',
+    'collection_9': 'Niphad - Pimpalgaon',
+    'collection_10': 'Niphad - Kunndewadi',
+    'collection_11': 'Nashik - Palse',
+    'collection_12': 'Nashik - Indira Nagar'
 }
 
 # Plot size mapping
 plot_sizes = {
-    'TechDemo': '1 Acre',
-    'Mr.Arjun': '3 Acre',
-    'DevOps': '1 Acre',
-    'DevMode': '1.5 Acre',
-    'debugging': '3 Acre',
-    'testing': '1 Acre',
-    'QDIC_test': '1 Acre',
-    'demo_db': '2.5 Acre'
+    'collection_1': '1 Acre',
+    'collection_2': '3 Acres',
+    'collection_3': '1 Acre',
+    'collection_4': '1.5 Acres',
+    'collection_5': '3 Acres',
+    'collection_6': '1 Acre',
+    'collection_7': '1 Acre',
+    'demo_db': '2.5 Acres',
+    'collection_9': '1 Acre',
+    'collection_10': '2 Acres',
+    'collection_11': '2.5 Acres',
+    'collection_12': '1.2 Acres'
 }
 
+#How old is the farm
+farm_ages = {
+    'collection_1': '8 Years',
+    'collection_2': '13 Years',
+    'collection_3': '6 Years',
+    'collection_4': '9 Years',
+    'collection_5': '11 Years',
+    'collection_6': '8 Years',
+    'collection_7': '10 Years',
+    'demo_db': '7 Years',
+    'collection_9': '8 Years',
+    'collection_10': '12 Years',
+    'collection_11': '10 Years',
+    'collection_12': '9 Years'
+}
 # Collection dates mapping (using original date format)
 collection_dates = {
     'TechDemo': ['2024-02-28', '2024-02-29'],
@@ -291,13 +325,14 @@ collection_dates = {
     'DevMode': ['2024-02-22', '2024-02-23', '2024-02-24', '2024-02-25', '2024-02-26', '2024-02-28'],
     'debugging': ['2024-06-10', '2024-06-13', '2024-06-14'],
     'testing': ['2024-06-13'],
-    'demo_db': ['2024-08-23', '2024-08-24'],
+    'demo_db': [],
     'QDIC_test': ['2024-09-03']
     
 }
 
+
 # Generate dropdown options with collection names and original date format
-dropdown_options = []
+dropdown_options = ['Dananjay Yadav']
 for collection, dates in collection_dates.items():
     farmer_name = farmer_names.get(collection, 'Unknown Farmer')
     if dates:
@@ -306,7 +341,7 @@ for collection, dates in collection_dates.items():
         dropdown_options.append(f"{farmer_name} - No Dates")
 
 # Sort dropdown options by newest to oldest
-dropdown_options = sorted(dropdown_options, key=lambda x: datetime.strptime(x.split(' - ')[1], '%Y-%m-%d') if 'No Dates' not in x else datetime.min, reverse=True)
+dropdown_options[1:] = sorted(dropdown_options[1:], key=lambda x: datetime.strptime(x.split(' - ')[1], '%Y-%m-%d') if 'No Dates' not in x else datetime.min, reverse=True)
 
 # Create dropdown menu
 selected_options = st.multiselect('Select farmer plots with Dates', dropdown_options)
@@ -319,17 +354,21 @@ if selected_options:
     device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
 
     for option in selected_options:
-        farmer_name, date_str = option.split(' - ')
-        collection = [key for key, value in farmer_names.items() if value == farmer_name][0]  # Find the collection based on farmer name
-        if date_str == "No Dates":
-            date_str = None
-        if collection not in selected_collections:
-            selected_collections[collection] = []
-        selected_collections[collection].append(date_str)
+        if option == 'Dananjay Yadav':  # If Dananjay Yadav is selected
+            collection = 'demo_db'
+            selected_collections[collection] = [None]  # No specific dates
+        else:
+            farmer_name, date_str = option.split(' - ')
+            collection = [key for key, value in farmer_names.items() if value == farmer_name][0]  # Find the collection based on farmer name
+            if date_str == "No Dates":
+                date_str = None
+            if collection not in selected_collections:
+                selected_collections[collection] = []
+            selected_collections[collection].append(date_str)
 
     # Fetch data and plot charts
     for collection, dates in selected_collections.items():
-        if "No Dates" in dates or not dates[0]:
+        if collection == 'demo_db' or "No Dates" in dates or not dates[0]:  # Retrieve all scans for Dananjay Yadav
             docs = db.collection(collection).stream()
         else:
             docs = []
@@ -342,8 +381,26 @@ if selected_options:
                             .where('timestamp', '<=', end_datetime)
                             .stream())
 
-        healthy_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Healthy')
-        infected_count = sum(1 for doc in docs if doc.to_dict().get('InfStat') == 'Infected')
+        # Process documents and retrieve device names using the DataFrame method
+        metadata_list = []
+        for doc in docs:
+            doc_data = doc.to_dict()
+            # Convert datetime values to timezone-unaware
+            for key, value in doc_data.items():
+                if isinstance(value, datetime):
+                    doc_data[key] = value.replace(tzinfo=None)
+            metadata_list.append(doc_data)
+
+        # Convert list of dictionaries to DataFrame
+        df_metadata = pd.DataFrame(metadata_list)
+
+        # Filter out the required columns including DeviceName
+        desired_columns = ['DeviceName', 'InfStat', 'timestamp']
+        df_metadata_filtered = df_metadata[desired_columns]
+
+        # Sum up counts based on 'InfStat' for healthy and infected
+        healthy_count = df_metadata_filtered[df_metadata_filtered['InfStat'] == 'Healthy'].shape[0]
+        infected_count = df_metadata_filtered[df_metadata_filtered['InfStat'] == 'Infected'].shape[0]
         total_scans = healthy_count + infected_count
 
         # Accumulate counts for combined and data share pie charts
@@ -352,127 +409,118 @@ if selected_options:
         collection_scan_counts[collection] = total_scans
 
         # Collect device data
-        for doc in docs:
-            doc_data = doc.to_dict()
-            device_name = doc_data.get('DeviceName:')
-            if not device_name:
+        for _, row in df_metadata_filtered.iterrows():
+            device_name = row['DeviceName']
+            if pd.isna(device_name):
                 continue  # Skip if DeviceName is missing
-            date_key = doc_data['timestamp'].date().strftime('%Y-%m-%d')
-            inf_stat = doc_data.get('InfStat', 'Unknown')
+            date_key = row['timestamp'].strftime('%Y-%m-%d')
+            inf_stat = row['InfStat']
             if inf_stat == 'Healthy':
                 device_data[device_name][date_key]['Healthy'] += 1
             elif inf_stat == 'Infected':
                 device_data[device_name][date_key]['Infected'] += 1
-
+                
     # Layout for the first row (4 columns)
-    col1, col2, col3 = st.columns(3)
+    col1, col2 = st.columns(2)
 
-    # Pie chart for combined data across all selected collections
-    if total_healthy + total_infected > 0:
-        fig = go.Figure(data=[go.Pie(
-            labels=['Healthy', 'Infected'],
-            values=[total_healthy, total_infected],
-            hole=0.3,  # To make it a donut chart if desired
-            marker=dict(colors=['#00FF00', '#FF0000'])
-        )])
-        fig.update_layout(
-            title_text="Combined Healthy vs Infected Scans",
-            font=dict(color='white'),
-            paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
-            plot_bgcolor='rgba(0,0,0,0)'
-        )
-        col1.plotly_chart(fig)
-
-        # Pie chart showing data share by each collection
-        if collection_scan_counts:
-            total_scans_all_collections = sum(collection_scan_counts.values())
-            if total_scans_all_collections > 0:
-                scan_shares = [count / total_scans_all_collections * 100 for count in collection_scan_counts.values()]
-                fig = go.Figure(data=[go.Pie(
-                    labels=list(collection_scan_counts.keys()),
-                    values=scan_shares,
-                    hole=0.3
-                )])
-                fig.update_layout(
-                    title_text="Data Share by Each Collection",
-                    font=dict(color='white'),
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)'
-                )
-                col2.plotly_chart(fig)
 
     # Bar chart showing collections with most infected scans
-    if total_infected > 0:
-        sorted_collections = sorted(collection_scan_counts.items(), key=lambda item: item[1], reverse=True)
-        collections = [item[0] for item in sorted_collections]
-        infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collections]
+    if collection_scan_counts:
+        farmer_names_list = [farmer_names.get(collection, 'Unknown Farmer') for collection in collection_scan_counts.keys()]
+        # Calculate healthy and infected counts for each collection
+        healthy_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Healthy') for collection in collection_scan_counts.keys()]
+        infected_counts = [sum(1 for doc in db.collection(collection).stream() if doc.to_dict().get('InfStat') == 'Infected') for collection in collection_scan_counts.keys()]
 
-        fig = go.Figure(data=[go.Bar(
-            y=collections,
-            x=infected_counts,
-            orientation='h',
-            marker=dict(color='#FF0000')
-        )])
+        fig = go.Figure()
+
+        # Add healthy counts for each collection
+        fig.add_trace(go.Bar(
+            x=farmer_names_list,
+            y=healthy_counts,
+            name='Healthy',
+            marker=dict(color='#00FF00'),  # Green for healthy
+        ))
+
+        # Add infected counts for each collection
+        fig.add_trace(go.Bar(
+            x=farmer_names_list,
+            y=infected_counts,
+            name='Infected',
+            marker=dict(color='#FF0000'),  # Red for infected
+        ))
+
         fig.update_layout(
-            title_text="Infected Scans by Collection (Most to Least)",
-            xaxis_title="Number of Infected Scans",
-            yaxis_title="Collection",
+            title_text="Healthy and Infected Scans by Collection",
+            xaxis_title="Collection",
+            yaxis_title="Number of Scans",
+            barmode='group',  # Side-by-side grouping
+            bargap=0.2,  # Gap between bars (adjust as needed)
             font=dict(color='white'),
             paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)'
+            plot_bgcolor='rgba(0,0,0,0)',
+            height=300
         )
-        col3.plotly_chart(fig)
 
+        col1.plotly_chart(fig, use_container_width=True)
 
     # Layout for the second row (Vertical Bar Chart)
     if device_data:
         fig = go.Figure()
+
         device_names = list(device_data.keys())
-        dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys()))
+        # Collect all device names from selected collections
+        for device_name in device_names:
+            healthy_values = [device_data[device_name][date]['Healthy'] for date in device_data[device_name].keys()]
+            infected_values = [device_data[device_name][date]['Infected'] for date in device_data[device_name].keys()]
+            dates = list(device_data[device_name].keys())  # Fetch dates associated with each device
 
-        for device in device_names:
-            healthy_counts = []
-            infected_counts = []
-            
-            for date in dates:
-                # Safely get the healthy and infected counts for each device on each date
-                healthy_count = device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Healthy']
-                infected_count = device_data[device].get(date, {'Healthy': 0, 'Infected': 0})['Infected']
-            
-                # Append the counts to the respective lists
-                healthy_counts.append(healthy_count)
-                infected_counts.append(infected_count)
-
-            # Add healthy counts for the device
+            # Plot healthy scans
             fig.add_trace(go.Bar(
                 x=dates,
-                y=healthy_counts,
-                name=f'{device} - Healthy',
-                marker=dict(color='#00FF00')  # Green for healthy
+                y=healthy_values,
+                name=f'{device_name} - Healthy',
+                marker=dict(color='#00FF00'),  # Green for healthy
             ))
 
-            # Add infected counts for the device
+            # Plot infected scans
             fig.add_trace(go.Bar(
                 x=dates,
-                y=infected_counts,
-                name=f'{device} - Infected',
+                y=infected_values,
+                name=f'{device_name} - Infected',
                 marker=dict(color='#FF0000'),  # Red for infected
-                base=healthy_counts  # Stack infected on top of healthy
             ))
-            
+        
         fig.update_layout(
-            barmode='stack',
-            title_text="Scans by Device Across Collections",
+            title_text="Scans by Device (Grouped by Collection)",
             xaxis_title="Date",
             yaxis_title="Number of Scans",
+            barmode='group',  # Group devices by collection
             font=dict(color='white'),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            legend_title_text="Devices",  # Add a title to the legend
-            xaxis=dict(tickangle=-45),  # Rotate x-axis labels for better readability
-            height = 300
+            height=300
         )
-        st.plotly_chart(fig, use_container_width=True)
+
+        col2.plotly_chart(fig, use_container_width=True)
+
+    # Calculate percentages for combined collection
+    if total_healthy + total_infected > 0:
+        infection_percentage = (total_infected / (total_healthy + total_infected)) * 100
+        healthy_percentage = (total_healthy / (total_healthy + total_infected)) * 100
+    else:
+        infection_percentage = 0
+        healthy_percentage = 0
+
+    # Calculate data share by each collection
+    data_share_text = ""
+    
+    if collection_scan_counts:
+        total_scans_all_collections = sum(collection_scan_counts.values())
+        if total_scans_all_collections > 0:
+            for collection, count in collection_scan_counts.items():
+                share_percentage = (count / total_scans_all_collections) * 100
+                farmer_name = farmer_names.get(collection, 'Unknown Farmer')
+                data_share_text += f"{farmer_name}: {share_percentage:.2f}%<br>"
 
     # Styled box for comments
     most_active_device = "Sloth's Katana"
@@ -484,16 +532,23 @@ if selected_options:
     st.markdown(f"""
         <div style="
             padding: 10px;
-            background-color: #f5f5f5;
+            background-color: #ADD8E6;
             border-radius: 10px;
             box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
             font-family: 'Arial', sans-serif;
             color: #333333;
             width: 100%;  /* Take full column width */
-            margin-top: 20px;
+            margin-top: 10px;
         ">
-            <h4 style="color: #007ACC; margin-bottom: 10px;">Comments</h4>
-            <hr style="border: none; height: 1px; background-color: #007ACC; margin-bottom: 10px;">
+            <h4 style="color: #007ACC; margin-bottom: 1px;">Comments</h4>
+            <hr style="border: none; height: 1px; background-color: #007ACC; margin-bottom: 1px;">
+            <p style="font-size: 14px; margin: 5px 0;">
+                <strong>Combined Collection:</strong> Infection status: {infection_percentage:.2f}%, Healthy status: {healthy_percentage:.2f}%
+            </p>
+            <p style="font-size: 14px; margin: 5px 0;">
+                <strong>Data Share by Each Collection:</strong>
+            </p>
+            {data_share_text}
             <p style="font-size: 14px; margin: 5px 0;">
                 <strong>Most Active Device:</strong> {most_active_device}
             </p>
@@ -528,13 +583,12 @@ if selected_options:
         for doc in docs:
             doc_data = doc.to_dict()
             inf_stat = doc_data.get('InfStat', 'Unknown')
-            device_name = doc_data.get('DeviceName:')
+            device_name = doc_data.get('DeviceName')
             timestamp = doc_data.get('timestamp', None)
         
-            if not timestamp:
+            if not timestamp or not device_name:
                 continue
-        
-            date_key = timestamp.date().strftime('%Y-%m-%d')
+            date_key = timestamp.strftime('%Y-%m-%d')
 
             # Update counts
             if inf_stat == 'Healthy':
@@ -549,26 +603,55 @@ if selected_options:
         if total_scans > 0:
             st.write(f"** **")
         # Layout for collection details
-
-        col1, col2, col3, col4 = st.columns(4)
+        
+        col1, col2, col3 = st.columns(3)
     
         with col1:
             # Display farmer image
             farmer_image = farmer_images.get(collection, 'default.png')
             farmer_name = farmer_names.get(collection, 'Unknown Farmer')
-            st.image(farmer_image, width=60, use_column_width=True)
+            st.image(farmer_image, width= 300, use_column_width=False)
             st.write(f"**Farmer Name:** {farmer_name}", color='white')
     
         with col2:
             # Display scan counts
-            st.write(f"**Total Scans:** {total_scans}", color='white')
-            st.write(f"**Healthy Scans:** {healthy_count}", color='white')
-            st.write(f"**Infected Scans:** {infected_count}", color='white')
+            #st.write(f"**Total Scans:** {total_scans}", color='white')
+            #st.write(f"**Healthy Scans:** {healthy_count}", color='white')
+            #st.write(f"**Infected Scans:** {infected_count}", color='white')
             location = farm_locations.get(collection, 'Unknown Location')
             plot_size = plot_sizes.get(collection, 'Unknown Plot Size')
-            st.write(f"**Farm Location:** {location}", color='white')
-            st.write(f"**Plot Size:** {plot_size}", color='white')
-
+            farm_age = farm_ages.get(collection, 'Unknown farm age')
+            st.markdown(f"""
+                <div style='
+                    text-align: center; 
+                    color: white; 
+                    font-size: 24px;
+                    font-weight: bold;
+                    margin-bottom: 10px;'>
+                    Farm Details
+                </div>
+                <div style='
+                    text-align: justify; 
+                    color: white; 
+                    background-color: rgba(0, 128, 0, 0.1); 
+                    border: 2px solid white; 
+                    padding: 10px; 
+                    border-radius: 10px;
+                    margin: 10px auto;
+                    width: 80%;'>
+                    <br>
+                    <b>Total Scans:</b> {total_scans}<br>
+                    <b>Healthy Scans:</b> {healthy_count}<br>
+                    <b>Infected Scans:</b> {infected_count}<br>
+                    <b>Farm Location:</b> {location}<br>
+                    <b>Farm Age:</b> {farm_age}<br>
+                    <b>Plot Size:</b> {plot_size}
+                </div>
+                """, unsafe_allow_html=True)
+            #st.write(f"**Farm Location:** {location}", color='white')
+            #st.write(f"**Farm Age:** {farm_age}", color='white')
+            #st.write(f"**Plot Size:** {plot_size}", color='white')
+        
         with col3:
         # Plot pie chart for healthy vs infected scans
             if total_scans > 0:
@@ -579,80 +662,108 @@ if selected_options:
                     marker=dict(colors=['#00FF00', '#FF0000'])
                 )])
                 fig.update_layout(
-                    title_text=f'{collection} - Healthy vs Infected',
+                    title_text=f'{farmer_name} - Healthy vs Infected',
                     font=dict(color='white'),
                     paper_bgcolor='rgba(0,0,0,0)',
-                    plot_bgcolor='rgba(0,0,0,0)'
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    height= 350
                 )
                 st.plotly_chart(fig)
-
-        with col4:
-            # Plot vertical bar chart for device scan counts
-            fig = go.Figure()
-
-            # Prepare data for the bar chart
-            device_names = list(device_data.keys())
-            dates = sorted(set(date for date_counts in device_data.values() for date in date_counts.keys()))
-
-            # Add data for each device
-            for device_name in device_names:
-                healthy_counts = [device_data[device_name].get(date, {'Healthy': 0})['Healthy'] for date in dates]
-                infected_counts = [device_data[device_name].get(date, {'Infected': 0})['Infected'] for date in dates]
         
-            # Plot healthy counts for the device
-            fig.add_trace(go.Bar(
-                x=dates,
-                y=healthy_counts,
-                name=f'{device_name} - Healthy',
-                marker=dict(color='#00FF00'),  # Green for healthy
-                width=0.1
-            ))
+        # Plot vertical bar chart for device scan counts
+        fig = go.Figure()
 
-            # Plot infected counts for the device
-            fig.add_trace(go.Bar(
-                x=dates,
-                y=infected_counts,
-                name=f'{device_name} - Infected',
-                marker=dict(color='#FF0000'),  # Red for infected
-                base=healthy_counts,  # Stack infected on top of healthy
-                width=0.1
-            ))
+        device_names = list(device_data.keys())
+        dates = sorted(set(date for device in device_data.values() for date in device.keys()))
+        
+        
+        # Define a color palette for both healthy and infected bars
+        color_palette_healthy = ['#00FF00', '#1E90FF', '#FFA500', '#FFFF00', '#800080', '#FF69B4']  # Colors for healthy scans
+        color_palette_infected = ['#FF6347', '#DC143C', '#8B0000', '#FF4500', '#FF1493', '#C71585']  # Colors for infected scans
 
-        # Update layout for transparency and appropriate colors
+        # Add data for each date, grouping healthy and infected bars side by side for each device
+        for i, device_name in enumerate(device_names):
+            for date in dates:
+                # Get healthy and infected scan counts for the current date and device
+                healthy_count = device_data[device_name].get(date, {'Healthy': 0})['Healthy']
+                infected_count = device_data[device_name].get(date, {'Infected': 0})['Infected']
+
+                # Plot healthy counts for the device
+                fig.add_trace(go.Bar(
+                    x=[date],  # Same date for healthy and infected, but split by device
+                    y=[healthy_count],
+                    name=f'{device_name} - Healthy',
+                    marker=dict(color=color_palette_healthy[i % len(color_palette_healthy)]),  # Unique color for healthy
+                    width=0.35,  # Adjust bar thickness
+                    offsetgroup=device_name,  # Group by device to align healthy/infected bars together
+                    hoverinfo='y'
+                ))
+
+                # Plot infected counts for the device
+                fig.add_trace(go.Bar(
+                    x=[date],  # Same date for healthy and infected, but split by device
+                    y=[infected_count],
+                    name=f'{device_name} - Infected',
+                    marker=dict(color=color_palette_infected[i % len(color_palette_infected)]),  # Unique color for infected
+                    width=0.35,  # Same bar thickness as healthy
+                    offsetgroup=device_name,  # Group by device to align healthy/infected bars together
+                    hoverinfo='y'
+                ))
+
+        # Update layout for transparency, appropriate colors, and bar grouping
         fig.update_layout(
-            barmode='stack',  # Stack bars on top of each other
-            title_text=f'{collection} Collection - Device Scan Counts',
+            barmode='group',  # Group healthy and infected bars side by side
+            bargap=0.2,  # Small gap between different devices
+            title_text=f'Device Scan Counts by Date',
             xaxis_title="Date",
             yaxis_title="Number of Scans",
             font=dict(color='white'),  # White font for dark background
             paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
             plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
             legend_title_text="Devices",
-            height =300,
+            legend=dict(orientation="v",  # Vertical legend
+                        y=0.5,  # Align in the middle vertically
+                        x=1.02,  # Move it outside the chart area, on the right
+                        xanchor='left'),  # Anchor the legend to the left of the plot
+            height=400,
+            xaxis=dict(tickformat='%Y-%m-%d'),  # Display only the date
         )
 
         # Plot the figure in Streamlit
         st.plotly_chart(fig)
-
-
-    # Add a button in the middle of the app with larger size
+    
+    
+    # Add a button aligned to the left with a small, soft light blue style
     button_html = """
-        <div style="display: flex; justify-content: center; align-items: center; height: 100px;">
-            <a href="https://webbapptrebirth-dxf7mxdthdtwclmx6d2mcx.streamlit.app/" target="_blank" style="
+        <div style="display: flex; justify-content: center; align-items: center; gap: 30px; height: 50px;">
+            <a href="https://qskfow5zno4xytjdx4ydcs.streamlit.app/" target="_blank" style="
                 display: inline-block;
-                padding: 20px 40px;
-                font-size: 24px;
-                font-weight: bold;
-                background-color: #007ACC;
-                color: white;
+                padding: 10px 20px;
+                font-size: 16px;
+                font-weight: normal;
+                background-color: #ADD8E6;
+                color: black;
                 text-align: center;
                 text-decoration: none;
-                border-radius: 10px;
-                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+                border-radius: 5px;
+                box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
             ">
-                Go to Next Web App
+                Detailed Scan Analysis
+            </a>
+            <a href="https://mainpy-vknuf7uh4vuaqyrhwqzvhk.streamlit.app/" target="_blank" style="
+                display: inline-block;
+                padding: 10px 20px;
+                font-size: 16px;
+                font-weight: normal;
+                background-color: #ADD8E6;
+                color: black;
+                text-align: center;
+                text-decoration: none;
+                border-radius: 5px;
+                box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            ">
+                Customer View
             </a>
         </div>
     """
-
     st.markdown(button_html, unsafe_allow_html=True)
