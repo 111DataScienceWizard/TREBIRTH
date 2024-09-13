@@ -408,7 +408,7 @@ collection_2_data = [
         'Total Infected Trees': 3,
         'Total Healthy Trees': 11,
         'Date of Scans': '2024-03-12'
-    }
+    },
     {
         'Device Name': 'Borer_blade_1',
         'Total Scan': 106,
@@ -788,7 +788,7 @@ collection_2_data = [
         'Total Infected Trees': 2,
         'Total Healthy Trees': 9,
         'Date of Scans': '2024-06-29'
-    }
+    },
     {
         'Device Name': 'Borer_blade_1',
         'Total Scan': 106,
@@ -1168,7 +1168,7 @@ collection_2_data = [
         'Total Infected Trees': 2,
         'Total Healthy Trees': 9,
         'Date of Scans': '2024-06-29'
-    }
+    },
     {
         'Device Name': 'Borer_blade_1',
         'Total Scan': 106,
