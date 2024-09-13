@@ -247,10 +247,10 @@ farmer_images = {
     'collection_6': 'Admin_web_app/F3.png',
     'collection_7': 'Admin_web_app/F7.png',
     'demo_db': 'Admin_web_app/F8.png',
-    'collection_9':
-    'collection_10':
-    'collection_11':
-    'collection_12':
+    'collection_9': 'Admin_web_app/F9.png',
+    'collection_10': 'Admin_web_app/F10.png',
+    'collection_11': 'Admin_web_app/F11.png',
+    'collection_12': 'Admin_web_app/F712.png'
 }
 
 
