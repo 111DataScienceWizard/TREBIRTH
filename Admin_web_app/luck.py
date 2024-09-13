@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 
 # Define the collection file paths in your GitHub repository
-GITHUB_REPO_URL = "https://github.com/111DataScienceWizard/TREBIRTH/tree/main/Admin_web_app"
+GITHUB_REPO_URL = "https://github.com/111DataScienceWizard/TREBIRTH/tree/main/"
 collection_file_paths = {
     'collection_1': 'Admin_web_app/collection_1.xlsx',
     'collection_2': 'Admin_web_app/collection_2.xlsx',
