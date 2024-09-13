@@ -16,29 +16,17 @@ from collections import defaultdict
 import matplotlib.dates as mdates
 import plotly.express as px
 import plotly.graph_objects as go
-import openpyxl
+from collection_1 import collection_1_data
 
-# Define the collection file paths in your GitHub repository
-GITHUB_REPO_URL = "https://github.com/111DataScienceWizard/TREBIRTH/tree/main/"
-collection_file_paths = {
-    'collection_1': 'Admin_web_app/collection_1.xlsx',
-    'collection_2': 'Admin_web_app/collection_2.xlsx',
-    'collection_3': 'Admin_web_app/collection_3.xlsx',
-    'collection_4': 'Admin_web_app/collection_4.xlsx',
-    'collection_5': 'Admin_web_app/collection_5.xlsx',
-    'collection_6': 'Admin_web_app/collection_6.xlsx',
-    'collection_7': 'Admin_web_app/collection_7.xlsx',
-    'collection_9': 'Admin_web_app/collection_9.xlsx',
-    'collection_10': 'Admin_web_app/collection_10.xlsx',
-    'collection_11': 'Admin_web_app/collection_11.xlsx',
-    'collection_12': 'Admin_web_app/collection_12.xlsx',
+# Define the collection data mapping
+collection_data = {
+    'collection_1': collection_1_data
 }
 
-# Function to load the data from the GitHub repository
+# Function to load the data from the imported variables
 @st.cache_data
 def load_collection(collection_name):
-    file_url = GITHUB_REPO_URL + collection_file_paths[collection_name]
-    df = pd.read_excel(file_url)
+    df = collection_data[collection_name]
     return df
 
 # App title
@@ -47,7 +35,7 @@ st.title("Collection Data Viewer")
 # Multiselect for collections (Dropdown 1)
 collections = st.multiselect(
     "Select collection(s):", 
-    options=list(collection_file_paths.keys()), 
+    options=list(collection_data.keys()), 
     help="You can select one or multiple collections."
 )
 
