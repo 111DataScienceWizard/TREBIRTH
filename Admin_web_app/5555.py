@@ -333,6 +333,13 @@ collection_file_paths = {
     'collection_12': 'Admin_web_app/collection_12.xlsx',
 }
 
+collection_dates = {collection: [] for collection in collection_file_paths.keys()}
+
+# Populate collection_dates with actual dates from XLSX files
+for collection, file_path in collection_file_paths.items():
+    df_metadata = pd.read_excel(file_path)
+    unique_dates = pd.to_datetime(df_metadata['Date of Scans']).dt.date.unique()
+    collection_dates[collection] = sorted([date.strftime('%Y-%m-%d') for date in unique_dates], reverse=True)
 
 # Dropdown options with collection names and original date format
 dropdown_options = ['Dananjay Yadav']
