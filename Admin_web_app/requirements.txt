@@ -12,3 +12,4 @@ Pillow
 datetime
 matplotlib
 scipy>=1.7.1
+openpyxl
