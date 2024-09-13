@@ -317,19 +317,7 @@ farm_ages = {
     'collection_12': '9 Years'
 }
 # Collection dates mapping (using original date format)
-collection_dates = {
-    'TechDemo': ['2024-02-28', '2024-02-29'],
-    'Mr.Arjun': ['2024-03-04', '2024-03-05'],
-    'DevOps': ['2024-03-11', '2024-03-12', '2024-03-13', '2024-03-14', '2024-03-15', '2024-03-16', 
-               '2024-06-04', '2024-06-05'],
-    'DevMode': ['2024-02-22', '2024-02-23', '2024-02-24', '2024-02-25', '2024-02-26', '2024-02-28'],
-    'debugging': ['2024-06-10', '2024-06-13', '2024-06-14'],
-    'testing': ['2024-06-13'],
-    'demo_db': [],
-    'QDIC_test': ['2024-09-03']
-    
-}
-
+collection_dates = {'demo_db': []}
 
 collection_file_paths = {
     'collection_1': 'Admin_web_app/collection_1.xlsx',
@@ -383,58 +371,38 @@ if selected_options:
 
     # Fetch data and plot charts
     for collection, dates in selected_collections.items():
-        if collection == 'demo_db' or "No Dates" in dates or not dates[0]:  # Retrieve all scans for Dananjay Yadav
+        if collection == 'demo_db':
             docs = db.collection(collection).stream()
+            metadata_list = [doc.to_dict() for doc in docs]
+            df_metadata = pd.DataFrame(metadata_list)
+            df_metadata['timestamp'] = pd.to_datetime(df_metadata['timestamp'])
+            desired_columns = ['DeviceName', 'InfStat', 'timestamp']
+            df_filtered = df_metadata[desired_columns]
+            healthy_count = df_filtered[df_filtered['InfStat'] == 'Healthy'].shape[0]
+            infected_count = df_filtered[df_filtered['InfStat'] == 'Infected'].shape[0]
         else:
-            docs = []
-            for date_str in dates:
-                date_obj = datetime.strptime(date_str, '%Y-%m-%d')
-                start_datetime = datetime.combine(date_obj, datetime.min.time())
-                end_datetime = datetime.combine(date_obj, datetime.max.time())
-                docs.extend(db.collection(collection)
-                            .where('timestamp', '>=', start_datetime)
-                            .where('timestamp', '<=', end_datetime)
-                            .stream())
+            # For XLSX collections
+            xlsx_url = collection_files.get(collection)
+            df_metadata = pd.read_excel(xlsx_url, index_col=0)
+            df_metadata['Date of Scans'] = pd.to_datetime(df_metadata['Date of Scans'])
+            healthy_count = df_metadata['Total Healthy Scan']
+            infected_count = df_metadata['Total Infected Scan']
 
-        # Process documents and retrieve device names using the DataFrame method
-        metadata_list = []
-        for doc in docs:
-            doc_data = doc.to_dict()
-            # Convert datetime values to timezone-unaware
-            for key, value in doc_data.items():
-                if isinstance(value, datetime):
-                    doc_data[key] = value.replace(tzinfo=None)
-            metadata_list.append(doc_data)
-
-        # Convert list of dictionaries to DataFrame
-        df_metadata = pd.DataFrame(metadata_list)
-
-        # Filter out the required columns including DeviceName
-        desired_columns = ['DeviceName', 'InfStat', 'timestamp']
-        df_metadata_filtered = df_metadata[desired_columns]
-
-        # Sum up counts based on 'InfStat' for healthy and infected
-        healthy_count = df_metadata_filtered[df_metadata_filtered['InfStat'] == 'Healthy'].shape[0]
-        infected_count = df_metadata_filtered[df_metadata_filtered['InfStat'] == 'Infected'].shape[0]
-        total_scans = healthy_count + infected_count
-
-        # Accumulate counts for combined and data share pie charts
+         # Accumulate data
         total_healthy += healthy_count
         total_infected += infected_count
+        total_scans = healthy_count + infected_count
         collection_scan_counts[collection] = total_scans
-
-        # Collect device data
-        for _, row in df_metadata_filtered.iterrows():
-            device_name = row['DeviceName']
+        
+        # Device-level data processing
+        for _, row in df_metadata.iterrows():
+            device_name = row['Device Name']
             if pd.isna(device_name):
-                continue  # Skip if DeviceName is missing
-            date_key = row['timestamp'].strftime('%Y-%m-%d')
-            inf_stat = row['InfStat']
-            if inf_stat == 'Healthy':
-                device_data[device_name][date_key]['Healthy'] += 1
-            elif inf_stat == 'Infected':
-                device_data[device_name][date_key]['Infected'] += 1
-                
+                continue
+            date_key = row['Date of Scans'].strftime('%Y-%m-%d')
+            device_data[device_name][date_key]['Healthy'] += row['Total Healthy Scan']
+            device_data[device_name][date_key]['Infected'] += row['Total Infected Scan']
+           
     # Layout for the first row (4 columns)
     col1, col2 = st.columns(2)
 
