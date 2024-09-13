@@ -334,6 +334,60 @@ collection_file_paths = {
     'collection_12': 'Admin_web_app/collection_12.xlsx',
 }
 
+# Demo_db collection that retrieves data from Firestore
+demo_db_collection = 'demo_db'
+
+# Create a dropdown for selecting collections
+collections = list(farmer_names.keys())
+
+# Ensure demo_db is shown at the top of the dropdown
+collections.insert(0, demo_db_collection)
+
+# Multi-select for collections
+selected_collections = st.multiselect('Select collections', collections, default=[demo_db_collection])
+
+# Initialize dictionaries to store unique dates
+collection_dates = {}
+
+# Load unique dates for selected Excel collections
+for collection in selected_collections:
+    if collection != demo_db_collection:
+        # Load dates for collections other than demo_db
+        df = pd.read_excel(collection_file_paths[collection])
+        unique_dates = df['Date of Scans'].dt.date.unique()
+        collection_dates[collection] = unique_dates
+
+# Date dropdown should appear for non-demo_db collections only
+if demo_db_collection not in selected_collections:
+    # Generate unique dates across all selected collections
+    all_unique_dates = pd.unique([date for dates in collection_dates.values() for date in dates])
+    # Date multi-select dropdown
+    selected_dates = st.multiselect('Select dates (optional)', all_unique_dates)
+
+# Fetch and process data for demo_db
+if demo_db_collection in selected_collections:
+    # Fetch demo_db data from Firestore
+    docs = db.collection(demo_db_collection).stream()
+    metadata_list = [doc.to_dict() for doc in docs]
+
+    # Process Firestore data (specific code you've already implemented)
+    # ...
+
+# For other selected collections, retrieve data based on selected dates (if any)
+for collection in selected_collections:
+    if collection != demo_db_collection:
+        df = pd.read_excel(collection_file_paths[collection])
+
+        # Filter data based on selected dates (if any)
+        if selected_dates:
+            df = df[df['Date of Scans'].dt.date.isin(selected_dates)]
+
+        # Process the filtered data
+        # ...
+
+# Continue with the layout and chart plotting...
+
+
 collection_dates = {collection: [] for collection in collection_file_paths.keys()}
 
 for collection, file_path in collection_file_paths.items():
