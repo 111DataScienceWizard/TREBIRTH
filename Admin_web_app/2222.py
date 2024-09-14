@@ -103,7 +103,7 @@ def plot_multiple_time_domain(data_list, timestamps):
     fig = go.Figure()
     
     # Define colors for the different scans
-    colors = ['#E24E42', '#59C3C3']
+    colors = ['green', 'blue']
     
     # Add traces (lines) for each scan
     for i, data in enumerate(data_list):
@@ -233,9 +233,9 @@ if __name__ == "__main__":
     main()
 
 st.write(f"**Farmer Name:** Dananjay Yadav", color='white')
-st.write(f"**Farm Location:** Rahuri Nashik", color='white')
-st.write(f"**Farm Age:** 7 Years", color='white')
-st.write(f"**Plot Size:** 2.5 Acre", color='white')
+st.write(f"**Farm Location:** Null", color='white')
+st.write(f"**Farm Age:** Null", color='white')
+st.write(f"**Plot Size:** Null", color='white')
 
 # Mapping collections to farmer images
 farmer_images = {
