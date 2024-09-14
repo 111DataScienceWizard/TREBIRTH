@@ -234,7 +234,7 @@ if __name__ == "__main__":
     main()
 
 st.write(f"**Farmer Name:** Demo_db", color='white')
-st.write(f"**Farm Location:** Not yet updated", color='white')
+st.write(f"**Farm Location:** Null", color='white')
 st.write(f"**Farm Age:** Null", color='white')
 st.write(f"**Plot Size:** Null", color='white')
 
