@@ -455,7 +455,7 @@ if collections:
                             y=[healthy_count],
                             name=f'{device_name} - Healthy',
                             marker=dict(color=color_palette_healthy[i % len(color_palette_healthy)]),  # Assign unique healthy color
-                            width=0.35,  # Bar width
+                            #width=0.35,  # Bar width
                             offsetgroup=device_name,  # Group by device
                             hoverinfo='y'
                         ))
@@ -466,7 +466,7 @@ if collections:
                             y=[infected_count],
                             name=f'{device_name} - Infected',
                             marker=dict(color=color_palette_infected[i % len(color_palette_infected)]),  # Assign unique infected color
-                            width=0.35,  # Same bar width as healthy
+                            #width=0.35,  # Same bar width as healthy
                             offsetgroup=device_name,  # Group by device
                             hoverinfo='y'
                         ))
@@ -474,7 +474,7 @@ if collections:
                 # Update layout for grouped bars, improved aesthetics, and legend placement
                 fig.update_layout(
                     barmode='group',  # Group healthy and infected bars side by side
-                    bargap=0.2,  # Gap between different devices
+                    #bargap=0.2,  # Gap between different devices
                     title_text=f'Device Scan Counts by Date',
                     xaxis_title="Date",
                     yaxis_title="Number of Scans",
