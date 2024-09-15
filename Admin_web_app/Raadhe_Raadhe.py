@@ -240,19 +240,23 @@ if collections:
             col1.plotly_chart(fig, use_container_width=True)
 
         # Layout for the second row (Vertical Bar Chart)
-        if collections:
+        if selected_dates:
             fig = go.Figure()
 
+            filtered_data = df[df['Date of Scans'].isin(selected_dates)]
+            
             # Iterate through selected collections and extract device-wise data
             for collection in collections:
-                data = collection_data[collection]
-                device_names = list(set(item['Device Name'] for item in data))  # Unique device names
+                collection_data_filtered = filtered_data[filtered_data['Device Name'].isin(
+                    [item['Device Name'] for item in load_collection(collection)]
+                )]
+                device_names = list(set(collection_data_filtered['Device Name']))  # Unique device names
                 for device_name in device_names:
-                    device_data = [item for item in data if item['Device Name'] == device_name]
-                    dates = [item['Date of Scans'] for item in device_data]
-                    healthy_values = [item['Total Healthy Scan'] for item in device_data]
-                    infected_values = [item['Total Infected Scan'] for item in device_data]
-
+                    device_data = collection_data_filtered[collection_data_filtered['Device Name'] == device_name]
+                    dates = device_data['Date of Scans']
+                    healthy_values = device_data['Total Healthy Scan']
+                    infected_values = device_data['Total Infected Scan']
+                    
                     # Plot healthy scans
                     fig.add_trace(go.Bar(
                         x=dates,
