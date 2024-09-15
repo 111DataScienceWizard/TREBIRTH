@@ -17,10 +17,31 @@ import matplotlib.dates as mdates
 import plotly.express as px
 import plotly.graph_objects as go
 from collection_1 import collection_1_data
-
+from collection_2 import collection_2_data
+from collection_3 import collection_3_data
+from collection_4 import collection_4_data
+from collection_5 import collection_5_data
+from collection_6 import collection_6_data
+from collection_7 import collection_7_data
+from collection_8 import collection_8_data
+from collection_9 import collection_9_data
+from collection_10 import collection_10_data
+from collection_11 import collection_11_data
+from collection_12 import collection_12_data
 # Define the collection data mapping
 collection_data = {
-    'collection_1': collection_1_data
+    'collection_1': collection_1_data,
+    'collection_2': collection_2_data,
+    'collection_3': collection_3_data,
+    'collection_4': collection_4_data,
+    'collection_5': collection_5_data,
+    'collection_6': collection_6_data,
+    'collection_7': collection_7_data,
+    'collection_8': collection_8_data,
+    'collection_9': collection_9_data,
+    'collection_10': collection_10_data,
+    'collection_11': collection_11_data,
+    'collection_12': collection_12_data,
 }
 
 # Function to load the data from the imported variables
