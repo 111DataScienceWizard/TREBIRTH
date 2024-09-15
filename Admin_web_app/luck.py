@@ -28,34 +28,6 @@ from collection_9 import collection_9_data
 from collection_10 import collection_10_data
 from collection_11 import collection_11_data
 
-def exponential_backoff(retries):
-    base_delay = 1
-    max_delay = 60
-    delay = base_delay * (2 ** retries) + random.uniform(0, 1)
-    return min(delay, max_delay)
-
-def get_firestore_data(query):
-    retries = 0
-    max_retries = 10
-    while retries < max_retries:
-        try:
-            results = query.stream()
-            return list(results)
-        except ResourceExhausted as e:
-            st.warning(f"Quota exceeded, retrying... (attempt {retries + 1})")
-            time.sleep(exponential_backoff(retries))
-            retries += 1
-        except RetryError as e:
-            st.warning(f"Retry error: {e}, retrying... (attempt {retries + 1})")
-            time.sleep(exponential_backoff(retries))
-            retries += 1
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
-            break
-    raise Exception("Max retries exceeded")
-
-
-
 # Define the collection data mapping
 collection_data = {
     'collection_1': collection_1_data,
@@ -68,7 +40,81 @@ collection_data = {
     'collection_8': collection_8_data,
     'collection_9': collection_9_data,
     'collection_10': collection_10_data,
-    'collection_11': collection_11_data,
+    'collection_11': collection_11_data
+}
+
+# Mapping collections to farmer images
+farmer_images = {
+    'collection_1': 'Admin_web_app/F1.png',
+    'collection_2': 'Admin_web_app/F2.png',
+    'collection_3': 'Admin_web_app/F6.png',
+    'collection_4': 'Admin_web_app/F4.png',
+    'collection_5': 'Admin_web_app/F5.png',
+    'collection_6': 'Admin_web_app/F3.png',
+    'collection_7': 'Admin_web_app/F7.png',
+    'collection_8': 'Admin_web_app/F8.png',
+    'collection_9': 'Admin_web_app/F9.png',
+    'collection_10': 'Admin_web_app/F10.png',
+    'collection_11': 'Admin_web_app/F11.png'
+}
+
+
+farmer_names = {
+    'collection_1': 'Dipak Sangamnere',
+    'collection_2': 'Ramesh Kapre',
+    'collection_3': 'Arvind Khode',
+    'collection_4': 'Ravindra Sambherao',
+    'collection_5': 'Prabhakr Shirsath',
+    'collection_6': 'Arjun Jachak',
+    'collection_7': 'Yash More',
+    'collection_8': 'Anant More',
+    'collection_9': 'Dananjay Yadav',
+    'collection_10': 'Kiran Derle',
+    'collection_11': 'Nitin Gaidhani'
+}
+
+# Farm location mapping
+farm_locations = {
+    'collection_1': 'Niphad - Kherwadi',
+    'collection_2': 'Niphad - Panchkeshwar',
+    'collection_3': 'Nashik - Indira Nagar',
+    'collection_4': 'Manori - Khurd',
+    'collection_5': 'Kundwadi - Niphad',
+    'collection_6': 'Pathardi',
+    'collection_7': 'Niphad - Pimpalgaon',
+    'collection_8': 'Rahuri - Nashik',
+    'collection_9': 'Niphad - Kundewadi',
+    'collection_10': 'Nashik - Palse',
+    'collection_11': 'Nashik - Indira Nagar'
+}
+
+# Plot size mapping
+plot_sizes = {
+    'collection_1': '1 Acre',
+    'collection_2': '3 Acre',
+    'collection_3': '1 Acre',
+    'collection_4': '1.5 Acre',
+    'collection_5': '3 Acre',
+    'collection_6': '2 Acre',
+    'collection_7': '1 Acre',
+    'collection_8': '2.5 Acre',
+    'collection_9': '2 Acre',
+    'collection_10': '3 Acre',
+    'collection_11': '2.5 Acre'
+}
+
+#How old is the farm
+farm_ages = {
+    'collection_1': '8 Years',
+    'collection_2': '13 Years',
+    'collection_3': '6 Years',
+    'collection_4': '9 Years',
+    'collection_5': '11 Years',
+    'collection_6': '8 Years',
+    'collection_8': '10 Years',
+    'collection_9': '7 Years',
+    'collection_10': '4 Years',
+    'collection_11': '12 Years'
 }
 
 # Function to load the data from the imported variables
