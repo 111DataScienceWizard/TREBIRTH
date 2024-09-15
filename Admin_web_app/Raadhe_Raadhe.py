@@ -128,7 +128,7 @@ def load_collection(collection_name):
     
 # Multiselect for collections (Dropdown 1)
 collections = st.multiselect(
-    "Select collection(s):", 
+    "Select farm(s):", 
     options=list(collection_data.keys()), 
     help="You can select one or multiple collections."
 )
@@ -164,13 +164,17 @@ if collections:
         # Calculate percentages for combined collection
         total_healthy = filtered_data['Total Healthy Scan'].sum()
         total_infected = filtered_data['Total Infected Scan'].sum()
+
+        # Calculate percentages for combined collection
+        total_healthy_trees = filtered_data['Total Healthy Trees'].sum()
+        total_infected_trees = filtered_data['Total Infected Trees'].sum()
         
-        if total_healthy + total_infected > 0:
-            infection_percentage = (total_infected / (total_healthy + total_infected)) * 100
-            healthy_percentage = (total_healthy / (total_healthy + total_infected)) * 100
+        if total_healthy_trees + total_infected_trees > 0:
+            healthy_percentage = (total_healthy_trees / (total_healthy_trees + total_infected_trees)) * 100
+            infected_percentage = (total_infected_trees / (total_healthy_trees + total_infected_trees)) * 100
         else:
-            infection_percentage = 0
             healthy_percentage = 0
+            infected_percentage = 0
 
         # Calculate data share by each collection
         collection_scan_counts = filtered_data.groupby('Device Name')['Total Scan'].sum()
@@ -413,13 +417,13 @@ if collections:
                         # Plot pie chart for healthy vs infected scans
                         if total_scans > 0:
                             fig = go.Figure(data=[go.Pie(
-                            labels=['Healthy', 'Infected'],
-                            values=[healthy_count, infected_count],
+                            labels=['Healthy Trees', 'Infected Trees'],
+                            values=[total_healthy_trees, total_infected_trees],
                             hole=0.3,  # Donut chart style
                             marker=dict(colors=['#00FF00', '#FF0000'])
                         )])
                             fig.update_layout(
-                            title_text=f'{farmer_name} - Healthy vs Infected',
+                            title_text=f'{farmer _name} - Healthy vs Infected',
                             font=dict(color='white'),
                             paper_bgcolor='rgba(0,0,0,0)',
                             plot_bgcolor='rgba(0,0,0,0)',
