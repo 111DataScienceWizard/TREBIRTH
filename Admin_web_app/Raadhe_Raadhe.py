@@ -423,7 +423,7 @@ if collections:
                             marker=dict(colors=['#00FF00', '#FF0000'])
                         )])
                             fig.update_layout(
-                            title_text=f'{farmer _name} - Healthy vs Infected',
+                            title_text=f'{farmer_name} - Healthy vs Infected',
                             font=dict(color='white'),
                             paper_bgcolor='rgba(0,0,0,0)',
                             plot_bgcolor='rgba(0,0,0,0)',
