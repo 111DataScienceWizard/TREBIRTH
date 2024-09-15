@@ -137,7 +137,7 @@ collections = st.multiselect(
 # Create a placeholder for the second dropdown
 #if collections:
     # Load data for all selected collections
-selected_collections = [collection for collection, name in farmer_names.items() if name in selected_farmers]
+selected_collections = [collection for collection, name in farmer_names.items() if name in collections]
 all_data = []
 for collection in collections:
     data = load_collection(collection)
