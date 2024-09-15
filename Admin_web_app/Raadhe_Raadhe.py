@@ -118,12 +118,13 @@ farm_ages = {
     'collection_11': '12 Years'
 }
 
+# Set page configuration
+st.set_page_config(layout="wide")
+st.title("Farm Analytics")
+
 # Function to load the data from the imported variables
 def load_collection(collection_name):
     return collection_data[collection_name]
-
-# App title
-st.title("Collection Data Viewer")
 
 # Multiselect for collections (Dropdown 1)
 collections = st.multiselect(
