@@ -169,12 +169,12 @@ if collections:
         total_healthy_trees = filtered_data['Total Healthy Trees'].sum()
         total_infected_trees = filtered_data['Total Infected Trees'].sum()
         
-        if total_healthy_trees + total_infected_trees > 0:
-            healthy_percentage = (total_healthy_trees / (total_healthy_trees + total_infected_trees)) * 100
-            infected_percentage = (total_infected_trees / (total_healthy_trees + total_infected_trees)) * 100
+        if total_healthy + total_infected > 0:
+            infection_percentage = (total_infected / (total_healthy + total_infected)) * 100
+            healthy_percentage = (total_healthy / (total_healthy + total_infected)) * 100
         else:
+            infection_percentage = 0
             healthy_percentage = 0
-            infected_percentage = 0
 
         # Calculate data share by each collection
         collection_scan_counts = filtered_data.groupby('Device Name')['Total Scan'].sum()
