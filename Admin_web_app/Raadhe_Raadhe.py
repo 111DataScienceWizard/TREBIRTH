@@ -180,6 +180,7 @@ if collections:
                 share_percentage = (count / collection_scan_counts.sum()) * 100
                 farmer_name = farmer_names.get(collection, 'Unknown Farmer')
                 data_share_text += f"{farmer_name}: {share_percentage:.2f}%<br>"
+        st.write(filtered_data.columns)
 
         # Example placeholders for other statistics
         most_active_device = "Sloth's Katana"  # You might want to calculate this
