@@ -208,9 +208,17 @@ if collections:
         if collections:
             farmer_names_list = [farmer_names.get(collection, 'Unknown Farmer') for collection in collections]
             # Calculate healthy and infected counts for each collection
-            healthy_counts = [filtered_data[filtered_data['Collection'] == collection]['Total Healthy Scan'].sum() for collection in collections]
-            infected_counts = [filtered_data[filtered_data['Collection'] == collection]['Total Infected Scan'].sum() for collection in collections]
+            healthy_counts = []
+            infected_counts = []
 
+            # Iterate through selected collections to get healthy and infected counts
+            for collection in collections:
+                data = collection_data[collection]
+                healthy_sum = sum(item['Total Healthy Scan'] for item in data)
+                infected_sum = sum(item['Total Infected Scan'] for item in data)
+                healthy_counts.append(healthy_sum)
+                infected_counts.append(infected_sum)
+                
             fig = go.Figure()
 
             # Add healthy counts for each collection
@@ -244,32 +252,34 @@ if collections:
             col1.plotly_chart(fig, use_container_width=True)
 
         # Layout for the second row (Vertical Bar Chart)
-        if filtered_data.shape[0] > 0:
+        if collections:
             fig = go.Figure()
 
-            device_names = filtered_data['Device Name'].unique()
-            # Collect data for each device
-            for device_name in device_names:
-                device_data = filtered_data[filtered_data['Device Name'] == device_name]
-                dates = device_data['Date of Scans'].unique()
-                healthy_values = [device_data[device_data['Date of Scans'] == date]['Total Healthy Scan'].sum() for date in dates]
-                infected_values = [device_data[device_data['Date of Scans'] == date]['Total Infected Scan'].sum() for date in dates]
+            # Iterate through selected collections and extract device-wise data
+            for collection in collections:
+                data = collection_data[collection]
+                device_names = list(set(item['Device Name'] for item in data))  # Unique device names
+                for device_name in device_names:
+                    device_data = [item for item in data if item['Device Name'] == device_name]
+                    dates = [item['Date of Scans'] for item in device_data]
+                    healthy_values = [item['Total Healthy Scan'] for item in device_data]
+                    infected_values = [item['Total Infected Scan'] for item in device_data]
 
-                # Plot healthy scans
-                fig.add_trace(go.Bar(
-                    x=dates,
-                    y=healthy_values,
-                    name=f'{device_name} - Healthy',
-                    marker=dict(color='#00FF00'),  # Green for healthy
-                ))
+                    # Plot healthy scans
+                    fig.add_trace(go.Bar(
+                        x=dates,
+                        y=healthy_values,
+                        name=f'{device_name} - Healthy',
+                        marker=dict(color='#00FF00'),  # Green for healthy
+                    ))
 
-                # Plot infected scans
-                fig.add_trace(go.Bar(
-                    x=dates,
-                    y=infected_values,
-                    name=f'{device_name} - Infected',
-                    marker=dict(color='#FF0000'),  # Red for infected
-                ))
+                    # Plot infected scans
+                    fig.add_trace(go.Bar(
+                        x=dates,
+                        y=infected_values,
+                        name=f'{device_name} - Infected',
+                        marker=dict(color='#FF0000'),  # Red for infected
+                    ))
 
             fig.update_layout(
                 title_text="Scans by Device (Grouped by Collection)",
