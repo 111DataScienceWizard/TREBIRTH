@@ -118,6 +118,23 @@ farm_ages = {
     'Nitin Gaidhani': '12 Years'
 }
 
+device_colors = {
+    ('Borer_blade_1', 'Healthy'): '#FF5733',  # Orange for healthy Borer_blade_1
+    ('Borer_blade_1', 'Infected'): '#FFC300',  # Yellow for infected Borer_blade_1
+    ('Borer_blade_2', 'Healthy'): '#33FF57',  # Green for healthy Borer_blade_2
+    ('Borer_blade_2', 'Infected'): '#28A745',  # Dark green for infected Borer_blade_2
+    ('Borer_blade_3', 'Healthy'): '#3357FF',  # Blue for healthy Borer_blade_3
+    ('Borer_blade_3', 'Infected'): '#1A73E8',  # Light blue for infected Borer_blade_3
+    ('Borer_blade_4', 'Healthy'): '#3333FF',  # Darker blue for healthy Borer_blade_4
+    ('Borer_blade_4', 'Infected'): '#001F3F',  # Navy blue for infected Borer_blade_4
+}
+
+# Example of generating a color palette
+def generate_colors(n_colors, start_color='rgb(0,0,255)', end_color='rgb(255,0,0)'):
+    return n_colors(start_color, end_color, n_colors)
+
+
+
 # Set page configuration
 st.set_page_config(layout="wide")
 st.title("Farm Analytics")
@@ -239,38 +256,54 @@ if collections:
 
             col1.plotly_chart(fig, use_container_width=True)
 
+        # Number of collections and devices (adjust as needed)
+        num_collections = 12
+        num_devices = len(set(df['Device Name']))  # Adjust as per actual data
+
+        # Generate colors for collections and devices
+        collection_colors = generate_colors(num_collections, start_color='rgb(0,0,255)', end_color='rgb(255,0,0)')
+        device_colors = generate_colors(num_devices, start_color='rgb(0,255,0)', end_color='rgb(255,255,0)')
+
+        # Map device and collection to colors
+        device_color_map = {f'Device_{i+1}': device_colors[i] for i in range(num_devices)}
+        collection_color_map = {f'Collection_{i+1}': collection_colors[i] for i in range(num_collections)}
+
         # Layout for the second row (Vertical Bar Chart)
         if selected_dates:
             fig = go.Figure()
 
             filtered_data = df[df['Date of Scans'].isin(selected_dates)]
+
             
             # Iterate through selected collections and extract device-wise data
             for collection in collections:
                 collection_data_filtered = filtered_data[filtered_data['Device Name'].isin(
                     [item['Device Name'] for item in load_collection(collection)]
                 )]
+                collection_color = collection_color_map.get(collection)
                 device_names = list(set(collection_data_filtered['Device Name']))  # Unique device names
                 for device_name in device_names:
                     device_data = collection_data_filtered[collection_data_filtered['Device Name'] == device_name]
                     dates = device_data['Date of Scans']
                     healthy_values = device_data['Total Healthy Scan']
                     infected_values = device_data['Total Infected Scan']
-                    
+
+                    healthy_color = device_color_map.get(device_name)  # Default color if not found
+                    infected_color = device_color_map.get(device_name)
                     # Plot healthy scans
                     fig.add_trace(go.Bar(
                         x=[d.strftime('%b %d') for d in dates],
                         y=healthy_values,
-                        name=f'{device_name} - Healthy',
-                        marker=dict(color='#00FF00'),  # Green for healthy
+                        name=f'{device_name} - Healthy ({collection})',
+                        marker=dict(color=healthy_color),  # Green for healthy
                     ))
 
                     # Plot infected scans
                     fig.add_trace(go.Bar(
                         x=[d.strftime('%b %d') for d in dates],
                         y=infected_values,
-                        name=f'{device_name} - Infected',
-                        marker=dict(color='#FF0000'),  # Red for infected
+                        name=f'{device_name} - Infected ({collection})',
+                        marker=dict(color=infected_color),  # Red for infected
                     ))
 
             fig.update_layout(
