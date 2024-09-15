@@ -118,23 +118,6 @@ farm_ages = {
     'Nitin Gaidhani': '12 Years'
 }
 
-device_colors = {
-    ('Borer_blade_1', 'Healthy'): '#FF5733',  # Orange for healthy Borer_blade_1
-    ('Borer_blade_1', 'Infected'): '#FFC300',  # Yellow for infected Borer_blade_1
-    ('Borer_blade_2', 'Healthy'): '#33FF57',  # Green for healthy Borer_blade_2
-    ('Borer_blade_2', 'Infected'): '#28A745',  # Dark green for infected Borer_blade_2
-    ('Borer_blade_3', 'Healthy'): '#3357FF',  # Blue for healthy Borer_blade_3
-    ('Borer_blade_3', 'Infected'): '#1A73E8',  # Light blue for infected Borer_blade_3
-    ('Borer_blade_4', 'Healthy'): '#3333FF',  # Darker blue for healthy Borer_blade_4
-    ('Borer_blade_4', 'Infected'): '#001F3F',  # Navy blue for infected Borer_blade_4
-}
-
-# Example of generating a color palette
-def generate_colors(n_colors, start_color='rgb(0,0,255)', end_color='rgb(255,0,0)'):
-    return n_colors(start_color, end_color, n_colors)
-
-
-
 # Set page configuration
 st.set_page_config(layout="wide")
 st.title("Farm Analytics")
@@ -256,21 +239,12 @@ if collections:
 
             col1.plotly_chart(fig, use_container_width=True)
 
-        # Number of collections and devices (adjust as needed)
-        num_collections = 12
-        num_devices = len(set(df['Device Name']))  # Adjust as per actual data
-
-        # Generate colors for collections and devices
-        collection_colors = generate_colors(num_collections, start_color='rgb(0,0,255)', end_color='rgb(255,0,0)')
-        device_colors = generate_colors(num_devices, start_color='rgb(0,255,0)', end_color='rgb(255,255,0)')
-
-        # Map device and collection to colors
-        device_color_map = {f'Device_{i+1}': device_colors[i] for i in range(num_devices)}
-        collection_color_map = {f'Collection_{i+1}': collection_colors[i] for i in range(num_collections)}
-
         # Layout for the second row (Vertical Bar Chart)
         if selected_dates:
             fig = go.Figure()
+
+            color_palette_healthy = ['#00FF00', '#1E90FF', '#FFA500', '#FFFF00', '#800080', '#FF69B4']  # Healthy colors
+            color_palette_infected = ['#FF6347', '#DC143C', '#8B0000', '#FF4500', '#FF1493', '#C71585']  # Infected colors
 
             filtered_data = df[df['Date of Scans'].isin(selected_dates)]
 
@@ -280,7 +254,7 @@ if collections:
                 collection_data_filtered = filtered_data[filtered_data['Device Name'].isin(
                     [item['Device Name'] for item in load_collection(collection)]
                 )]
-                collection_color = collection_color_map.get(collection)
+                
                 device_names = list(set(collection_data_filtered['Device Name']))  # Unique device names
                 for device_name in device_names:
                     device_data = collection_data_filtered[collection_data_filtered['Device Name'] == device_name]
@@ -288,14 +262,15 @@ if collections:
                     healthy_values = device_data['Total Healthy Scan']
                     infected_values = device_data['Total Infected Scan']
 
-                    healthy_color = device_color_map.get(device_name)  # Default color if not found
-                    infected_color = device_color_map.get(device_name)
+                   # Initialize color index
+                   color_index_healthy = 0
+                   color_index_infected = 0
                     # Plot healthy scans
                     fig.add_trace(go.Bar(
                         x=[d.strftime('%b %d') for d in dates],
                         y=healthy_values,
                         name=f'{device_name} - Healthy ({collection})',
-                        marker=dict(color=healthy_color),  # Green for healthy
+                        marker=dict(color=color_palette_healthy[color_index_healthy % len(color_palette_healthy)]),  # Assign unique healthy color
                     ))
 
                     # Plot infected scans
@@ -303,8 +278,9 @@ if collections:
                         x=[d.strftime('%b %d') for d in dates],
                         y=infected_values,
                         name=f'{device_name} - Infected ({collection})',
-                        marker=dict(color=infected_color),  # Red for infected
+                        marker=dict(color=color_palette_infected[color_index_infected % len(color_palette_infected)]),  # Assign unique infected color
                     ))
+                    color_index_healthy += 1  # Move to the next color in the palette
 
             fig.update_layout(
                 title_text="Scans by Device (Grouped by Collection)",
