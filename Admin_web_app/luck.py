@@ -257,13 +257,13 @@ if collections:
             col2.plotly_chart(fig, use_container_width=True)
 
 # Calculate percentages for combined collection
-if 'df' in locals() and not df.empty:
+if df['Total Scan'] > 0
     total_healthy = df['Total Healthy Scan'].sum()
     total_infected = df['Total Infected Scan'].sum()
 
     if total_healthy + total_infected > 0:
-        infection_percentage = (total_infected / (total_healthy + total_infected)) * 100
-        healthy_percentage = (total_healthy / (total_healthy + total_infected)) * 100
+        infection_percentage = (df['Total Infected Scan'] / (df['Total Scan'])) * 100
+        healthy_percentage = (df['Total Healthy Scan'] / (df['Total Scan'])) * 100
     else:
         infection_percentage = 0
         healthy_percentage = 0
