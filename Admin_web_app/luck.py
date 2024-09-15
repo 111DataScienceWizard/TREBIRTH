@@ -159,6 +159,33 @@ if collections:
         # Filter the data by the selected dates
         filtered_data = df[df['Date of Scans'].isin(selected_dates)]
         
+        # Calculate percentages for combined collection
+        total_healthy = filtered_data['Total Healthy Scan'].sum()
+        total_infected = filtered_data['Total Infected Scan'].sum()
+        
+        if total_healthy + total_infected > 0:
+            infection_percentage = (total_infected / (total_healthy + total_infected)) * 100
+            healthy_percentage = (total_healthy / (total_healthy + total_infected)) * 100
+        else:
+            infection_percentage = 0
+            healthy_percentage = 0
+
+        # Calculate data share by each collection
+        collection_scan_counts = filtered_data.groupby('Device Name')['Total Scan'].sum()
+        data_share_text = ""
+        
+        if collection_scan_counts.sum() > 0:
+            for collection, count in collection_scan_counts.items():
+                share_percentage = (count / collection_scan_counts.sum()) * 100
+                farmer_name = farmer_names.get(collection, 'Unknown Farmer')
+                data_share_text += f"{farmer_name}: {share_percentage:.2f}%<br>"
+
+        # Example placeholders for other statistics
+        most_active_device = "Sloth's Katana"  # You might want to calculate this
+        least_active_device = "Proto 2"  # You might want to calculate this
+        total_infected_trees = filtered_data['Total Infected Trees'].sum()
+        most_infected_plot = "Devmode"  # You might want to calculate this
+        least_infected_plot = "Testing"  # You might want to calculate this
         # Display the filtered data in the desired format
         #st.write("Filtered Data:")
         #for date in selected_dates:
@@ -256,50 +283,6 @@ if collections:
 
             col2.plotly_chart(fig, use_container_width=True)
 
-
-if collections:
-    all_data = []
-    for collection in collections:
-        data = get_collection_data(collection)
-        all_data.append(df)
-    
-    # Convert list of dictionaries to DataFrame
-    df = pd.concat(all_data, ignore_index=True)
-# Calculate percentages for combined collection
-if df['Total Scan'].sum() > 0:
-    total_healthy = df['Total Healthy Scan'].sum()
-    total_infected = df['Total Infected Scan'].sum()
-
-    if total_healthy + total_infected > 0:
-        infection_percentage = (total_infected / (total_healthy + total_infected)) * 100
-        healthy_percentage = (total_healthy / (total_healthy + total_infected)) * 100
-    else:
-        infection_percentage = 0
-        healthy_percentage = 0
-else:
-    infection_percentage = 0
-    healthy_percentage = 0
-
-
-
-# Calculate data share by each collection
-data_share_text = ""
-collection_scan_counts = df.groupby('Collection Name').size().to_dict()
-
-if collection_scan_counts:
-    total_scans_all_collections = sum(collection_scan_counts.values())
-    if total_scans_all_collections > 0:
-        for collection, count in collection_scan_counts.items():
-            share_percentage = (count / total_scans_all_collections) * 100
-            farmer_name = farmer_names.get(collection, 'Unknown Farmer')
-            data_share_text += f"{farmer_name}: {share_percentage:.2f}%<br>"
-
-# Styled box for comments
-most_active_device = "Sloth's Katana"  # Placeholder value
-least_active_device = "Proto 2"  # Placeholder value
-total_infected_trees = 456  # Placeholder value
-most_infected_plot = "Devmode"  # Placeholder value
-least_infected_plot = "Testing"  # Placeholder value
 
 st.markdown(f"""
     <div style="
