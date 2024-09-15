@@ -247,6 +247,9 @@ if collections:
             color_palette_infected = ['#FF6347', '#DC143C', '#8B0000', '#FF4500', '#FF1493', '#C71585']  # Infected colors
 
             filtered_data = df[df['Date of Scans'].isin(selected_dates)]
+            # Initialize color index
+            color_index_healthy = 0
+            color_index_infected = 0
 
             
             # Iterate through selected collections and extract device-wise data
@@ -262,9 +265,7 @@ if collections:
                     healthy_values = device_data['Total Healthy Scan']
                     infected_values = device_data['Total Infected Scan']
 
-                    # Initialize color index
-                    color_index_healthy = 0
-                    color_index_infected = 0
+                    
                     # Plot healthy scans
                     fig.add_trace(go.Bar(
                         x=[d.strftime('%b %d') for d in dates],
@@ -280,7 +281,8 @@ if collections:
                         name=f'{device_name} - Infected ({collection})',
                         marker=dict(color=color_palette_infected[color_index_infected % len(color_palette_infected)]),  # Assign unique infected color
                     ))
-                    color_index_healthy += 1  # Move to the next color in the palette
+                    color_index_healthy += 1
+                    color_index_infected += 1# Move to the next color in the palette
 
             fig.update_layout(
                 title_text="Scans by Device (Grouped by Collection)",
