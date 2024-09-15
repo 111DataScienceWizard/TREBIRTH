@@ -284,25 +284,25 @@ if collections:
             col2.plotly_chart(fig, use_container_width=True)
 
 
-st.markdown(f"""
-    <div style="
-        padding: 10px;
-        background-color: #ADD8E6;
-        border-radius: 10px;
-        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-        font-family: 'Arial', sans-serif;
-        color: #333333;
-        width: 100%;
-        margin-top: 10px;
-    ">
-        <h4 style="color: #007ACC; margin-bottom: 1px;">Comments</h4>
-        <hr style="border: none; height: 1px; background-color: #007ACC; margin-bottom: 1px;">
-        <p style="font-size: 14px; margin: 5px 0;">
-            <strong>Combined Collection:</strong> Infection status: {infection_percentage:.2f}%, Healthy status: {healthy_percentage:.2f}%
-        </p>
-        <p style="font-size: 14px; margin: 5px 0;">
+            st.markdown(f"""
+                <div style="
+                padding: 10px;
+                background-color: #ADD8E6;
+                border-radius: 10px;
+                box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+                font-family: 'Arial', sans-serif;
+                color: #333333;
+                width: 100%;
+                margin-top: 10px;
+            ">
+                <h4 style="color: #007ACC; margin-bottom: 1px;">Comments</h4>
+                <hr style="border: none; height: 1px; background-color: #007ACC; margin-bottom: 1px;">
+                <p style="font-size: 14px; margin: 5px 0;">
+                    <strong>Combined Collection:</strong> Infection status: {infection_percentage:.2f}%, Healthy status: {healthy_percentage:.2f}%
+                </p>
+               <p style="font-size: 14px; margin: 5px 0;">
             <strong>Data Share by Each Collection:</strong>
-        </p>
+            </p>
         {data_share_text}
         <p style="font-size: 14px; margin: 5px 0;">
             <strong>Most Active Device:</strong> {most_active_device}
