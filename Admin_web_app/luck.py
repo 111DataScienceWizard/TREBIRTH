@@ -256,6 +256,16 @@ if collections:
 
             col2.plotly_chart(fig, use_container_width=True)
 
+
+if collections:
+    # Load data for all selected collections
+    all_data = []
+    for collection in collections:
+        data = load_collection(collection)
+        all_data.extend(data)
+    
+    # Convert list of dictionaries to DataFrame
+    df = pd.DataFrame(all_data)
 # Calculate percentages for combined collection
 if df['Total Scan'].sum() > 0:
     total_healthy = df['Total Healthy Scan'].sum()
@@ -270,6 +280,8 @@ if df['Total Scan'].sum() > 0:
 else:
     infection_percentage = 0
     healthy_percentage = 0
+
+
 
 # Calculate data share by each collection
 data_share_text = ""
