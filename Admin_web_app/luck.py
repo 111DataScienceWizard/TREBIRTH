@@ -258,14 +258,13 @@ if collections:
 
 
 if collections:
-    # Load data for all selected collections
     all_data = []
     for collection in collections:
-        data = load_collection(collection)
-        all_data.extend(data)
+        data = get_collection_data(collection)
+        all_data.append(df)
     
     # Convert list of dictionaries to DataFrame
-    df = pd.DataFrame(all_data)
+    df = pd.concat(all_data, ignore_index=True)
 # Calculate percentages for combined collection
 if df['Total Scan'].sum() > 0:
     total_healthy = df['Total Healthy Scan'].sum()
