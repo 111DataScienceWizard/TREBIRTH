@@ -27,7 +27,6 @@ from collection_8 import collection_8_data
 from collection_9 import collection_9_data
 from collection_10 import collection_10_data
 from collection_11 import collection_11_data
-from collection_12 import collection_12_data
 # Define the collection data mapping
 collection_data = {
     'collection_1': collection_1_data,
@@ -41,7 +40,6 @@ collection_data = {
     'collection_9': collection_9_data,
     'collection_10': collection_10_data,
     'collection_11': collection_11_data,
-    'collection_12': collection_12_data,
 }
 
 # Function to load the data from the imported variables
