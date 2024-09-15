@@ -111,6 +111,7 @@ farm_ages = {
     'collection_4': '9 Years',
     'collection_5': '11 Years',
     'collection_6': '8 Years',
+    'collection_7': '7 Years',
     'collection_8': '10 Years',
     'collection_9': '7 Years',
     'collection_10': '4 Years',
