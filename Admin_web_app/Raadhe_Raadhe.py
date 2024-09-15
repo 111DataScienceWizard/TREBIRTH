@@ -122,26 +122,25 @@ farm_ages = {
 st.set_page_config(layout="wide")
 st.title("Farm Analytics")
 
-# Create a list of unique farmer names
-farmer_options = list(set(farmer_names.values()))
 # Function to load the data from the imported variables
 def load_collection(collection_name):
     return collection_data[collection_name]
-
+    
+farmer_name = farmer_names.get(collection, 'Unknown Farmer')
 # Multiselect for collections (Dropdown 1)
 collections = st.multiselect(
-    "Select farms:", 
-    options=farmer_options, 
+    "Select collection(s):", 
+    options=list(collection_data.keys()), 
+    help="You can select one or multiple collections."
 )
 
 # Create a placeholder for the second dropdown
-#if collections:
+if collections:
     # Load data for all selected collections
-selected_collections = [collection for collection, name in farmer_names.items() if name in collections]
-all_data = []
-for collection in collections:
-    data = load_collection(collection)
-    all_data.extend(data)
+    all_data = []
+    for collection in collections:
+        data = load_collection(collection)
+        all_data.extend(data)
     
 # Convert list of dictionaries to DataFrame
 df = pd.DataFrame(all_data)
