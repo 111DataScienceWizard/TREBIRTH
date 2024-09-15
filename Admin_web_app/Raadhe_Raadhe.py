@@ -118,6 +118,10 @@ farm_ages = {
     'collection_11': '12 Years'
 }
 
+
+# Reverse the farmer_names mapping for easy lookup
+farmer_to_collection = {v: k for k, v in farmer_names.items()}
+
 # Set page configuration
 st.set_page_config(layout="wide")
 st.title("Farm Analytics")
@@ -128,9 +132,8 @@ def load_collection(collection_name):
 
 # Multiselect for collections (Dropdown 1)
 collections = st.multiselect(
-    "Select collection(s):", 
-    options=list(collection_data.keys()), 
-    help="You can select one or multiple collections."
+    "Select farms:", 
+    options=list(farmer_names.values()), 
 )
 
 # Create a placeholder for the second dropdown
