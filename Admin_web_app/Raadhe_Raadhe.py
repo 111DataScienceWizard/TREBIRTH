@@ -315,7 +315,7 @@ if collections:
                         <strong>Combined Collection:</strong> Infection status: {infection_percentage:.2f}%, Healthy status: {healthy_percentage:.2f}%
                     </p>
                     <p style="font-size: 14px; margin: 5px 0;">
-                        <strong>Data Share by Each Collection:</strong>
+                        <strong>Data Share by Each Device:</strong>
                     </p>
                     {data_share_text}
                     <p style="font-size: 14px; margin: 5px 0;">
