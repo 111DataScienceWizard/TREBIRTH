@@ -257,28 +257,31 @@ if collections:
             col2.plotly_chart(fig, use_container_width=True)
 
 # Calculate percentages for combined collection
-if df['Total Scan'] > 0
+if df['Total Scan'].sum() > 0:
     total_healthy = df['Total Healthy Scan'].sum()
     total_infected = df['Total Infected Scan'].sum()
 
     if total_healthy + total_infected > 0:
-        infection_percentage = (df['Total Infected Scan'] / (df['Total Scan'])) * 100
-        healthy_percentage = (df['Total Healthy Scan'] / (df['Total Scan'])) * 100
+        infection_percentage = (total_infected / (total_healthy + total_infected)) * 100
+        healthy_percentage = (total_healthy / (total_healthy + total_infected)) * 100
     else:
         infection_percentage = 0
         healthy_percentage = 0
+else:
+    infection_percentage = 0
+    healthy_percentage = 0
 
-    # Calculate data share by each collection
-    data_share_text = ""
-    collection_scan_counts = df.groupby('Collection Name').size().to_dict()
-    
-    if collection_scan_counts:
-        total_scans_all_collections = sum(collection_scan_counts.values())
-        if total_scans_all_collections > 0:
-            for collection, count in collection_scan_counts.items():
-                share_percentage = (count / total_scans_all_collections) * 100
-                farmer_name = farmer_names.get(collection, 'Unknown Farmer')
-                data_share_text += f"{farmer_name}: {share_percentage:.2f}%<br>"
+# Calculate data share by each collection
+data_share_text = ""
+collection_scan_counts = df.groupby('Collection Name').size().to_dict()
+
+if collection_scan_counts:
+    total_scans_all_collections = sum(collection_scan_counts.values())
+    if total_scans_all_collections > 0:
+        for collection, count in collection_scan_counts.items():
+            share_percentage = (count / total_scans_all_collections) * 100
+            farmer_name = farmer_names.get(collection, 'Unknown Farmer')
+            data_share_text += f"{farmer_name}: {share_percentage:.2f}%<br>"
 
 # Styled box for comments
 most_active_device = "Sloth's Katana"  # Placeholder value
