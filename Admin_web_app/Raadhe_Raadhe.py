@@ -179,8 +179,8 @@ if collections:
         if collection_scan_counts.sum() > 0:
             for collection, count in collection_scan_counts.items():
                 share_percentage = (count / collection_scan_counts.sum()) * 100
-                farmer_name = farmer_names.get(collection, 'Unknown Farmer')
-                data_share_text += f"{farmer_name}: {share_percentage:.2f}%<br>"
+                collection_name = collection
+                data_share_text += f"{collection_name}: {share_percentage:.2f}%<br>"
 
         #   Example placeholders for other statistics
         most_active_device = "Sloth's Katana"  # You might want to calculate this
