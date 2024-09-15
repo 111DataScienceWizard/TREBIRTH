@@ -262,9 +262,9 @@ if collections:
                     healthy_values = device_data['Total Healthy Scan']
                     infected_values = device_data['Total Infected Scan']
 
-                   # Initialize color index
-                   color_index_healthy = 0
-                   color_index_infected = 0
+                    # Initialize color index
+                    color_index_healthy = 0
+                    color_index_infected = 0
                     # Plot healthy scans
                     fig.add_trace(go.Bar(
                         x=[d.strftime('%b %d') for d in dates],
