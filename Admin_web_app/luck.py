@@ -27,6 +27,35 @@ from collection_8 import collection_8_data
 from collection_9 import collection_9_data
 from collection_10 import collection_10_data
 from collection_11 import collection_11_data
+
+def exponential_backoff(retries):
+    base_delay = 1
+    max_delay = 60
+    delay = base_delay * (2 ** retries) + random.uniform(0, 1)
+    return min(delay, max_delay)
+
+def get_firestore_data(query):
+    retries = 0
+    max_retries = 10
+    while retries < max_retries:
+        try:
+            results = query.stream()
+            return list(results)
+        except ResourceExhausted as e:
+            st.warning(f"Quota exceeded, retrying... (attempt {retries + 1})")
+            time.sleep(exponential_backoff(retries))
+            retries += 1
+        except RetryError as e:
+            st.warning(f"Retry error: {e}, retrying... (attempt {retries + 1})")
+            time.sleep(exponential_backoff(retries))
+            retries += 1
+        except Exception as e:
+            st.error(f"An error occurred: {e}")
+            break
+    raise Exception("Max retries exceeded")
+
+
+
 # Define the collection data mapping
 collection_data = {
     'collection_1': collection_1_data,
