@@ -259,7 +259,7 @@ if collections:
                     
                     # Plot healthy scans
                     fig.add_trace(go.Bar(
-                        x=dates,
+                        x=[d.strftime('%b %d') for d in dates],
                         y=healthy_values,
                         name=f'{device_name} - Healthy',
                         marker=dict(color='#00FF00'),  # Green for healthy
@@ -267,7 +267,7 @@ if collections:
 
                     # Plot infected scans
                     fig.add_trace(go.Bar(
-                        x=dates,
+                        x=[d.strftime('%b %d') for d in dates],
                         y=infected_values,
                         name=f'{device_name} - Infected',
                         marker=dict(color='#FF0000'),  # Red for infected
