@@ -345,9 +345,9 @@ if collections:
                 filtered_data = df[df['Date of Scans'].isin(selected_dates)]
         
              # Loop over each selected collection and calculate the values individually
-             for collection in collections:
+                for collection in collections:
                  # Filter data specific to the current collection and selected dates
-                 collection_filtered_data = filtered_data[filtered_data['Collection Name'] == collection]
+                    collection_filtered_data = filtered_data[filtered_data['Collection Name'] == collection]
 
                     # Initialize counts for the current collection
                     healthy_count = collection_filtered_data['Total Healthy Scan'].sum()
