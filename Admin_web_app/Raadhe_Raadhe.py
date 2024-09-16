@@ -475,7 +475,7 @@ if collections:
                 fig.update_layout(
                     barmode='group',  # Group healthy and infected bars side by side
                     #bargap=0.2,  # Gap between different devices
-                    title_text=f'Device Scan Counts by Date',
+                    title_text=f'{farmer_name} -Device Scan Counts by Date',
                     xaxis_title="Date",
                     yaxis_title="Number of Scans",
                     font=dict(color='white'),  # White font for dark theme
