@@ -189,7 +189,7 @@ if collections:
         #   Example placeholders for other statistics
         most_active_device = "Sloth's Katana"  # You might want to calculate this
         least_active_device = "Borer_blade_2"  # You might want to calculate this
-        total_infected_trees = "987"
+        total_infected_trees = filtered_data['Total Infected Trees'].sum()
         most_infected_plot = "Ramesh Kapre"  # You might want to calculate this
         least_infected_plot = "Arvind Khode"  # You might want to calculate this
         
@@ -205,9 +205,9 @@ if collections:
 
             # Iterate through selected collections to get healthy and infected counts
             for collection in collections:
-                collection_filtered_data = filtered_data[filtered_data['Device Name'] == collection]
-                healthy_sum = collection_filtered_data['Total Healthy Scan'].sum()
-                infected_sum = collection_filtered_data['Total Infected Scan'].sum()
+                data = collection_data[collection]
+                healthy_sum = sum(item['Total Healthy Scan'] for item in data)
+                infected_sum = sum(item['Total Infected Scan'] for item in data)
                 healthy_counts.append(healthy_sum)
                 infected_counts.append(infected_sum)
                 
@@ -344,32 +344,32 @@ if collections:
             # Filter the data by the selected dates
                 filtered_data = df[df['Date of Scans'].isin(selected_dates)]
         
-             # Loop over each selected collection and calculate the values individually
+             # Display the filtered data in the desired format
                 for collection in collections:
-                 # Filter data specific to the current collection and selected dates
-                    collection_filtered_data = filtered_data[filtered_data['Collection Name'] == collection]
-
-                    # Initialize counts for the current collection
-                    healthy_count = collection_filtered_data['Total Healthy Scan'].sum()
-                    infected_count = collection_filtered_data['Total Infected Scan'].sum()
-                    total_scans = healthy_count + infected_count
-
-                    total_healthy_trees = collection_filtered_data['Total Healthy Trees'].sum()
-                    total_infected_trees = collection_filtered_data['Total Infected Trees'].sum()
-
+                    collection_data = df[df['Date of Scans'].isin(selected_dates)]
+            
+                    # Initialize counts
+                    healthy_count = 0
+                    infected_count = 0
+                    total_scans = 0
+            
                     # Initialize device data storage
                     device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
             
-                    for index, row in collection_filtered_data.iterrows():
+                    for index, row in collection_data.iterrows():
                         inf_stat = 'Healthy' if row['Total Healthy Scan'] > 0 else 'Infected'
                         device_name = row['Device Name']
                         date_key = row['Date of Scans']
                 
                         if inf_stat == 'Healthy':
+                            healthy_count += row['Total Healthy Scan']
                             device_data[device_name][date_key]['Healthy'] += row['Total Healthy Scan']
                         elif inf_stat == 'Infected':
+                            infected_count += row['Total Infected Scan']
                             device_data[device_name][date_key]['Infected'] += row['Total Infected Scan']
-                    
+            
+                    total_scans = healthy_count + infected_count
+            
                     # Layout for collection details
                     col1, col2, col3 = st.columns(3)
             
