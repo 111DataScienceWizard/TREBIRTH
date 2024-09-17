@@ -425,7 +425,7 @@ if collections:
                                     height=350
                                 )
                                 st.plotly_chart(fig)
-
+                        fig = go.Figure()
                         if selected_dates:
                             # Display the filtered data for each individual collection
                             for collection in collections:
@@ -452,7 +452,7 @@ if collections:
                                         device_data[device_name][scan_date]['healthy'] += entry['Total Healthy Scan']
 
                                     # Create a single bar chart for this collection
-                                    fig = go.Figure()
+                                    
 
                                     # Generate a unique color for each device
                                     device_colors = px.colors.qualitative.Plotly[:len(device_data)]  # Predefined color palette for devices
