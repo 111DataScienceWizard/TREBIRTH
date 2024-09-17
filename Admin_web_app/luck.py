@@ -425,64 +425,49 @@ if collections:
                                     height=350
                                 )
                                 st.plotly_chart(fig)
-                        
-                        for collection in collections:
-                            if collection in collection_summaries:
-                                summary = collection_summaries[collection]
-                                data = load_collection(collection)
-                                filtered_data = [entry for entry in data if pd.to_datetime(entry['Date of Scans']).date() in selected_dates]
-
-                                # Prepare data for plotting bar chart
-                                device_data = {}
-                                for entry in filtered_data:
-                                    device_name = entry['Device Name']
-                                    if device_name not in device_data:
-                                        device_data[device_name] = {'infected': 0, 'healthy': 0}
-                                    device_data[device_name]['infected'] += entry['Total Infected Scan']
-                                    device_data[device_name]['healthy'] += entry['Total Healthy Scan']
-
-                                # Bar chart plotting
-                                device_names = []
-                                healthy_counts = []
-                                infected_counts = []
-
-                                for device, counts in device_data.items():
-                                    device_names.append(device)
-                                    infected_counts.append(counts['infected'])
-                                    healthy_counts.append(counts['healthy'])
-
-                                # Create bar chart for healthy and infected scans
-                                fig = go.Figure()
-
-                                # Add healthy scan bars
-                                fig.add_trace(go.Bar(
-                                    x=device_names,
-                                    y=healthy_counts,
-                                    name='Healthy Scans',
-                                    marker_color='green'
-                                ))
-
-                                # Add infected scan bars
-                                fig.add_trace(go.Bar(
-                                    x=device_names,
-                                    y=infected_counts,
-                                    name='Infected Scans',
-                                    marker_color='red'
-                                ))
-
-                                # Update chart layout
-                                fig.update_layout(
-                                    barmode='group',
-                                    title_text=f"{farmer_names[collection]}: Scan Distribution by Device",
-                                    xaxis_title="Devices",
-                                    yaxis_title="Number of Scans",
-                                    legend_title="Scan Type",
-                                    paper_bgcolor='rgba(0,0,0,0)',
-                                    plot_bgcolor='rgba(0,0,0,0)',
-                                    font=dict(color='white'),
-                                    height=400,
-                                    width=800
-                                )
-
-                                # Show the chart in the app
-                                st.plotly_chart(fig)
+                                
+                        # If selected dates are available
+                        # If dates are selected
+                        if selected_dates:
+                            # Initialize the figure for the bar chart
+                            fig = go.Figure()
+                            
+                            for collection in collections:
+                                collection_data_filtered = df[(df['Date of Scans'].isin(selected_dates)) & (df['Device Name'].isin(
+                                    [item['Device Name'] for item in load_collection(collection)]
+                                ))]
+                                
+                                device_names = collection_data_filtered['Device Name'].unique()
+                                for device_name in device_names:
+                                    device_data = collection_data_filtered[collection_data_filtered['Device Name'] == device_name]
+                                    
+                                    dates = device_data['Date of Scans']
+                                    healthy_values = device_data['Total Healthy Scan']
+                                    infected_values = device_data['Total Infected Scan']
+                                    
+                                    fig.add_trace(go.Bar(
+                                        x=[d.strftime('%b %d') for d in dates],
+                                        y=healthy_values,
+                                        name=f'{device_name} - Healthy ({collection})',
+                                        marker=dict(color='#00FF00'),  # Green for healthy
+                                    ))
+                                    
+                                    fig.add_trace(go.Bar(
+                                        x=[d.strftime('%b %d') for d in dates],
+                                        y=infected_values,
+                                        name=f'{device_name} - Infected ({collection})',
+                                        marker=dict(color='#FF6347'),  # Red for infected
+                                    ))
+                            
+                            fig.update_layout(
+                                title_text="Scans by Device and Date",
+                                xaxis_title="Date",
+                                yaxis_title="Number of Scans",
+                                barmode='group',
+                                font=dict(color='white'),
+                                paper_bgcolor='rgba(0,0,0,0)',
+                                plot_bgcolor='rgba(0,0,0,0)',
+                                height=300
+                            )
+                            
+                            st.plotly_chart(fig, use_container_width=True)
