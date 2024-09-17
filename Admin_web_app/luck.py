@@ -347,7 +347,7 @@ if collections:
                     total_infected_trees = sum(entry['Total Infected Trees'] for entry in filtered_data)
             
                     collection_summaries[collection] = {
-                        'total_trees': total_tress,
+                        'total_trees': total_trees,
                         'total_scans': total_scans,
                         'total_healthy': total_healthy,
                         'total_infected': total_infected,
