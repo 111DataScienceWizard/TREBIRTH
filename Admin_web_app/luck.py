@@ -508,7 +508,7 @@ if collections:
                                     ),
                                     height=400,  # Chart height
                                     xaxis=dict(tickformat='%Y-%m-%d'),  # Display only the date in 'YYYY-MM-DD' format
-                                 )
+                                )
 
-                                 # Plot the figure in Streamlit
-                                 st.plotly_chart(fig)
+                                # Plot the figure in Streamlit
+                                st.plotly_chart(fig)
