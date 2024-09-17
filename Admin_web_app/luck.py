@@ -210,7 +210,7 @@ if collections:
         #   Example placeholders for other statistics
         most_active_device = "Sloth's Katana"  # You might want to calculate this
         least_active_device = "Borer_blade_2"  # You might want to calculate this
-        total_infected_trees = filtered_data['Total Infected Trees'].sum()
+        total_infected_trees = "987"
         most_infected_plot = "Ramesh Kapre"  # You might want to calculate this
         least_infected_plot = "Arvind Khode"  # You might want to calculate this
         
