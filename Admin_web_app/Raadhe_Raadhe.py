@@ -426,27 +426,33 @@ if collections:
                                 )
                                 st.plotly_chart(fig)
 
-                        fig = go.Figure()
                         if selected_dates:
+                            # Display the filtered data for each individual collection
                             for collection in collections:
+                                # Load data for the current collection
                                 data = load_collection(collection)
+
+                                # Filter the data to only include the selected unique dates for this collection
                                 filtered_data = [entry for entry in data if pd.to_datetime(entry['Date of Scans']).date() in selected_dates]
 
-                                
                                 if filtered_data:
+                                    # Convert filtered data to DataFrame
                                     filtered_df = pd.DataFrame(filtered_data)
 
+                                    # Prepare data for plotting the bar chart
                                     device_data = {}
                                     for entry in filtered_data:
                                         device_name = entry['Device Name']
                                         scan_date = pd.to_datetime(entry['Date of Scans']).date()
-                                    
-               
+
                                         if device_name not in device_data:
-                                        device_data[device_name] = {date: {'infected': 0, 'healthy': 0} for date in selected_dates}
+                                            device_data[device_name] = {date: {'infected': 0, 'healthy': 0} for date in selected_dates}
 
                                         device_data[device_name][scan_date]['infected'] += entry['Total Infected Scan']
                                         device_data[device_name][scan_date]['healthy'] += entry['Total Healthy Scan']
+
+                                    # Create a single bar chart for this collection
+                                    fig = go.Figure()
 
                                     # Generate a unique color for each device
                                     device_colors = px.colors.qualitative.Plotly[:len(device_data)]  # Predefined color palette for devices
@@ -464,7 +470,7 @@ if collections:
                                             y=healthy_counts,
                                             name=f'{device} - Healthy Scans',
                                             marker_color=color_mapping[device],
-                                            offsetgroup=device,
+                                            offsetgroup=device,  # Group bars for the same device side by side
                                         ))
 
                                         # Add infected scan bars
@@ -473,13 +479,13 @@ if collections:
                                             y=infected_counts,
                                             name=f'{device} - Infected Scans',
                                             marker_color=color_mapping[device],
-                                            opacity=0.6,
+                                            opacity=0.6,  # Make infected bars slightly transparent
                                             offsetgroup=device,
                                         ))
 
                                     # Update chart layout
                                     fig.update_layout(
-                                        barmode='group',
+                                        barmode='group',  # Group the bars (infected and healthy) side by side for each device
                                         title_text=f"{collection} - Scan Distribution by Device and Date",
                                         xaxis_title="Dates",
                                         yaxis_title="Number of Scans",
@@ -490,5 +496,5 @@ if collections:
                                         height=400
                                     )
 
-                                    # Show the chart in the app
-                                    st.plotly_chart(fig)
+                                    # Show the chart in the app for the current collection
+                                    st.plotly_chart(fig, use_container_width=True)
