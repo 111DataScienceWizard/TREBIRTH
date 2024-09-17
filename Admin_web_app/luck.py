@@ -342,11 +342,17 @@ if collections:
                     total_healthy = sum(entry['Total Healthy Scan'] for entry in filtered_data)
                     total_infected = sum(entry['Total Infected Scan'] for entry in filtered_data)
                     total_scans = sum(entry['Total Scan'] for entry in filtered_data)
+                    total_trees = sum(entry['Total Trees'] for entry in filtered_data)
+                    total_healthy_trees = sum(entry['Total Healthy Trees'] for entry in filtered_data)
+                    total_infected_trees = sum(entry['Total Infected Trees'] for entry in filtered_data)
             
                     collection_summaries[collection] = {
+                        'total_trees': total_tress,
                         'total_scans': total_scans,
                         'total_healthy': total_healthy,
-                        'total_infected': total_infected
+                        'total_infected': total_infected,
+                        'total_healthy_trees': total_healthy_trees,
+                        'total_infected_trees': total_infected_trees
                     }
         
                 # Display the filtered data in the desired format
@@ -354,8 +360,11 @@ if collections:
                     if collection in collection_summaries:
                         summary = collection_summaries[collection]
                         total_scans = summary['total_scans']
+                        total_trees = summary['total_trees']
                         total_healthy = summary['total_healthy']
                         total_infected = summary['total_infected']
+                        total_healthy_trees = summary['total_healthy_trees']
+                        total_infected_trees = summary['total_infected_trees']
 
                         # Layout for collection details
                         col1, col2, col3 = st.columns(3)
@@ -390,9 +399,9 @@ if collections:
                                     margin: 10px auto;
                                     width: 80%;'>
                                     <br>
-                                    <b>Total Scans:</b> {total_scans}<br>
-                                    <b>Total Healthy Scans:</b> {total_healthy}<br>
-                                    <b>Total Infected Scans:</b> {total_infected}<br>
+                                    <b>Total Scans:</b> {total_trees}<br>
+                                    <b>Total Healthy Scans:</b> {total_healthy_trees}<br>
+                                    <b>Total Infected Scans:</b> {total_infected_trees}<br>
                                     <b>Farm Location:</b> {location}<br>
                                     <b>Farm Age:</b> {farm_age}<br>
                                     <b>Plot Size:</b> {plot_size}
