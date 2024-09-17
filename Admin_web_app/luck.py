@@ -181,16 +181,32 @@ if collections:
             infected_counts.append(total_infected)
 
 
-        # Calculate data share by each collection
-        collection_scan_counts = filtered_data.groupby('Device Name')['Total Scan'].sum()
-        data_share_text = ""
-        
-        if collection_scan_counts.sum() > 0:
-            for collection, count in collection_scan_counts.items():
-                share_percentage = (count / collection_scan_counts.sum()) * 100
-                collection_name = collection
-                data_share_text += f"{collection_name}: {share_percentage:.2f}%<br>"
+        if filtered_data:
+            filtered_df = pd.DataFrame(filtered_data)
 
+         # Calculate total infected and healthy scans
+            total_infected = filtered_df['Total Infected Scan'].sum()
+            total_healthy = filtered_df['Total Healthy Scan'].sum()
+
+            # Calculate infection percentage
+            if (total_infected + total_healthy) > 0:
+                infection_percentage = (total_infected / (total_infected + total_healthy)) * 100
+                healthy_percentage = 100 - infection_percentage
+            else:
+                infection_percentage = 0
+                healthy_percentage = 0
+        
+            # Calculate data share by each device
+            if 'Device Name' in filtered_df.columns:
+                collection_scan_counts = filtered_df.groupby('Device Name')['Total Scan'].sum()
+
+                data_share_text = ""
+                if collection_scan_counts.sum() > 0:
+                    for device, count in collection_scan_counts.items():
+                        share_percentage = (count / collection_scan_counts.sum()) * 100
+                        device_name = device
+                        data_share_text += f"{device_name}: {share_percentage:.2f}%<br>"
+                        
         #   Example placeholders for other statistics
         most_active_device = "Sloth's Katana"  # You might want to calculate this
         least_active_device = "Borer_blade_2"  # You might want to calculate this
