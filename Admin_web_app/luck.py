@@ -399,9 +399,9 @@ if collections:
                                     margin: 10px auto;
                                     width: 80%;'>
                                     <br>
-                                    <b>Total Scans:</b> {total_trees}<br>
-                                    <b>Total Healthy Scans:</b> {total_healthy_trees}<br>
-                                    <b>Total Infected Scans:</b> {total_infected_trees}<br>
+                                    <b>Total Scans:</b> {total_scans}<br>
+                                    <b>Total Healthy Scans:</b> {total_healthy}<br>
+                                    <b>Total Infected Scans:</b> {total_infected}<br>
                                     <b>Farm Location:</b> {location}<br>
                                     <b>Farm Age:</b> {farm_age}<br>
                                     <b>Plot Size:</b> {plot_size}
