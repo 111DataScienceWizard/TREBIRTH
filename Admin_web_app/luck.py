@@ -188,10 +188,10 @@ if collections:
             
             # Share data by each device
             if collection_scan_counts.sum() > 0:
-            for collection, count in collection_scan_counts.items():
-                share_percentage = (count / collection_scan_counts.sum()) * 100
-                collection_name = collection
-                data_share_text += f"{collection_name}: {share_percentage:.2f}%<br>"
+                for collection, count in collection_scan_counts.items():
+                    share_percentage = (count / collection_scan_counts.sum()) * 100
+                    collection_name = collection
+                    data_share_text += f"{collection_name}: {share_percentage:.2f}%<br>"
             # Example placeholders for additional metrics
             most_active_device = "Sloth's Katana"
             least_active_device = "Borer_blade_2"
