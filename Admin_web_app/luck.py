@@ -157,55 +157,31 @@ if collections:
         help="Select one or more dates to filter data."
     )
 
-    if selected_dates:
+    if filtered_data:
+        filtered_df = pd.DataFrame(filtered_data)
 
-        # Initialize lists to store healthy and infected counts
-        healthy_counts = []
-        infected_counts = []
-        farmer_names_list = [farmer_names.get(collection, 'Unknown Farmer') for collection in collections]
-    
+        # Calculate total infected and healthy scans
+        total_infected = filtered_df['Total Infected Scan'].sum()
+        total_healthy = filtered_df['Total Healthy Scan'].sum()
+
+        # Calculate infection percentage
+        if (total_infected + total_healthy) > 0:
+            infection_percentage = (total_infected / (total_infected + total_healthy)) * 100
+            healthy_percentage = 100 - infection_percentage
+        else:
+            infection_percentage = 0
+            healthy_percentage = 0
         
-        # Iterate over the selected collections
-        for collection in collections:
-            data = collection_data[collection] 
-            
-            # Filter data by the selected dates
-            filtered_data = [entry for entry in data if pd.to_datetime(entry['Date of Scans']).date() in selected_dates]
-        
-            # Calculate total healthy and infected scans for this collection
-            total_healthy = sum(entry['Total Healthy Scan'] for entry in filtered_data)
-            total_infected = sum(entry['Total Infected Scan'] for entry in filtered_data)
-        
-            # Append the totals to the respective lists
-            healthy_counts.append(total_healthy)
-            infected_counts.append(total_infected)
+        # Calculate data share by each device
+        if 'Device Name' in filtered_df.columns:
+            collection_scan_counts = filtered_df.groupby('Device Name')['Total Scan'].sum()
 
-
-        if filtered_data:
-            filtered_df = pd.DataFrame(filtered_data)
-
-         # Calculate total infected and healthy scans
-            total_infected = filtered_df['Total Infected Scan'].sum()
-            total_healthy = filtered_df['Total Healthy Scan'].sum()
-
-            # Calculate infection percentage
-            if (total_infected + total_healthy) > 0:
-                infection_percentage = (total_infected / (total_infected + total_healthy)) * 100
-                healthy_percentage = 100 - infection_percentage
-            else:
-                infection_percentage = 0
-                healthy_percentage = 0
-        
-            # Calculate data share by each device
-            if 'Device Name' in filtered_df.columns:
-                collection_scan_counts = filtered_df.groupby('Device Name')['Total Scan'].sum()
-
-                data_share_text = ""
-                if collection_scan_counts.sum() > 0:
-                    for device, count in collection_scan_counts.items():
-                        share_percentage = (count / collection_scan_counts.sum()) * 100
-                        device_name = device
-                        data_share_text += f"{device_name}: {share_percentage:.2f}%<br>"
+            data_share_text = ""
+            if collection_scan_counts.sum() > 0:
+                for device, count in collection_scan_counts.items():
+                    share_percentage = (count / collection_scan_counts.sum()) * 100
+                    device_name = device
+                    data_share_text += f"{device_name}: {share_percentage:.2f}%<br>"
                         
         #   Example placeholders for other statistics
         most_active_device = "Sloth's Katana"  # You might want to calculate this
