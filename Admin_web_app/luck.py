@@ -427,8 +427,8 @@ if collections:
                                 st.plotly_chart(fig)
 
                     # Plot vertical bar chart for device scan counts
-                    
-
+            
+                    filtered_data = filtered_data.tolist() if isinstance(filtered_data, np.ndarray) else filtered_data
                     # Filter data based on the selected collection and selected dates
                     device_data = {}
                     for entry in filtered_data:
@@ -468,7 +468,6 @@ if collections:
                             y=healthy_count,
                             name=f'{device_name} - Healthy',
                             marker=dict(color=color_palette_healthy[i % len(color_palette_healthy)]),  # Assign unique healthy color
-                                #width=0.35,  # Bar width
                             offsetgroup=device_name,  # Group by device
                             hoverinfo='y'
                             ))
