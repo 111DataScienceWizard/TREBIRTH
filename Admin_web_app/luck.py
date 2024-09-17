@@ -158,23 +158,28 @@ if collections:
     )
 
     if selected_dates:
-        # Filter the data by the selected dates
-        filtered_data = df[df['Date of Scans'].isin(selected_dates)]
-        
-        # Calculate percentages for combined collection
-        total_healthy = filtered_data['Total Healthy Scan'].sum()
-        total_infected = filtered_data['Total Infected Scan'].sum()
 
-        # Calculate percentages for combined collection
-        total_healthy_trees = filtered_data['Total Healthy Trees'].sum()
-        total_infected_trees = filtered_data['Total Infected Trees'].sum()
+        # Initialize lists to store healthy and infected counts
+        healthy_counts = []
+        infected_counts = []
+        farmer_names_list = [farmer_names.get(collection, 'Unknown Farmer') for collection in collections]
+    
         
-        if total_healthy + total_infected > 0:
-            infection_percentage = (total_infected / (total_healthy + total_infected)) * 100
-            healthy_percentage = (total_healthy / (total_healthy + total_infected)) * 100
-        else:
-            infection_percentage = 0
-            healthy_percentage = 0
+        # Iterate over the selected collections
+        for collection in collections:
+            data = collection_data[collection] 
+            
+            # Filter data by the selected dates
+            filtered_data = [entry for entry in data if pd.to_datetime(entry['Date of Scans']).date() in selected_dates]
+        
+            # Calculate total healthy and infected scans for this collection
+            total_healthy = sum(entry['Total Healthy Scan'] for entry in filtered_data)
+            total_infected = sum(entry['Total Infected Scan'] for entry in filtered_data)
+        
+            # Append the totals to the respective lists
+            healthy_counts.append(total_healthy)
+            infected_counts.append(total_infected)
+
 
         # Calculate data share by each collection
         collection_scan_counts = filtered_data.groupby('Device Name')['Total Scan'].sum()
@@ -196,52 +201,58 @@ if collections:
         # Layout for the first row (2 columns)
         col1, col2 = st.columns(2)
 
-        # Bar chart showing collections with most infected scans
-        if collections:
-            farmer_names_list = [farmer_names.get(collection, 'Unknown Farmer') for collection in collections]
-            # Calculate healthy and infected counts for each collection
+        if selected_dates:
+         # Initialize lists to store healthy and infected counts
             healthy_counts = []
             infected_counts = []
-
-            # Iterate through selected collections to get healthy and infected counts
+            farmer_names_list = [farmer_names.get(collection, 'Unknown Farmer') for collection in collections]
+    
+            # Iterate through the selected collections
             for collection in collections:
-                data = collection_data[collection]
-                healthy_sum = sum(item['Total Healthy Scan'] for item in data)
-                infected_sum = sum(item['Total Infected Scan'] for item in data)
-                healthy_counts.append(healthy_sum)
-                infected_counts.append(infected_sum)
+                data = collection_data[collection]  # Load data for the collection
+        
+                # Filter data by the selected dates
+                filtered_data = [entry for entry in data if pd.to_datetime(entry['Date of Scans']).date() in selected_dates]
+        
+                # Calculate total healthy and infected scans for this collection
+                total_healthy = sum(entry['Total Healthy Scan'] for entry in filtered_data)
+                total_infected = sum(entry['Total Infected Scan'] for entry in filtered_data)
+        
+                # Append the totals to the respective lists
+                healthy_counts.append(total_healthy)
+                infected_counts.append(total_infected)
                 
-            fig = go.Figure()
+                fig = go.Figure()
 
-            # Add healthy counts for each collection
-            fig.add_trace(go.Bar(
-                x=farmer_names_list,
-                y=healthy_counts,
-                name='Healthy',
-                marker=dict(color='#00FF00'),  # Green for healthy
-            ))
+                # Add healthy counts for each collection
+                fig.add_trace(go.Bar(
+                    x=farmer_names_list,
+                    y=healthy_counts,
+                    name='Healthy',
+                    marker=dict(color='#00FF00'),  # Green for healthy
+                ))
 
-            # Add infected counts for each collection
-            fig.add_trace(go.Bar(
-                x=farmer_names_list,
-                y=infected_counts,
-                name='Infected',
-                marker=dict(color='#FF0000'),  # Red for infected
-            ))
+                # Add infected counts for each collection
+                fig.add_trace(go.Bar(
+                    x=farmer_names_list,
+                    y=infected_counts,
+                    name='Infected',
+                    marker=dict(color='#FF0000'),  # Red for infected
+                ))
 
-            fig.update_layout(
-                title_text="Healthy and Infected Scans by Collection",
-                xaxis_title="Collection",
-                yaxis_title="Number of Scans",
-                barmode='group',  # Side-by-side grouping
-                bargap=0.2,  # Gap between bars (adjust as needed)
-                font=dict(color='white'),
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                height=300
-            )
+                fig.update_layout(
+                    title_text="Healthy and Infected Scans by Collection",
+                    xaxis_title="Collection",
+                    yaxis_title="Number of Scans",
+                    barmode='group',  # Side-by-side grouping
+                    bargap=0.2,  # Gap between bars (adjust as needed)
+                    font=dict(color='white'),
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    height=300
+                )
 
-            col1.plotly_chart(fig, use_container_width=True)
+                col1.plotly_chart(fig, use_container_width=True)
 
         # Layout for the second row (Vertical Bar Chart)
         if selected_dates:
