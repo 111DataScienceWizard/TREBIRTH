@@ -428,7 +428,6 @@ if collections:
                                 
                         # If selected dates are available
                         if selected_dates:  
-                            for collection in collections:  
                                 data = load_collection(collection)  
                                 filtered_data = [entry for entry in data if pd.to_datetime(entry['Date of Scans']).date() in selected_dates]  
                   
