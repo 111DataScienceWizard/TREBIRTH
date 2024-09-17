@@ -60,19 +60,13 @@ def get_recent_scans(db, num_scans=2):
     )
     radar_data_list = []
     timestamps = []
-    index_data = []
     for doc in docs:
         data_dict = doc.to_dict()
         radar_raw = data_dict.get('RadarRaw', [])
         timestamp = data_dict.get('timestamp')
-        index_radar = data_dict.get('IndexRadar', [])
         radar_data_list.append(radar_raw)
         timestamps.append(timestamp)
-        if index_radar:
-            index_data.append({
-                'IndexRadar': index_radar
-            })
-    return radar_data_list, timestamps, index_data
+    return radar_data_list, timestamps
 
 
 # Insert missing packets
@@ -246,15 +240,16 @@ def main():
         # Time domain plot for multiple scans
         with col1:
             time_fig = plot_multiple_time_domain([df['Radar'].values for df in processed_data_list], timestamps)
-            
+            st.pyplot(time_fig)
         # Frequency domain plot for multiple scans
         with col2:
             freq_fig = plot_multiple_frequency_domain([df['Radar'].values for df in processed_data_list], timestamps)
-            
+            st.pyplot(freq_fig)
         # Statistics plot for multiple scans
         with col3:
             stats_dfs = [calculate_statistics(df) for df in processed_data_list]
             stats_fig = plot_multiple_statistics(stats_dfs, timestamps)
+            st.pyplot(stats_fig)
     else:
         st.error("No data available in the 'Dananjay Yadav' collection.")
 
