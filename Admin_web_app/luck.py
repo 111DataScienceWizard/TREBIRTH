@@ -187,11 +187,10 @@ if collections:
             healthy_percentage = 100 - infection_percentage if total_scans > 0 else 0
             
             # Share data by each device
-            if collection_scan_counts.sum() > 0:
-                for collection, count in collection_scan_counts.items():
-                    share_percentage = (count / collection_scan_counts.sum()) * 100
-                    collection_name = collection
-                    data_share_text += f"{collection_name}: {share_percentage:.2f}%<br>"
+            if 'Device Name' in filtered_df.columns:
+                device_scan_counts = filtered_df.groupby('Device Name')['Total Scan'].sum()
+                data_share_text = "".join([f"{device}: {count / device_scan_counts.sum() * 100:.2f}%<br>" for device, count in device_scan_counts.items()])
+            
             # Example placeholders for additional metrics
             most_active_device = "Sloth's Katana"
             least_active_device = "Borer_blade_2"
