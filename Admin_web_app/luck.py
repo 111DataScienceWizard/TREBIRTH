@@ -427,38 +427,56 @@ if collections:
                                 st.plotly_chart(fig)
 
                     # Plot vertical bar chart for device scan counts
+                    
+
+                    # Filter data based on the selected collection and selected dates
+                    device_data = {}
+                    for entry in filtered_data:
+                        device_name = entry['Device Name']
+                        scan_date = entry['Date of Scans']
+                        if device_name not in device_data:
+                            device_data[device_name] = {'Healthy': {}, 'Infected': {}}
+    
+                        # Add up healthy and infected scans by date
+                        if scan_date not in device_data[device_name]['Healthy']:
+                            device_data[device_name]['Healthy'][scan_date] = 0
+                            device_data[device_name]['Infected'][scan_date] = 0
+    
+                        device_data[device_name]['Healthy'][scan_date] += entry['Total Healthy Scan']
+                        device_data[device_name]['Infected'][scan_date] += entry['Total Infected Scan']
+
+                        # Extract all unique dates
+                    dates = sorted({entry['Date of Scans'] for entry in filtered_data})
                     fig = go.Figure()
 
-                    # Extract device names and dates from the current data structure
-                    device_names = list(device_data.keys())
-                    dates = sorted(set(date for device in device_data.values() for date in device.keys()))
-
-                    # Define a color palette for healthy and infected bars
+                    # Define color palettes for healthy and infected bars
                     color_palette_healthy = ['#00FF00', '#1E90FF', '#FFA500', '#FFFF00', '#800080', '#FF69B4']  # Healthy colors
                     color_palette_infected = ['#FF6347', '#DC143C', '#8B0000', '#FF4500', '#FF1493', '#C71585']  # Infected colors
+ 
+                    # Iterate over each device and plot healthy and infected scans
+                    for i, device_name in enumerate(device_data.keys()):
+                        healthy_counts = []
+                        infected_counts = []
 
-                    # Iterate through devices and dates to plot healthy and infected scans
-                    for i, device_name in enumerate(device_names):
                         for date in dates:
-                        # Retrieve healthy and infected scan counts for the given date and device
-                            healthy_count = device_data[device_name].get(date, {'Healthy': 0})['Healthy']
-                            infected_count = device_data[device_name].get(date, {'Infected': 0})['Infected']
+                            healthy_counts.append(device_data[device_name]['Healthy'].get(date, 0))
+                            infected_counts.append(device_data[device_name]['Infected'].get(date, 0))
 
-                            # Add bar for healthy scans
-                            fig.add_trace(go.Bar(
-                                x=[date],  # Date for healthy scans
-                                y=[healthy_count],
-                                name=f'{device_name} - Healthy',
-                                marker=dict(color=color_palette_healthy[i % len(color_palette_healthy)]),  # Assign unique healthy color
+                        # Add bar for healthy scans
+                        fig.add_trace(go.Bar(
+                            x=dates,   # Date for healthy scans
+                            y=healthy_count,
+                            name=f'{device_name} - Healthy',
+                            marker=dict(color=color_palette_healthy[i % len(color_palette_healthy)]),  # Assign unique healthy color
                                 #width=0.35,  # Bar width
-                                offsetgroup=device_name,  # Group by device
-                                hoverinfo='y'
+                            offsetgroup=device_name,  # Group by device
+                            hoverinfo='y'
                             ))
 
                             # Add bar for infected scans
                             fig.add_trace(go.Bar(
-                                x=[date],  # Date for infected scans
-                                y=[infected_count],
+                                x=dates,  # Date for infected scans
+                                y=infected_count,
                                 name=f'{device_name} - Infected',
                                 marker=dict(color=color_palette_infected[i % len(color_palette_infected)]),  # Assign unique infected color
                                 #width=0.35,  # Same bar width as healthy
