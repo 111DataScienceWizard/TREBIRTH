@@ -432,51 +432,59 @@ if collections:
                                 data = load_collection(collection)
                                 filtered_data = [entry for entry in data if pd.to_datetime(entry['Date of Scans']).date() in selected_dates]
 
-                                # Prepare data for plotting bar chart
+                                # Prepare data for plotting the bar chart
                                 device_data = {}
+                                unique_dates = sorted(set([pd.to_datetime(entry['Date of Scans']).date() for entry in filtered_data]))
+
                                 for entry in filtered_data:
                                     device_name = entry['Device Name']
+                                    scan_date = pd.to_datetime(entry['Date of Scans']).date()
+
                                     if device_name not in device_data:
-                                        device_data[device_name] = {'infected': 0, 'healthy': 0}
-                                    device_data[device_name]['infected'] += entry['Total Infected Scan']
-                                    device_data[device_name]['healthy'] += entry['Total Healthy Scan']
+                                        device_data[device_name] = {date: {'infected': 0, 'healthy': 0} for date in unique_dates}
 
-                                # Bar chart plotting
-                                device_names = []
-                                healthy_counts = []
-                                infected_counts = []
+                                    device_data[device_name][scan_date]['infected'] += entry['Total Infected Scan']
+                                    device_data[device_name][scan_date]['healthy'] += entry['Total Healthy Scan']
 
-                                for device, counts in device_data.items():
-                                    device_names.append(device)
-                                    infected_counts.append(counts['infected'])
-                                    healthy_counts.append(counts['healthy'])
-
-                                # Create bar chart for healthy and infected scans
+                                # Plot data for one collection
                                 fig = go.Figure()
 
-                                # Add healthy scan bars
-                                fig.add_trace(go.Bar(
-                                    x=device_names,
-                                    y=healthy_counts,
-                                    name='Healthy Scans',
-                                    marker_color='green'
-                                ))
+                                # Generate a unique color for each device
+                                device_colors = px.colors.qualitative.Plotly[:len(device_data)]  # Predefined color palette for devices
+                                color_mapping = dict(zip(device_data.keys(), device_colors))
 
-                                # Add infected scan bars
-                                fig.add_trace(go.Bar(
-                                    x=device_names,
-                                    y=infected_counts,
-                                    name='Infected Scans',
-                                    marker_color='red'
-                                ))
+                                # Iterate through devices to plot bars
+                                for device, scan_data in device_data.items():
+                                    dates = list(scan_data.keys())
+                                    healthy_counts = [scan_data[date]['healthy'] for date in dates]
+                                    infected_counts = [scan_data[date]['infected'] for date in dates]
+
+                                    # Add healthy scan bars
+                                    fig.add_trace(go.Bar(
+                                        x=dates,
+                                        y=healthy_counts,
+                                        name=f'{device} - Healthy Scans',
+                                        marker_color=color_mapping[device],
+                                        offsetgroup=device,  # Group bars for same device side by side
+                                    ))
+
+                                    # Add infected scan bars
+                                    fig.add_trace(go.Bar(
+                                        x=dates,
+                                        y=infected_counts,
+                                        name=f'{device} - Infected Scans',
+                                        marker_color=color_mapping[device],
+                                        opacity=0.6,  # Different opacity for distinction
+                                        offsetgroup=device,  # Group bars for same device side by side
+                                    ))
 
                                 # Update chart layout
                                 fig.update_layout(
                                     barmode='group',
-                                    title_text=f"{farmer_names[collection]}: Scan Distribution by Device",
-                                    xaxis_title="Devices",
+                                    title_text=f"{farmer_names[collection]}: Scan Distribution by Device and Date",
+                                    xaxis_title="Dates",
                                     yaxis_title="Number of Scans",
-                                    legend_title="Scan Type",
+                                    legend_title="Device and Scan Type",
                                     paper_bgcolor='rgba(0,0,0,0)',
                                     plot_bgcolor='rgba(0,0,0,0)',
                                     font=dict(color='white'),
