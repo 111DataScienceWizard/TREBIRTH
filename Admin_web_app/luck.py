@@ -479,7 +479,7 @@ if collections:
                                     y=healthy_counts,
                                     name=f'{device_name} - Healthy',
                                     marker=dict(color=color_palette_healthy[i % len(color_palette_healthy)]),
-                                    offsetgroup=device_name,
+                                    offsetgroup=i,
                                 ))
 
                                 # Add infected scan bars
@@ -488,7 +488,7 @@ if collections:
                                     y=infected_counts,
                                     name=f'{device_name} - Infected',
                                     marker=dict(color=color_palette_infected[i % len(color_palette_infected)]),
-                                    offsetgroup=device_name,
+                                    offsetgroup=i,
                                 ))
 
                                 # Update layout for grouped bars
