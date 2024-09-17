@@ -433,7 +433,7 @@ if collections:
                         # Loop through each selected collection to create individual bar charts
                         for collection in collections:
                         # Load the data for the selected collection
-                            data = load_collection_data(collection)
+                            data = load_collection(collection)
     
                         # Filter the data based on selected dates
                             filtered_data = [entry for entry in data if pd.to_datetime(entry['Date of Scans']).date() in selected_dates]
