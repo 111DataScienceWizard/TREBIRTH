@@ -431,7 +431,10 @@ if collections:
                         if selected_dates:
                             for collection in collections:
                                 # Filter data for the current collection and selected dates
-                                collection_data_filtered = [entry for entry in load_collection(collection) if pd.to_datetime(entry['Date of Scans']).date() in selected_dates]
+                                collection_data_filtered = [
+                                    entry for entry in load_collection(collection)
+                                    if pd.to_datetime(entry['Date of Scans']).date() in selected_dates
+                                ]
                                 
                                 # Convert filtered data to DataFrame
                                 collection_df = pd.DataFrame(collection_data_filtered)
@@ -472,7 +475,10 @@ if collections:
                                     xaxis_title="Date",
                                     yaxis_title="Number of Scans",
                                     barmode='group',
-                                    xaxis=dict(tickvals=selected_dates, ticktext=[date.strftime('%Y-%m-%d') for date in selected_dates]),
+                                    xaxis=dict(
+                                        tickvals=[date for date in selected_dates], 
+                                        ticktext=[date.strftime('%Y-%m-%d') for date in selected_dates]
+                                    ),
                                     font=dict(color='white'),
                                     paper_bgcolor='rgba(0,0,0,0)',
                                     plot_bgcolor='rgba(0,0,0,0)',
