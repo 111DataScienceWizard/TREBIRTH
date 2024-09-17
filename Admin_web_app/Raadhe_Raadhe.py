@@ -430,30 +430,31 @@ if collections:
                             if collection in collection_summaries:
                                 summary = collection_summaries[collection]
                                 data = load_collection(collection)
+                                
+                                # Filter data based on selected dates
+                                selected_dates = sorted(set([pd.to_datetime(entry['Date of Scans']).date() for entry in data]))
                                 filtered_data = [entry for entry in data if pd.to_datetime(entry['Date of Scans']).date() in selected_dates]
 
                                 # Prepare data for plotting the bar chart
                                 device_data = {}
-                                unique_dates = sorted(set([pd.to_datetime(entry['Date of Scans']).date() for entry in filtered_data]))
-
                                 for entry in filtered_data:
                                     device_name = entry['Device Name']
                                     scan_date = pd.to_datetime(entry['Date of Scans']).date()
-
+                                    
                                     if device_name not in device_data:
-                                        device_data[device_name] = {date: {'infected': 0, 'healthy': 0} for date in unique_dates}
+                                        device_data[device_name] = {date: {'infected': 0, 'healthy': 0} for date in selected_dates}
 
                                     device_data[device_name][scan_date]['infected'] += entry['Total Infected Scan']
                                     device_data[device_name][scan_date]['healthy'] += entry['Total Healthy Scan']
 
-                                # Plot data for one collection
+                                # Create a single bar chart for the collection
                                 fig = go.Figure()
-
+                                
                                 # Generate a unique color for each device
                                 device_colors = px.colors.qualitative.Plotly[:len(device_data)]  # Predefined color palette for devices
                                 color_mapping = dict(zip(device_data.keys(), device_colors))
 
-                                # Iterate through devices to plot bars
+                                # Plot bars for each device
                                 for device, scan_data in device_data.items():
                                     dates = list(scan_data.keys())
                                     healthy_counts = [scan_data[date]['healthy'] for date in dates]
@@ -465,7 +466,7 @@ if collections:
                                         y=healthy_counts,
                                         name=f'{device} - Healthy Scans',
                                         marker_color=color_mapping[device],
-                                        offsetgroup=device,  # Group bars for same device side by side
+                                        offsetgroup=device,
                                     ))
 
                                     # Add infected scan bars
@@ -474,14 +475,14 @@ if collections:
                                         y=infected_counts,
                                         name=f'{device} - Infected Scans',
                                         marker_color=color_mapping[device],
-                                        opacity=0.6,  # Different opacity for distinction
-                                        offsetgroup=device,  # Group bars for same device side by side
+                                        opacity=0.6,
+                                        offsetgroup=device,
                                     ))
 
                                 # Update chart layout
                                 fig.update_layout(
                                     barmode='group',
-                                    title_text=f"{farmer_names[collection]}: Scan Distribution by Device and Date",
+                                    title_text=f"{collection} - Scan Distribution by Device and Date",
                                     xaxis_title="Dates",
                                     yaxis_title="Number of Scans",
                                     legend_title="Device and Scan Type",
