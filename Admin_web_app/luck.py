@@ -476,7 +476,7 @@ if collections:
                                     name=f'{device_name} - Healthy',
                                     marker=dict(color=color_palette_healthy[i % len(color_palette_healthy)]),
                                     offsetgroup=device_name,  
-                                    hoverindo='y'
+                                    hoverinfo='y'
                                 ))
             
                                 # Add bar for infected scans
