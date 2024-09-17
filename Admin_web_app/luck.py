@@ -470,18 +470,17 @@ if collections:
                             marker=dict(color=color_palette_healthy[i % len(color_palette_healthy)]),  # Assign unique healthy color
                             offsetgroup=device_name,  # Group by device
                             hoverinfo='y'
-                            ))
+                        ))
 
-                            # Add bar for infected scans
-                            fig.add_trace(go.Bar(
-                                x=dates,  # Date for infected scans
-                                y=infected_count,
-                                name=f'{device_name} - Infected',
-                                marker=dict(color=color_palette_infected[i % len(color_palette_infected)]),  # Assign unique infected color
-                                #width=0.35,  # Same bar width as healthy
-                                offsetgroup=device_name,  # Group by device
-                                hoverinfo='y'
-                            ))
+                         # Add bar for infected scans
+                        fig.add_trace(go.Bar(
+                            x=dates,  # Date for infected scans
+                            y=infected_count,
+                            name=f'{device_name} - Infected',
+                            marker=dict(color=color_palette_infected[i % len(color_palette_infected)]),  # Assign unique infected color
+                            offsetgroup=device_name,  # Group by device
+                            hoverinfo='y'
+                        ))
 
                     # Update layout for grouped bars, improved aesthetics, and legend placement
                     fig.update_layout(
