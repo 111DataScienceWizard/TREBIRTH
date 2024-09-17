@@ -157,91 +157,80 @@ if collections:
         help="Select one or more dates to filter data."
     )
 
+    # If dates are selected
     if selected_dates:
-        # Filter the data by the selected dates
-        filtered_data = df[df['Date of Scans'].isin(selected_dates)]
-        
-        # Calculate percentages for combined collection
-        total_healthy = filtered_data['Total Healthy Scan'].sum()
-        total_infected = filtered_data['Total Infected Scan'].sum()
+        healthy_counts = []
+        infected_counts = []
+        farmer_names_list = [farmer_names.get(collection, 'Unknown Farmer') for collection in collections]
 
-        # Calculate percentages for combined collection
-        total_healthy_trees = filtered_data['Total Healthy Trees'].sum()
-        total_infected_trees = filtered_data['Total Infected Trees'].sum()
-        
-        if total_healthy + total_infected > 0:
-            infection_percentage = (total_infected / (total_healthy + total_infected)) * 100
-            healthy_percentage = (total_healthy / (total_healthy + total_infected)) * 100
-        else:
-            infection_percentage = 0
-            healthy_percentage = 0
+        # Process data for each selected collection
+        for collection in collections:
+            data = load_collection(collection)
+            filtered_data = [entry for entry in data if pd.to_datetime(entry['Date of Scans']).date() in selected_dates]
 
-        # Calculate data share by each collection
-        collection_scan_counts = filtered_data.groupby('Device Name')['Total Scan'].sum()
-        data_share_text = ""
+            # Calculate total healthy and infected scans for the collection
+            total_healthy = sum(entry['Total Healthy Scan'] for entry in filtered_data)
+            total_infected = sum(entry['Total Infected Scan'] for entry in filtered_data)
+            
+            healthy_counts.append(total_healthy)
+            infected_counts.append(total_infected)
+            
+        # If data is filtered, generate statistics
+        if filtered_data:
+            filtered_df = pd.DataFrame(filtered_data)
+            total_healthy = filtered_df['Total Healthy Scan'].sum()
+            total_infected = filtered_df['Total Infected Scan'].sum()
+            
+            # Infection and healthy percentage calculations
+            total_scans = total_healthy + total_infected
+            infection_percentage = (total_infected / total_scans) * 100 if total_scans > 0 else 0
+            healthy_percentage = 100 - infection_percentage if total_scans > 0 else 0
+            
+            # Share data by each device
+            if 'Device Name' in filtered_df.columns:
+                device_scan_counts = filtered_df.groupby('Device Name')['Total Scan'].sum()
+                data_share_text = "".join([f"{device}: {count / device_scan_counts.sum() * 100:.2f}%<br>" for device, count in device_scan_counts.items()])
+          
+            # Example placeholders for additional metrics
+            most_active_device = "Sloth's Katana"
+            least_active_device = "Borer_blade_2"
+            total_infected_trees = "987"
+            most_infected_plot = "Ramesh Kapre"
+            least_infected_plot = "Arvind Khode"
         
-        if collection_scan_counts.sum() > 0:
-            for collection, count in collection_scan_counts.items():
-                share_percentage = (count / collection_scan_counts.sum()) * 100
-                collection_name = collection
-                data_share_text += f"{collection_name}: {share_percentage:.2f}%<br>"
-
-        #   Example placeholders for other statistics
-        most_active_device = "Sloth's Katana"  # You might want to calculate this
-        least_active_device = "Borer_blade_2"  # You might want to calculate this
-        total_infected_trees = filtered_data['Total Infected Trees'].sum()
-        most_infected_plot = "Ramesh Kapre"  # You might want to calculate this
-        least_infected_plot = "Arvind Khode"  # You might want to calculate this
-        
-        # Layout for the first row (2 columns)
+        # Layout for bar charts
         col1, col2 = st.columns(2)
 
-        # Bar chart showing collections with most infected scans
-        if collections:
-            farmer_names_list = [farmer_names.get(collection, 'Unknown Farmer') for collection in collections]
-            # Calculate healthy and infected counts for each collection
-            healthy_counts = []
-            infected_counts = []
+        # Bar chart for healthy and infected counts
+        fig = go.Figure()
 
-            # Iterate through selected collections to get healthy and infected counts
-            for collection in collections:
-                data = collection_data[collection]
-                healthy_sum = sum(item['Total Healthy Scan'] for item in data)
-                infected_sum = sum(item['Total Infected Scan'] for item in data)
-                healthy_counts.append(healthy_sum)
-                infected_counts.append(infected_sum)
-                
-            fig = go.Figure()
+        fig.add_trace(go.Bar(
+            x=farmer_names_list,
+            y=healthy_counts,
+            name='Healthy',
+            marker=dict(color='#00FF00'),  # Green for healthy scans
+        ))
 
-            # Add healthy counts for each collection
-            fig.add_trace(go.Bar(
-                x=farmer_names_list,
-                y=healthy_counts,
-                name='Healthy',
-                marker=dict(color='#00FF00'),  # Green for healthy
-            ))
+        fig.add_trace(go.Bar(
+            x=farmer_names_list,
+            y=infected_counts,
+            name='Infected',
+            marker=dict(color='#FF0000'),  # Red for infected scans
+        ))
 
-            # Add infected counts for each collection
-            fig.add_trace(go.Bar(
-                x=farmer_names_list,
-                y=infected_counts,
-                name='Infected',
-                marker=dict(color='#FF0000'),  # Red for infected
-            ))
+        fig.update_layout(
+            title="Healthy and Infected Scans by Collection",
+            xaxis_title="Collection",
+            yaxis_title="Number of Scans",
+            barmode='group',
+            bargap=0.2,
+            font=dict(color='white'),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            height=300
+        )
 
-            fig.update_layout(
-                title_text="Healthy and Infected Scans by Collection",
-                xaxis_title="Collection",
-                yaxis_title="Number of Scans",
-                barmode='group',  # Side-by-side grouping
-                bargap=0.2,  # Gap between bars (adjust as needed)
-                font=dict(color='white'),
-                paper_bgcolor='rgba(0,0,0,0)',
-                plot_bgcolor='rgba(0,0,0,0)',
-                height=300
-            )
-
-            col1.plotly_chart(fig, use_container_width=True)
+        col1.plotly_chart(fig, use_container_width=True)
 
         # Layout for the second row (Vertical Bar Chart)
         if selected_dates:
@@ -340,157 +329,160 @@ if collections:
                 </div>
             """, unsafe_allow_html=True)
             st.write(f"** **")
+            # If dates are selected
             if selected_dates:
-            # Filter the data by the selected dates
-                filtered_data = df[df['Date of Scans'].isin(selected_dates)]
-        
-             # Display the filtered data in the desired format
+                 # Initialize data storage for each collection
+                collection_summaries = {}
+
                 for collection in collections:
-                    collection_data = df[df['Date of Scans'].isin(selected_dates)]
+                    data = load_collection(collection)
+                    filtered_data = [entry for entry in data if pd.to_datetime(entry['Date of Scans']).date() in selected_dates]
             
-                    # Initialize counts
-                    healthy_count = 0
-                    infected_count = 0
-                    total_scans = 0
+                    # Calculate total healthy and infected scans for the collection
+                    total_healthy = sum(entry['Total Healthy Scan'] for entry in filtered_data)
+                    total_infected = sum(entry['Total Infected Scan'] for entry in filtered_data)
+                    total_scans = sum(entry['Total Scan'] for entry in filtered_data)
+                    total_trees = sum(entry['Total Trees'] for entry in filtered_data)
+                    total_healthy_trees = sum(entry['Total Healthy Trees'] for entry in filtered_data)
+                    total_infected_trees = sum(entry['Total Infected Trees'] for entry in filtered_data)
             
-                    # Initialize device data storage
-                    device_data = defaultdict(lambda: defaultdict(lambda: {'Healthy': 0, 'Infected': 0}))
-            
-                    for index, row in collection_data.iterrows():
-                        inf_stat = 'Healthy' if row['Total Healthy Scan'] > 0 else 'Infected'
-                        device_name = row['Device Name']
-                        date_key = row['Date of Scans']
+                    collection_summaries[collection] = {
+                        'total_trees': total_trees,
+                        'total_scans': total_scans,
+                        'total_healthy': total_healthy,
+                        'total_infected': total_infected,
+                        'total_healthy_trees': total_healthy_trees,
+                        'total_infected_trees': total_infected_trees
+                    }
+        
+                # Display the filtered data in the desired format
+                for collection in collections:
+                    if collection in collection_summaries:
+                        summary = collection_summaries[collection]
+                        total_scans = summary['total_scans']
+                        total_trees = summary['total_trees']
+                        total_healthy = summary['total_healthy']
+                        total_infected = summary['total_infected']
+                        total_healthy_trees = summary['total_healthy_trees']
+                        total_infected_trees = summary['total_infected_trees']
+
+                        # Layout for collection details
+                        col1, col2, col3 = st.columns(3)
+                        with col1:
+                            # Display farmer image
+                            farmer_image = farmer_images.get(collection, 'default.png')
+                            farmer_name = farmer_names.get(collection, 'Unknown Farmer')
+                            st.image(farmer_image, width=300, use_column_width=False)
+                            st.write(f"**Farmer Name:** {farmer_name}", color='white')
                 
-                        if inf_stat == 'Healthy':
-                            healthy_count += row['Total Healthy Scan']
-                            device_data[device_name][date_key]['Healthy'] += row['Total Healthy Scan']
-                        elif inf_stat == 'Infected':
-                            infected_count += row['Total Infected Scan']
-                            device_data[device_name][date_key]['Infected'] += row['Total Infected Scan']
+                        with col2:
+                            # Display scan counts and farm details
+                            location = farm_locations.get(collection, 'Unknown Location')
+                            plot_size = plot_sizes.get(collection, 'Unknown Plot Size')
+                            farm_age = farm_ages.get(collection, 'Unknown Farm Age')
+                            st.markdown(f"""
+                                <div style='
+                                    text-align: center; 
+                                    color: white; 
+                                    font-size: 24px;
+                                    font-weight: bold;
+                                    margin-bottom: 10px;'>
+                                    Farm Details
+                                </div> 
+                                <div style='
+                                    text-align: justify; 
+                                    color: white; 
+                                    background-color: rgba(0, 128, 0, 0.1); 
+                                    border: 2px solid white; 
+                                    padding: 10px; 
+                                    border-radius: 10px;
+                                    margin: 10px auto;
+                                    width: 80%;'>
+                                    <br>
+                                    <b>Total Scans:</b> {total_scans}<br>
+                                    <b>Total Healthy Scans:</b> {total_healthy}<br>
+                                    <b>Total Infected Scans:</b> {total_infected}<br>
+                                    <b>Farm Location:</b> {location}<br>
+                                    <b>Farm Age:</b> {farm_age}<br>
+                                    <b>Plot Size:</b> {plot_size}
+                                </div>
+                            """, unsafe_allow_html=True)
             
-                    total_scans = healthy_count + infected_count
-            
-                    # Layout for collection details
-                    col1, col2, col3 = st.columns(3)
-            
-                    with col1:
-                        # Display farmer image
-                        farmer_image = farmer_images.get(collection, 'default.png')
-                        farmer_name = farmer_names.get(collection, 'Unknown Farmer')
-                        st.image(farmer_image, width=300, use_column_width=False)
-                        st.write(f"**Farmer Name:** {farmer_name}", color='white')
-            
-                    with col2:
-                    # Display scan counts and farm details
-                        location = farm_locations.get(collection, 'Unknown Location')
-                        plot_size = plot_sizes.get(collection, 'Unknown Plot Size')
-                        farm_age = farm_ages.get(collection, 'Unknown Farm Age')
-                        st.markdown(f"""
-                            <div style='
-                                text-align: center; 
-                                color: white; 
-                                font-size: 24px;
-                                font-weight: bold;
-                                margin-bottom: 10px;'>
-                                Farm Details
-                            </div>
-                            <div style='
-                                text-align: justify; 
-                                color: white; 
-                                background-color: rgba(0, 128, 0, 0.1); 
-                                border: 2px solid white; 
-                                padding: 10px; 
-                                border-radius: 10px;
-                                margin: 10px auto;
-                                width: 80%;'>
-                                <br>
-                                <b>Total Scans:</b> {total_scans}<br>
-                                <b>Healthy Scans:</b> {healthy_count}<br>
-                                <b>Infected Scans:</b> {infected_count}<br>
-                                <b>Farm Location:</b> {location}<br>
-                                <b>Farm Age:</b> {farm_age}<br>
-                                <b>Plot Size:</b> {plot_size}
-                            </div>
-                        """, unsafe_allow_html=True)
-            
-                    with col3:
-                        # Plot pie chart for healthy vs infected scans
-                        if total_scans > 0:
-                            fig = go.Figure(data=[go.Pie(
-                                labels=['Healthy Trees', 'Infected Trees'],
-                                values=[total_healthy_trees, total_infected_trees],
-                                hole=0.3,  # Donut chart style
-                                marker=dict(colors=['#00FF00', '#FF0000'])
-                            )])
-                            fig.update_layout(
-                                title_text=f'{farmer_name} - Healthy vs Infected',
-                                font=dict(color='white'),
-                                paper_bgcolor='rgba(0,0,0,0)',
-                                plot_bgcolor='rgba(0,0,0,0)',
-                                height=350
-                            )
-                            st.plotly_chart(fig)
+                        with col3:
+                        #   Plot pie chart for healthy vs infected scans
+                            if total_scans > 0:
+                                fig = go.Figure(data=[go.Pie(
+                                    labels=['Healthy Trees', 'Infected Trees'],
+                                    values=[total_healthy_trees, total_infected_trees],
+                                    hole=0.3,  # Donut chart style
+                                    marker=dict(colors=['#00FF00', '#FF0000'])
+                                )])
+                                fig.update_layout(
+                                    title_text=f'{farmer_name} - Healthy vs Infected',
+                                    font=dict(color='white'),
+                                    paper_bgcolor='rgba(0,0,0,0)',
+                                    plot_bgcolor='rgba(0,0,0,0)',
+                                    height=350
+                                )
+                                st.plotly_chart(fig)
+                        
+                        for collection in collections:
+                            if collection in collection_summaries:
+                                summary = collection_summaries[collection]
+                                data = load_collection(collection)
+                                filtered_data = [entry for entry in data if pd.to_datetime(entry['Date of Scans']).date() in selected_dates]
 
-                    # Plot vertical bar chart for device scan counts
-                    fig = go.Figure()
+                                # Prepare data for plotting bar chart
+                                device_data = {}
+                                for entry in filtered_data:
+                                    device_name = entry['Device Name']
+                                    if device_name not in device_data:
+                                        device_data[device_name] = {'infected': 0, 'healthy': 0}
+                                    device_data[device_name]['infected'] += entry['Total Infected Scan']
+                                    device_data[device_name]['healthy'] += entry['Total Healthy Scan']
 
-                    # Extract device names and dates from the current data structure
-                    device_names = list(device_data.keys())
-                    dates = sorted(set(date for device in device_data.values() for date in device.keys()))
+                                # Bar chart plotting
+                                device_names = []
+                                healthy_counts = []
+                                infected_counts = []
 
-                    # Define a color palette for healthy and infected bars
-                    color_palette_healthy = ['#00FF00', '#1E90FF', '#FFA500', '#FFFF00', '#800080', '#FF69B4']  # Healthy colors
-                    color_palette_infected = ['#FF6347', '#DC143C', '#8B0000', '#FF4500', '#FF1493', '#C71585']  # Infected colors
+                                for device, counts in device_data.items():
+                                    device_names.append(device)
+                                    infected_counts.append(counts['infected'])
+                                    healthy_counts.append(counts['healthy'])
 
-                    # Iterate through devices and dates to plot healthy and infected scans
-                    for i, device_name in enumerate(device_names):
-                        for date in dates:
-                        # Retrieve healthy and infected scan counts for the given date and device
-                            healthy_count = device_data[device_name].get(date, {'Healthy': 0})['Healthy']
-                            infected_count = device_data[device_name].get(date, {'Infected': 0})['Infected']
+                                # Create bar chart for healthy and infected scans
+                                fig = go.Figure()
 
-                            # Add bar for healthy scans
-                            fig.add_trace(go.Bar(
-                                x=[date],  # Date for healthy scans
-                                y=[healthy_count],
-                                name=f'{device_name} - Healthy',
-                                marker=dict(color=color_palette_healthy[i % len(color_palette_healthy)]),  # Assign unique healthy color
-                                #width=0.35,  # Bar width
-                                offsetgroup=device_name,  # Group by device
-                                hoverinfo='y'
-                            ))
+                                # Add healthy scan bars
+                                fig.add_trace(go.Bar(
+                                    x=device_names,
+                                    y=healthy_counts,
+                                    name='Healthy Scans',
+                                    marker_color='green'
+                                ))
 
-                            # Add bar for infected scans
-                            fig.add_trace(go.Bar(
-                                x=[date],  # Date for infected scans
-                                y=[infected_count],
-                                name=f'{device_name} - Infected',
-                                marker=dict(color=color_palette_infected[i % len(color_palette_infected)]),  # Assign unique infected color
-                                #width=0.35,  # Same bar width as healthy
-                                offsetgroup=device_name,  # Group by device
-                                hoverinfo='y'
-                            ))
+                                # Add infected scan bars
+                                fig.add_trace(go.Bar(
+                                    x=device_names,
+                                    y=infected_counts,
+                                    name='Infected Scans',
+                                    marker_color='red'
+                                ))
 
-                    # Update layout for grouped bars, improved aesthetics, and legend placement
-                    fig.update_layout(
-                        barmode='group',  # Group healthy and infected bars side by side
-                        #bargap=0.2,  # Gap between different devices
-                        title_text=f'{farmer_name} -Device Scan Counts by Date',
-                        xaxis_title="Date",
-                        yaxis_title="Number of Scans",
-                        font=dict(color='white'),  # White font for dark theme
-                        paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
-                        plot_bgcolor='rgba(0,0,0,0)',  # Transparent plot background
-                        legend_title_text="Devices",
-                        legend=dict(
-                            orientation="v",  # Vertical legend
-                            y=0.5,  # Center vertically
-                            x=1.02,  # Move it outside the chart on the right
-                            xanchor='left'  # Anchor the legend to the left of the plot
-                        ),
-                        height=400,  # Chart height
-                        xaxis=dict(tickformat='%Y-%m-%d'),  # Display only the date in 'YYYY-MM-DD' format
-                    )
+                                # Update chart layout
+                                fig.update_layout(
+                                    barmode='group',
+                                    title_text=f"{farmer_names[collection]}: Scan Distribution by Device",
+                                    xaxis_title="Devices",
+                                    yaxis_title="Number of Scans",
+                                    legend_title="Scan Type",
+                                    paper_bgcolor='rgba(0,0,0,0)',
+                                    plot_bgcolor='rgba(0,0,0,0)',
+                                    font=dict(color='white'),
+                                    height=400,
+                                    width=800
+                                )
 
-                    # Plot the figure in Streamlit
-                    st.plotly_chart(fig)
+                                # Show the chart in the app
+                                st.plotly_chart(fig)
