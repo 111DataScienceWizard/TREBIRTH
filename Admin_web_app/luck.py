@@ -465,7 +465,7 @@ if collections:
                         # Add bar for healthy scans
                         fig.add_trace(go.Bar(
                             x=dates,   # Date for healthy scans
-                            y=healthy_count,
+                            y=healthy_counts,
                             name=f'{device_name} - Healthy',
                             marker=dict(color=color_palette_healthy[i % len(color_palette_healthy)]),  # Assign unique healthy color
                             offsetgroup=device_name,  # Group by device
@@ -475,7 +475,7 @@ if collections:
                          # Add bar for infected scans
                         fig.add_trace(go.Bar(
                             x=dates,  # Date for infected scans
-                            y=infected_count,
+                            y=infected_counts,
                             name=f'{device_name} - Infected',
                             marker=dict(color=color_palette_infected[i % len(color_palette_infected)]),  # Assign unique infected color
                             offsetgroup=device_name,  # Group by device
