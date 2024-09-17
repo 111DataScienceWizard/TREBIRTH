@@ -428,46 +428,59 @@ if collections:
                                 
                         # If selected dates are available
                         # If dates are selected
-                        if selected_dates:
-                            # Initialize the figure for the bar chart
-                            fig = go.Figure()
-                            
-                            for collection in collections:
-                                collection_data_filtered = df[(df['Date of Scans'].isin(selected_dates)) & (df['Device Name'].isin(
-                                    [item['Device Name'] for item in load_collection(collection)]
-                                ))]
-                                
-                                device_names = collection_data_filtered['Device Name'].unique()
-                                for device_name in device_names:
-                                    device_data = collection_data_filtered[collection_data_filtered['Device Name'] == device_name]
-                                    
-                                    dates = device_data['Date of Scans']
-                                    healthy_values = device_data['Total Healthy Scan']
-                                    infected_values = device_data['Total Infected Scan']
-                                    
-                                    fig.add_trace(go.Bar(
-                                        x=[d.strftime('%b %d') for d in dates],
-                                        y=healthy_values,
-                                        name=f'{device_name} - Healthy ({collection})',
-                                        marker=dict(color='#00FF00'),  # Green for healthy
-                                    ))
-                                    
-                                    fig.add_trace(go.Bar(
-                                        x=[d.strftime('%b %d') for d in dates],
-                                        y=infected_values,
-                                        name=f'{device_name} - Infected ({collection})',
-                                        marker=dict(color='#FF6347'),  # Red for infected
-                                    ))
-                            
-                            fig.update_layout(
-                                title_text="Scans by Device and Date",
-                                xaxis_title="Date",
-                                yaxis_title="Number of Scans",
-                                barmode='group',
-                                font=dict(color='white'),
-                                paper_bgcolor='rgba(0,0,0,0)',
-                                plot_bgcolor='rgba(0,0,0,0)',
-                                height=300
-                            )
-                            
-                            st.plotly_chart(fig, use_container_width=True)
+                        if selected_dates:  
+                            for collection in collections:  
+                                data = load_collection(collection)  
+                                filtered_data = [entry for entry in data if pd.to_datetime(entry['Date of Scans']).date() in selected_dates]  
+                  
+                                # Extract unique device names and dates  
+                                device_names = list(set(entry['Device Name'] for entry in filtered_data))  
+                                dates = list(set(pd.to_datetime(entry['Date of Scans']).date() for entry in filtered_data))  
+                  
+                                # Initialize color palettes  
+                                color_palette_healthy = ['#00FF00', '#1E90FF', '#FFA500', '#FFFF00', '#800080', '#FF69B4']  
+                                color_palette_infected = ['#FF6347', '#DC143C', '#8B0000', '#FF4500', '#FF1493', '#C71585']  
+                  
+                                # Create a figure for the bar chart  
+                                fig = go.Figure()  
+                  
+                                # Iterate through devices and dates  
+                                for i, device_name in enumerate(device_names):  
+                                    for date in dates:  
+                                        # Filter data for the current device and date  
+                                        device_data = [entry for entry in filtered_data if entry['Device Name'] == device_name and pd.to_datetime(entry['Date of Scans']).date() == date]  
+                  
+                                        # Calculate healthy and infected scans  
+                                        healthy_scans = sum(entry['Total Healthy Scan'] for entry in device_data)  
+                                        infected_scans = sum(entry['Total Infected Scan'] for entry in device_data)  
+                  
+                                        # Plot healthy scans  
+                                        fig.add_trace(go.Bar(  
+                                            x=[date],  
+                                            y=[healthy_scans],  
+                                            name=f'{device_name} - Healthy',  
+                                            marker=dict(color=color_palette_healthy[i % len(color_palette_healthy)]),  
+                                        ))  
+                  
+                                        # Plot infected scans  
+                                        fig.add_trace(go.Bar(  
+                                            x=[date],  
+                                            y=[infected_scans],  
+                                            name=f'{device_name} - Infected',  
+                                            marker=dict(color=color_palette_infected[i % len(color_palette_infected)]),  
+                                        ))  
+                  
+                                # Update layout  
+                                fig.update_layout(  
+                                    title_text=f'{collection} - Scans by Device',  
+                                    xaxis_title="Date",  
+                                    yaxis_title="Number of Scans",  
+                                    barmode='group',  
+                                    font=dict(color='white'),  
+                                    paper_bgcolor='rgba(0,0,0,0)',  
+                                    plot_bgcolor='rgba(0,0,0,0)',  
+                                    height=300  
+                                )  
+                  
+                                # Plot the figure  
+                                st.plotly_chart(fig, use_container_width=True)  
