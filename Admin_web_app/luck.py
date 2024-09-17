@@ -388,7 +388,7 @@ if collections:
                                     font-weight: bold;
                                     margin-bottom: 10px;'>
                                     Farm Details
-                                </div>
+                                </div> 
                                 <div style='
                                     text-align: justify; 
                                     color: white; 
