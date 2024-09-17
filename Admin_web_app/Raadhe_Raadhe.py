@@ -451,6 +451,7 @@ if collections:
                                 for i, device in enumerate(devices):
                                     device_data = aggregated_data[aggregated_data['Device Name'] == device]
                                     
+                                    # Plot Healthy Scan Bars
                                     fig.add_trace(go.Bar(
                                         x=device_data['Date of Scans'],
                                         y=device_data['Total Healthy Scan'],
@@ -458,6 +459,7 @@ if collections:
                                         marker_color=colors[i % len(colors)]
                                     ))
                                     
+                                    # Plot Infected Scan Bars
                                     fig.add_trace(go.Bar(
                                         x=device_data['Date of Scans'],
                                         y=device_data['Total Infected Scan'],
