@@ -88,10 +88,17 @@ def get_recent_scans(db, num_scans=3):
 
 # Filter scans by the same device name
 def filter_scans_by_device(scans):
-    # Group scans by 'DeviceName'
-    scans_df = pd.DataFrame(scans)
-    recent_scans_by_device = scans_df.groupby('DeviceName').apply(lambda x: x.head(2)).reset_index(drop=True)
-    return recent_scans_by_device
+    # Sort by timestamp in descending order to ensure most recent scans are at the top
+    scans_df = pd.DataFrame(scans).sort_values(by='timestamp', ascending=False)
+    
+    # Group by 'DeviceName', and pick the most recent group that has at least 2 scans
+    for device, group in scans_df.groupby('DeviceName'):
+        if len(group) >= 2:
+            # Return the two most recent scans for the device
+            return group.head(2)
+    
+    # If no device has at least 2 scans, return an empty dataframe
+    return pd.DataFrame()
     
 # Preprocess data for each scan
 def preprocess_multiple_scans(radar_data_list):
@@ -227,7 +234,7 @@ def main():
             
             # Extract timestamps and InfStat
             timestamps = filtered_scans['timestamp']
-            infstats = filtered_scans['InfStat']  # Assuming 'InfStat' is a field in your data
+            infstats = filtered_scans['InfStat']
             
             # Create columns for plots
             col1, col2, col3 = st.columns(3)
@@ -251,7 +258,6 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
 st.write(f"**Farmer Name:** Dananjay Yadav", color='white')
 st.write(f"**Farm Location:** Null", color='white')
