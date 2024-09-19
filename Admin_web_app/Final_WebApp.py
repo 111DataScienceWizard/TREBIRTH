@@ -60,7 +60,7 @@ st.title("Farm Analytics")
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
 
 # Fetch the most recent scan data from the "demo_db" collection
-def get_recent_scans(db, num_scans=3):
+def get_recent_scans(db, num_scans=2):
     docs = (
         db.collection('demo_db')
         .order_by('timestamp', direction=firestore.Query.DESCENDING)
@@ -69,16 +69,13 @@ def get_recent_scans(db, num_scans=3):
     )
     radar_data_list = []
     timestamps = []
-    device_names = []
     for doc in docs:
         data_dict = doc.to_dict()
         radar_raw = data_dict.get('RadarRaw', [])
         timestamp = data_dict.get('timestamp')
-        device_name = data_dict.get('DeviceName', 'Unknown')  # Ensure to handle missing device names
         radar_data_list.append(radar_raw)
         timestamps.append(timestamp)
-        device_names.append(device_name)
-    return radar_data_list, timestamps, device_names
+    return radar_data_list, timestamps
 
 # Preprocess data for each scan
 def preprocess_multiple_scans(radar_data_list):
@@ -98,7 +95,10 @@ def calculate_statistics(df):
         'Column': df.columns,
         'Mean': df.mean(),
         'Median': df.median(),
+        #'Std Deviation': df.std(),
         'PTP': df.apply(lambda x: np.ptp(x)),
+        #'Skewness': skew(df),
+        #'Kurtosis': kurtosis(df),
         'Min': df.min(),
         'Max': df.max()
     }
@@ -108,24 +108,33 @@ def calculate_statistics(df):
 # Plot multiple scans in time domain
 def plot_multiple_time_domain(data_list, timestamps):
     st.write("## Time Domain")
+    # Initialize the Plotly figure
     fig = go.Figure()
+    
+    # Define colors for the different scans
     colors = ['green', 'blue']
+    
+    # Add traces (lines) for each scan
     for i, data in enumerate(data_list):
         fig.add_trace(go.Scatter(
-            y=data,
+            y=data,  # Plot the raw index data on the y-axis
             mode='lines',
             name=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}',
             line=dict(color=colors[i])
         ))
+    
+    # Update layout for transparent background
     fig.update_layout(
-        template='plotly_white',
-        xaxis_title="Index",
+        template='plotly_white',  # Use a template with no dark background
+        xaxis_title="Index",  # Raw index numbers
         yaxis_title="Signal",
         legend_title="Scans",
-        font=dict(color="black"),
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
+        font=dict(color="black"),  # Adjust text color if needed
+        plot_bgcolor='rgba(0,0,0,0)',  # Transparent background
+        paper_bgcolor='rgba(0,0,0,0)'  # Transparent background
     )
+
+    # Render the plot using Streamlit
     st.plotly_chart(fig)
     return fig
     
@@ -133,98 +142,101 @@ def plot_multiple_time_domain(data_list, timestamps):
 def plot_multiple_frequency_domain(data_list, timestamps):
     st.write("## Frequency Domain")
     fig = go.Figure()
+
     colors = ['green', 'blue']
+
     for i, data in enumerate(data_list):
+        # Perform FFT
         frequencies = np.fft.fftfreq(len(data), d=1/100)
         fft_values = np.fft.fft(data)
         powers = np.abs(fft_values) / len(data)
         powers_db = 20 * np.log10(powers)
+
+        # Add trace to the Plotly figure
         fig.add_trace(go.Scatter(
-            x=frequencies[:len(frequencies)//2],
-            y=powers_db[:len(powers_db)//2],
+            x=frequencies[:len(frequencies)//2], 
+            y=powers_db[:len(powers_db)//2], 
             mode='lines',
             name=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}',
             line=dict(color=colors[i])
         ))
+
+    # Update layout for transparent background
     fig.update_layout(
         template='plotly_white',
         xaxis_title="Frequency (Hz)",
         yaxis_title="Power Spectrum (dB)",
         legend_title="Scans",
         font=dict(color="white"),
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
+        plot_bgcolor='rgba(0,0,0,0)',  # Transparent background
+        paper_bgcolor='rgba(0,0,0,0)'  # Transparent background
     )
+
     st.plotly_chart(fig)
     return fig
 
 # Plot statistics for multiple scans using Plotly
 def plot_multiple_statistics(stats_dfs, timestamps):
     st.write("## Radar Column Statistics")
+    
     fig = go.Figure()
+
     stats_measures = ['Mean', 'Median', 'PTP', 'Min', 'Max']
     colors = ['green', 'blue']
+
     for i, stats_df in enumerate(stats_dfs):
         for measure in stats_measures:
             fig.add_trace(go.Bar(
                 x=stats_measures,
-                y=[stats_df[measure].values[0] for measure in stats_measures],
+                y=[stats_df[measure].values[0] for measure in stats_measures],  # Assuming one radar column
                 name=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}',
                 marker_color=colors[i],
             ))
+
+    # Update layout for transparent background
     fig.update_layout(
         barmode='group',
         template='plotly_white',
         xaxis_title="Statistics",
         yaxis_title="Values",
         font=dict(color="white"),
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
+        plot_bgcolor='rgba(0,0,0,0)',  # Transparent background
+        paper_bgcolor='rgba(0,0,0,0)'  # Transparent background
     )
+
     st.plotly_chart(fig)
     return fig
 
 def main():
-    radar_data_list, timestamps, device_names = get_recent_scans(db, num_scans=3)
+    radar_data_list, timestamps = get_recent_scans(db, num_scans=2)
 
     if radar_data_list:
-        # Determine device names and indices for plotting
-        device_counts = pd.Series(device_names).value_counts()
-        most_common_device = device_counts.idxmax()
-        most_common_device_count = device_counts.max()
-        
-        if most_common_device_count >= 2:
-            # Filter scans for the most common device
-            same_device_indices = [i for i, device in enumerate(device_names) if device == most_common_device]
-            if len(same_device_indices) >= 2:
-                indices_to_plot = same_device_indices[:2]  # Plot the 2 most recent scans with the same device
-            else:
-                indices_to_plot = same_device_indices
-        else:
-            # All 3 devices are different or not enough scans with the same device
-            indices_to_plot = list(range(min(2, len(radar_data_list))))  # Plot the 2 most recent scans if available
-
         # Preprocess data for each scan
-        processed_data_list = preprocess_multiple_scans([radar_data_list[i] for i in indices_to_plot])
+        processed_data_list = preprocess_multiple_scans(radar_data_list)
         
         # Display timestamps of scans
-        st.markdown(f"**DATA ANALYSIS OF SELECTED SCANS**")
-        
+        #st.markdown(f"**Timestamps of Recent Scans:** {', '.join([ts.strftime('%Y-%m-%d %H:%M:%S') for ts in timestamps])}")
+        st.markdown(f"**DATA ANALAYSIS OF 2 RECENT SCANS**")
+
         # Create three columns for plots
         col1, col2, col3 = st.columns(3)
 
-        # Time domain plot for selected scans
+        # Time domain plot for multiple scans
         with col1:
-            time_fig = plot_multiple_time_domain([df['Radar'].values for df in processed_data_list], [timestamps[i] for i in indices_to_plot])
-        
-        # Frequency domain plot for selected scans
+            time_fig = plot_multiple_time_domain([df['Radar'].values for df in processed_data_list], timestamps)
+            
+
+        # Frequency domain plot for multiple scans
         with col2:
-            freq_fig = plot_multiple_frequency_domain([df['Radar'].values for df in processed_data_list], [timestamps[i] for i in indices_to_plot])
-        
-        # Statistics plot for selected scans
+            freq_fig = plot_multiple_frequency_domain([df['Radar'].values for df in processed_data_list], timestamps)
+            
+
+        # Statistics plot for multiple scans
         with col3:
             stats_dfs = [calculate_statistics(df) for df in processed_data_list]
-            stats_fig = plot_multiple_statistics(stats_dfs, [timestamps[i] for i in indices_to_plot])
+            stats_fig = plot_multiple_statistics(stats_dfs, timestamps)
+    else:
+        st.error("No data available in the 'Dananjay Yadav' collection.")
 
 if __name__ == "__main__":
     main()
