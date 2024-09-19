@@ -7,6 +7,7 @@ from scipy.stats import skew, kurtosis
 from google.cloud import firestore
 from google.cloud.firestore import FieldFilter
 from datetime import datetime, timedelta
+import pytz
 import time
 import random
 from google.api_core.exceptions import ResourceExhausted, RetryError
