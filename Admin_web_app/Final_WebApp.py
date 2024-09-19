@@ -212,33 +212,35 @@ def plot_multiple_statistics(stats_dfs, timestamps, infstats):
     return fig
 
 def main():
-    # Fetch recent scans
-    recent_scans = get_recent_scans(db, num_scans=3)
+    metadata_list = get_recent_scans(db, num_scans=3)
     
-    if recent_scans:
-        # Filter scans by device name and pick the 2 most recent ones with the same device name
-        filtered_scans = filter_scans_by_device(recent_scans)
+    if metadata_list:
+        # Convert metadata to DataFrame
+        scans_df = pd.DataFrame(metadata_list)
         
-        if not filtered_scans.empty:
-            st.markdown("## Data Analysis of 2 Recent Scans with Same Device")
-            
-            # Preprocess the scan data
-            processed_data_list = preprocess_multiple_scans(filtered_scans['RadarRaw'])
-            
-            # Extract timestamps and InfStat
-            timestamps = filtered_scans['Timestamp']
-            infstats = filtered_scans['InfStat']  # Assuming 'InfStat' is a field in your data
-            
-            # Create columns for plots
-            col1, col2, col3 = st.columns(3)
-            
-            # Time domain plot in col1
-            with col1:
-                plot_time_domain(filtered_scans)
+        # Ensure the column exists in the DataFrame and no missing values
+        if 'timestamp' not in scans_df.columns or scans_df['timestamp'].isnull().all():
+            st.error("No recent scan data available.")
+            return
+        
+        # Preprocess data for each scan
+        radar_data_list = scans_df['RadarRaw'].tolist()
+        processed_data_list = preprocess_multiple_scans(radar_data_list)
+        
+        # Extract timestamps and InfStat
+        timestamps = scans_df['timestamp']  # Make sure to use 'timestamp' instead of 'Timestamp'
+        infstats = scans_df['InfStat']  # Assuming 'InfStat' column is available
+        
+        # Create columns for plots
+        col1, col2, col3 = st.columns(3)
 
-            # Frequency domain plot in col2
-            with col2:
-                plot_frequency_domain(filtered_scans)
+        # Time domain plot for multiple scans
+        with col1:
+            time_fig = plot_multiple_time_domain([df['Radar'].values for df in processed_data_list], timestamps)
+        
+        # Frequency domain plot for multiple scans
+        with col2:
+            freq_fig = plot_multiple_frequency_domain([df['Radar'].values for df in processed_data_list], timestamps)
             
             # Statistics plot in col3
             with col3:
