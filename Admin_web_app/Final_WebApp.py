@@ -242,10 +242,11 @@ def main():
         with col2:
             freq_fig = plot_multiple_frequency_domain([df['Radar'].values for df in processed_data_list], timestamps)
             
-            # Statistics plot in col3
-            with col3:
-                stats_dfs = [calculate_statistics(df) for df in processed_data_list]
-                plot_multiple_statistics(stats_dfs, timestamps, infstats)
+        # Statistics plot in col3
+        with col3:
+            stats_dfs = [calculate_statistics(df) for df in processed_data_list]
+            plot_multiple_statistics(stats_dfs, timestamps, infstats)
+            
         else:
             st.warning("No matching scans found with the same device name.")
     else:
