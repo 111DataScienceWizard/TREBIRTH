@@ -60,6 +60,12 @@ st.title("Farm Analytics")
 
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
 
+
+def convert_to_local_time(timestamp, timezone='Asia/Kolkata'):
+    local_tz = pytz.timezone(timezone)
+    # Convert to UTC and then localize to the given timezone
+    return timestamp.astimezone(local_tz)
+    
 # Fetch the most recent scan data from the "demo_db" collection
 def get_recent_scans(db, num_scans=2):
     docs = (
@@ -74,8 +80,9 @@ def get_recent_scans(db, num_scans=2):
         data_dict = doc.to_dict()
         radar_raw = data_dict.get('RadarRaw', [])
         timestamp = data_dict.get('timestamp')
+        local_timestamp = convert_to_local_time(timestamp)
         radar_data_list.append(radar_raw)
-        timestamps.append(timestamp)
+        timestamps.append(local_timestamp)
     return radar_data_list, timestamps
 
 # Preprocess data for each scan
