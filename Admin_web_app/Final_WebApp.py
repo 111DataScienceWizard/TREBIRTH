@@ -215,13 +215,6 @@ def plot_multiple_statistics(stats_dfs, timestamps, infstats, device_names):
         font=dict(color="black"),  # Adjust text color if needed
         plot_bgcolor='rgba(0,0,0,0)',  # Transparent background
         paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
-        legend=dict(
-            orientation="h",  # Horizontal legend
-            yanchor="bottom",
-            y=1.02,
-            xanchor="center",
-            x=0.5
-        )
     )
 
     st.plotly_chart(fig)
