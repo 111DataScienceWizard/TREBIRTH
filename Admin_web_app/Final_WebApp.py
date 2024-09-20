@@ -185,7 +185,7 @@ def plot_frequency_domain(scans):
     st.plotly_chart(fig)
 
 # Plot statistics for multiple scans using Plotly with InfStat-based coloring
-def plot_multiple_statistics(stats_dfs, timestamps, infstats):
+def plot_multiple_statistics(stats_dfs, timestamps, infstats, device_names):
     st.write("## Radar Column Statistics")
     
     fig = go.Figure()
@@ -244,6 +244,7 @@ def main():
             # Extract timestamps and InfStat
             timestamps = filtered_scans['timestamp'].tolist()
             infstats = filtered_scans['InfStat'].tolist()
+            device_names = filtered_scans['DeviceName'].tolist()
             
             # Create columns for plots
             col1, col2, col3 = st.columns(3)
@@ -259,7 +260,7 @@ def main():
             # Statistics plot in col3
             with col3:
                 stats_dfs = [calculate_statistics(df) for df in processed_data_list]
-                plot_multiple_statistics(stats_dfs, timestamps, infstats)
+                plot_multiple_statistics(stats_dfs, timestamps, infstats, device_names)
         else:
             st.warning("No matching scans found with the same device name.")
     else:
