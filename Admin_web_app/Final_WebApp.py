@@ -129,13 +129,15 @@ def calculate_statistics(df):
     return stats_df
 
 # Plot time domain
-def plot_time_domain(scans):
+def plot_time_domain(scans, sampling_rate=100):
     st.write("## Time Domain")
     fig = go.Figure()
 
     for i, scan in scans.iterrows():
         color = 'green' if scan['InfStat'] == 'Healthy' else 'red'
+        time_seconds = np.arange(len(scan['RadarRaw'])) / sampling_rate
         fig.add_trace(go.Scatter(
+            x=time_seconds,
             y=scan['RadarRaw'],
             mode='lines',
             name=f"{scan['DeviceName']} - {scan['timestamp'].strftime('%Y-%m-%d %H:%M:%S')}",
@@ -144,7 +146,7 @@ def plot_time_domain(scans):
 
     fig.update_layout(
         template='plotly_white',
-        xaxis_title="Index",
+        xaxis_title="Time (s)",
         yaxis_title="Signal",
         legend_title="Scans",
         font=dict(color="black"),
