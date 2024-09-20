@@ -194,7 +194,8 @@ def plot_multiple_statistics(stats_dfs, timestamps, infstats):
     
     for i, stats_df in enumerate(stats_dfs):
         # Determine color based on InfStat
-        color = 'green' if infstats[i] == 'Healthy' else 'red'
+        if i < len(infstats):
+            color = 'green' if infstats[i] == 'Healthy' else 'red'
         
         for measure in stats_measures:
             fig.add_trace(go.Bar(
@@ -227,14 +228,14 @@ def main():
         filtered_scans = filter_scans_by_device(recent_scans)
         
         if not filtered_scans.empty:
-            st.markdown("## Data Analysis of 2 Recent Scans with Same Device")
+            st.markdown(" Data Analysis of 2 Recent Scans with Same Device")
             
             # Preprocess the scan data
             processed_data_list = preprocess_multiple_scans(filtered_scans['RadarRaw'])
             
             # Extract timestamps and InfStat
-            timestamps = filtered_scans['timestamp']
-            infstats = filtered_scans['InfStat']
+            timestamps = filtered_scans['timestamp'].tolist()
+            infstats = filtered_scans['InfStat'].tolist()
             
             # Create columns for plots
             col1, col2, col3 = st.columns(3)
