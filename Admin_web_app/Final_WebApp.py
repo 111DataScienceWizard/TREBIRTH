@@ -196,15 +196,13 @@ def plot_multiple_statistics(stats_dfs, timestamps, infstats):
         # Determine color based on InfStat
         if i < len(infstats):
             color = 'green' if infstats[i] == 'Healthy' else 'red'
-            show_legend = True if i == 0 else False
         
-        for measure in stats_measures:
-            fig.add_trace(go.Bar(
-                x=stats_measures,
-                y=[stats_df[measure].values[0] for measure in stats_measures],  # Assuming one radar column
-                name=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}',
-                marker_color=color,
-                showlegend=show_legend
+        #for measure in stats_measures:
+        fig.add_trace(go.Bar(
+            x=stats_measures,
+            y=[stats_df[measure].values[0] for measure in stats_measures],  # Assuming one radar column
+            name=f'Scan {i+1} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}',
+            marker_color=color,
             ))
 
     # Update layout for transparent background
@@ -213,9 +211,17 @@ def plot_multiple_statistics(stats_dfs, timestamps, infstats):
         template='plotly_white',
         xaxis_title="Statistics",
         yaxis_title="Values",
+        legend_title="Scans",
         font=dict(color="black"),  # Adjust text color if needed
         plot_bgcolor='rgba(0,0,0,0)',  # Transparent background
         paper_bgcolor='rgba(0,0,0,0)'  # Transparent background
+        legend=dict(
+            orientation="h",  # Horizontal legend
+            yanchor="bottom",
+            y=1.02,
+            xanchor="center",
+            x=0.5
+        )
     )
 
     st.plotly_chart(fig)
