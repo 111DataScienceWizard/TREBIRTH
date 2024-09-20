@@ -201,7 +201,7 @@ def plot_multiple_statistics(stats_dfs, timestamps, infstats):
         fig.add_trace(go.Bar(
             x=stats_measures,
             y=[stats_df[measure].values[0] for measure in stats_measures],  # Assuming one radar column
-            name=f"{scan['DeviceName']} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}",
+            name=f'{device_names[i]} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}',
             marker_color=color,
             ))
 
