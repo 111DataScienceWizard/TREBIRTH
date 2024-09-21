@@ -43,7 +43,7 @@ def convert_to_local_time(timestamp, timezone='Asia/Kolkata'):
 # Fetch the most recent scan data from the "demo_db" collection
 def get_recent_scans(db, num_scans=3):
     docs = (
-        db.collection('demo_db')
+        db.collection('demo_day')
         .order_by('timestamp', direction=firestore.Query.DESCENDING)
         .limit(num_scans)
         .stream()
@@ -55,7 +55,7 @@ def get_recent_scans(db, num_scans=3):
             'RadarRaw': data_dict.get('RadarRaw', []),
             'InfStat': data_dict.get('InfStat', 'Unknown'),
             'timestamp': convert_to_local_time(data_dict.get('timestamp')),
-            'DeviceName': data_dict.get('Device name', 'Unknown')
+            'DeviceName': data_dict.get('Devicename', 'Unknown')
         }
         metadata_list.append(metadata)
     return metadata_list
