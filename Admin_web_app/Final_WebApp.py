@@ -28,32 +28,6 @@ from collection_10 import collection_10_data
 from collection_11 import collection_11_data
 
 
-def exponential_backoff(retries):
-    base_delay = 1
-    max_delay = 60
-    delay = base_delay * (2 ** retries) + random.uniform(0, 1)
-    return min(delay, max_delay)
-
-def get_firestore_data(query):
-    retries = 0
-    max_retries = 10
-    while retries < max_retries:
-        try:
-            results = query.stream()
-            return list(results)
-        except ResourceExhausted as e:
-            st.warning(f"Quota exceeded, retrying... (attempt {retries + 1})")
-            time.sleep(exponential_backoff(retries))
-            retries += 1
-        except RetryError as e:
-            st.warning(f"Retry error: {e}, retrying... (attempt {retries + 1})")
-            time.sleep(exponential_backoff(retries))
-            retries += 1
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
-            break
-    raise Exception("Max retries exceeded")
-
 # Set page configuration
 st.set_page_config(layout="wide")
 st.title("Farm Analytics")
@@ -88,16 +62,11 @@ def get_recent_scans(db, num_scans=3):
 
 # Filter scans by the same device name
 def filter_scans_by_device(scans):
-    # Sort by timestamp in descending order to ensure most recent scans are at the top
     scans_df = pd.DataFrame(scans).sort_values(by='timestamp', ascending=False)
-    
-    # Group by 'DeviceName', and pick the most recent group that has at least 2 scans
     for device, group in scans_df.groupby('DeviceName'):
         if len(group) >= 2:
-            # Return the two most recent scans for the device
             return group.head(2)
     
-    # If no device has at least 2 scans, return an empty dataframe
     return pd.DataFrame()
     
 # Preprocess data for each scan
@@ -149,7 +118,7 @@ def plot_time_domain(scans, sampling_rate=100):
         xaxis_title="Time (s)",
         yaxis_title="Signal",
         legend_title="Scans",
-        font=dict(color="black"),
+        font=dict(color="white"),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)'
     )
@@ -180,7 +149,7 @@ def plot_frequency_domain(scans):
         xaxis_title="Frequency (Hz)",
         yaxis_title="Power Spectrum (dB)",
         legend_title="Scans",
-        font=dict(color="black"),
+        font=dict(color="white"),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)'
     )
@@ -214,7 +183,7 @@ def plot_multiple_statistics(stats_dfs, timestamps, infstats, device_names):
         xaxis_title="Statistics",
         yaxis_title="Values",
         legend_title="Scans",
-        font=dict(color="black"),  # Adjust text color if needed
+        font=dict(color="white"),  # Adjust text color if needed
         plot_bgcolor='rgba(0,0,0,0)',  # Transparent background
         paper_bgcolor='rgba(0,0,0,0)',  # Transparent background
     )
