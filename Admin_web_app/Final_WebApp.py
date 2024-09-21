@@ -98,18 +98,18 @@ def calculate_statistics(df):
     return stats_df
 
 # Plot time domain
-def plot_time_domain(scans, sampling_rate=100):
+def plot_time_domain(preprocessed_scans, timestamps, infstats, device_names, sampling_rate=100):
     st.write("## Time Domain")
     fig = go.Figure()
 
-    for i, scan in scans.iterrows():
-        color = 'green' if scan['InfStat'] == 'Healthy' else 'red'
-        time_seconds = np.arange(len(scan['RadarRaw'])) / sampling_rate
+    for i, preprocessed_scan in enumerate(preprocessed_scans):
+        color = 'green' if infstats[i] == 'Healthy' else 'red'
+        time_seconds = np.arange(len(preprocessed_scan)) / sampling_rate
         fig.add_trace(go.Scatter(
             x=time_seconds,
-            y=scan['RadarRaw'],
+            y=preprocessed_scan['Radar'],
             mode='lines',
-            name=f"{scan['DeviceName']} - {scan['timestamp'].strftime('%Y-%m-%d %H:%M:%S')}",
+            name=f"{device_names[i]} - {timestamps[i].strftime('%Y-%m-%d %H:%M:%S')}",
             line=dict(color=color)
         ))
 
@@ -124,23 +124,23 @@ def plot_time_domain(scans, sampling_rate=100):
     )
     st.plotly_chart(fig)
 
-# Plot frequency domain
-def plot_frequency_domain(scans):
+def plot_frequency_domain(preprocessed_scans, timestamps, infstats, device_names, sampling_rate=100):
     st.write("## Frequency Domain")
     fig = go.Figure()
 
-    for i, scan in scans.iterrows():
-        color = 'green' if scan['InfStat'] == 'Healthy' else 'red'
-        frequencies = np.fft.fftfreq(len(scan['RadarRaw']), d=1/100)
-        fft_values = np.fft.fft(scan['RadarRaw'])
-        powers = np.abs(fft_values) / len(scan['RadarRaw'])
+    for i, preprocessed_scan in enumerate(preprocessed_scans):
+        color = 'green' if infstats[i] == 'Healthy' else 'red'
+        # Apply FFT on the preprocessed scan data
+        frequencies = np.fft.fftfreq(len(preprocessed_scan), d=1/sampling_rate)
+        fft_values = np.fft.fft(preprocessed_scan['Radar'])
+        powers = np.abs(fft_values) / len(preprocessed_scan)
         powers_db = 20 * np.log10(powers)
 
         fig.add_trace(go.Scatter(
             x=frequencies[:len(frequencies)//2],
             y=powers_db[:len(powers_db)//2],
             mode='lines',
-            name=f"{scan['DeviceName']} - {scan['timestamp'].strftime('%Y-%m-%d %H:%M:%S')}",
+            name=f"{device_names[i]} - {timestamps[i].strftime('%Y-%m-%d %H:%M:%S')}",
             line=dict(color=color)
         ))
 
@@ -215,11 +215,11 @@ def main():
             
             # Time domain plot in col1
             with col1:
-                plot_time_domain(filtered_scans)
+                plot_time_domain(processed_data_list, timestamps, infstats, device_names)
 
             # Frequency domain plot in col2
             with col2:
-                plot_frequency_domain(filtered_scans)
+                plot_frequency_domain(processed_data_list, timestamps, infstats, device_names)
             
             # Statistics plot in col3
             with col3:
