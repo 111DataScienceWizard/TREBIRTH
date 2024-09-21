@@ -215,11 +215,13 @@ def main():
             
             # Time domain plot in col1
             with col1:
-                plot_time_domain(filtered_scans)
+                plot_time_domain(processed_data_list[0], timestamps[0], infstats[0], device_names[0])
+                plot_time_domain(processed_data_list[1], timestamps[1], infstats[1], device_names[1])
 
             # Frequency domain plot in col2
             with col2:
-                plot_frequency_domain(filtered_scans)
+                plot_frequency_domain(processed_data_list[0], timestamps[0], infstats[0], device_names[0])
+                plot_frequency_domain(processed_data_list[1], timestamps[1], infstats[1], device_names[1])
             
             # Statistics plot in col3
             with col3:
