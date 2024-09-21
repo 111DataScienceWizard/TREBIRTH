@@ -98,7 +98,7 @@ def calculate_statistics(df):
     return stats_df
 
 # Plot time domain
-def plot_time_domain(stats_dfs, timestamps, infstats, device_names, sampling_rate=100):
+def plot_time_domain(scans, sampling_rate=100):
     st.write("## Time Domain")
     fig = go.Figure()
 
@@ -125,7 +125,7 @@ def plot_time_domain(stats_dfs, timestamps, infstats, device_names, sampling_rat
     st.plotly_chart(fig)
 
 # Plot frequency domain
-def plot_frequency_domain(stats_dfs, timestamps, infstats, device_names):
+def plot_frequency_domain(scans):
     st.write("## Frequency Domain")
     fig = go.Figure()
 
@@ -215,13 +215,11 @@ def main():
             
             # Time domain plot in col1
             with col1:
-                stats_dfs = [calculate_statistics(df) for df in processed_data_list]
-                plot_time_domain(stats_dfs, timestamps, infstats, device_names)
+                plot_time_domain(filtered_scans)
 
             # Frequency domain plot in col2
             with col2:
-                stats_dfs = [calculate_statistics(df) for df in processed_data_list]
-                plot_frequency_domain(stats_dfs, timestamps, infstats, device_names)
+                plot_frequency_domain(filtered_scans)
             
             # Statistics plot in col3
             with col3:
