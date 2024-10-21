@@ -722,7 +722,7 @@ if selected_options:
     # Add a button aligned to the left with a small, soft light blue style
     button_html = """
         <div style="display: flex; justify-content: center; align-items: center; gap: 30px; height: 50px;">
-            <a href="https://qskfow5zno4xytjdx4ydcs.streamlit.app/" target="_blank" style="
+            <a href="https://dataanalyticspy-jfsxr76wbypntkxtkac2ov.streamlit.app/" target="_blank" style="
                 display: inline-block;
                 padding: 10px 20px;
                 font-size: 16px;
