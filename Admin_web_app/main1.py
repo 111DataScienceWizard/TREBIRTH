@@ -112,7 +112,9 @@ with col1:
 
 with col2:
     # Image and Map
-    st.markdown('#')
+    st.markdown('##')
+    st.markdown('##')
+
     # Load and resize the image to fit within the container
     #image2 = Image.open("Admin_web_app/Frame_4_2.jpg")
     #new_image2 = image2.resize((600, 375))  # Resize the image to fit within the screen width
