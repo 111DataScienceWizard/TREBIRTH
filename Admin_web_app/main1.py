@@ -93,8 +93,7 @@ df = pd.DataFrame(cal_rows)
 df.columns = df.iloc[0]
 df = df[1:]
 
-# Use Markdown to show the dataframe with highlighted dates
-st.sidebar.markdown(df.to_html(index=False, escape=False), use_container_width=True, unsafe_allow_html=True)
+st.sidebar.dataframe(df,hide_index = True,width=500)
 
 # Creating the layout with columns
 col1, col2 = st.columns([3, 2])
