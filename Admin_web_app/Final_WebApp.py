@@ -703,7 +703,7 @@ if collections:
             ">
                 Detailed Scan Analysis
             </a>
-            <a href="https://mainpy-vknuf7uh4vuaqyrhwqzvhk.streamlit.app/" target="_blank" style="
+            <a href="https://main1py-wnwb6yeb4mdhv55zphdyw7.streamlit.app/" target="_blank" style="
                 display: inline-block;
                 padding: 10px 20px;
                 font-size: 16px;
