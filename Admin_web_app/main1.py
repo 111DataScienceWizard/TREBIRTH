@@ -93,8 +93,11 @@ df = pd.DataFrame(cal_rows)
 df.columns = df.iloc[0]
 df = df[1:]
 
-st.sidebar.markdown(df.to_html(index = False, escape=False), unsafe_allow_html=True)
+html_calendar = df.to_html(index=False, escape=False)
+styled_html_calendar = f"<div style='width: 500px'>{html_calendar}</div>"
 
+# Display the styled HTML calendar in Streamlit's sidebar
+st.sidebar.markdown(styled_html_calendar, unsafe_allow_html=True)
 # Creating the layout with columns
 col1, col2 = st.columns([3, 2])
 
