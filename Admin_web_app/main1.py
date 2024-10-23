@@ -114,6 +114,7 @@ with col2:
     # Image and Map
     st.markdown('##')
     st.markdown('##')
+    st.markdown('##')
 
     # Load and resize the image to fit within the container
     #image2 = Image.open("Admin_web_app/Frame_4_2.jpg")
@@ -124,6 +125,8 @@ with col2:
     st.markdown("<h2 style='color: white; font-size: 18px;'>Actions to be taken:</h2>", unsafe_allow_html=True)
     st.image("Admin_web_app/Frame_4_2.jpg", use_column_width=True)
 
+    st.markdown('##')
+    st.markdown('##')
     st.markdown("<h2 style='color: white; font-size: 18px;'>MAP:</h2>", unsafe_allow_html=True)
     chart_data = pd.DataFrame(
         np.random.randn(5, 1) / [60, 60] + [20.079966, 74.109314],
