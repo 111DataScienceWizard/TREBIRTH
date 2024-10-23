@@ -66,7 +66,8 @@ st.sidebar.markdown("<h2 style='text-align: center; color: white;font-size: 25px
 st.sidebar.markdown("<h2 style='text-align: center; color: #247370;font-size: 19px;'>Plot number 1</h2>", unsafe_allow_html=True)
 st.sidebar.markdown("<h2 style='text-align: center; color: #1a5361;font-size: 19px'>Plot number 2 </h2>", unsafe_allow_html=True)
 st.sidebar.markdown("<h2 style='text-align: center; color: #1a5361;font-size: 19px'>Plot number 3 </h2>", unsafe_allow_html=True)
-st.markdown('##')
+
+st.markdown('#')
 # Calendar
 cal_rows = [['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']]
 cal = calendar.monthcalendar(2024, 3)
