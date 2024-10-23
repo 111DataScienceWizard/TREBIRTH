@@ -78,26 +78,24 @@ valid_dates = [day for week in cal for day in week[:-1] if day != 0]  # Ignore S
 start_day = random.choice(valid_dates[:-4])  # Ensure we can pick 5 consecutive dates
 random_dates = [start_day + i for i in range(5) if (start_day + i) in valid_dates]
 
-# Style to highlight the selected random dates
-def highlight_day(day):
-    if day in random_dates:
-        return f"<span style='background-color: yellow; color: black; padding: 5px;'>{day}</span>"
-    return str(day)
-
 # Build calendar rows with highlighted dates
 for week in cal:
-    cal_rows.append([highlight_day(day) if day != 0 else '' for day in week])
+    cal_rows.append([day if day != 0 else '' for day in week])
 
 # Convert calendar rows to a DataFrame
 df = pd.DataFrame(cal_rows)
 df.columns = df.iloc[0]
 df = df[1:]
 
-html_calendar = df.to_html(index=False, escape=False)
-styled_html_calendar = f"<div style='width: 500px'>{html_calendar}</div>"
+def highlight_random_dates(val):
+    if val in random_dates:
+        return 'background-color: yellow; color: black;'  # Highlighting specific cells
+    return ''
+# Apply styling to the DataFrame
+styled_df = df.style.applymap(highlight_random_dates)
 
-# Display the styled HTML calendar in Streamlit's sidebar
-st.sidebar.markdown(styled_html_calendar, unsafe_allow_html=True)
+# Display the styled DataFrame in the sidebar
+st.sidebar.dataframe(styled_df, hide_index=True, width=500)
 # Creating the layout with columns
 col1, col2 = st.columns([3, 2])
 
