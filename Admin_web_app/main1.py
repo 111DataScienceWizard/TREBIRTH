@@ -93,7 +93,7 @@ df = pd.DataFrame(cal_rows)
 df.columns = df.iloc[0]
 df = df[1:]
 
-st.sidebar.markdown(df.to_html(hide_index = True, escape=False), unsafe_allow_html=True)
+st.sidebar.markdown(df.to_html(index = False, escape=False), unsafe_allow_html=True)
 
 # Creating the layout with columns
 col1, col2 = st.columns([3, 2])
