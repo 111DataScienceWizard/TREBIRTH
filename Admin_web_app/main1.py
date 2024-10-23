@@ -64,6 +64,8 @@ st.sidebar.markdown(
 st.sidebar.markdown("<h1 style='text-align: center; color: white;font-size: 32px;'>Ramesh Kapare</h1>", unsafe_allow_html=True)
 st.sidebar.markdown("<h2 style='text-align: center; color: white;font-size: 25px;'>Niphad Farm</h2>", unsafe_allow_html=True)
 st.sidebar.markdown("<h2 style='text-align: center; color: #247370;font-size: 19px;'>Plot number 1</h2>", unsafe_allow_html=True)
+st.sidebar.markdown("<h2 style='text-align: center; color: #1a5361;font-size: 19px'>Plot number 2 </h2>", unsafe_allow_html=True)
+st.sidebar.markdown("<h2 style='text-align: center; color: #1a5361;font-size: 19px'>Plot number 3 </h2>", unsafe_allow_html=True)
 st.markdown('##')
 # Calendar
 cal_rows = [['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']]
@@ -92,7 +94,7 @@ df.columns = df.iloc[0]
 df = df[1:]
 
 # Use Markdown to show the dataframe with highlighted dates
-st.sidebar.markdown(df.to_html(index=False, escape=False), unsafe_allow_html=True)
+st.sidebar.markdown(df.to_html(index=False, escape=False), use_container_width=True, unsafe_allow_html=True)
 
 # Creating the layout with columns
 col1, col2 = st.columns([3, 2])
