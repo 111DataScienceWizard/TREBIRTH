@@ -45,7 +45,25 @@ no_healthy = Total_trees - no_inf
 image = Image.open('Admin_web_app/Farmer face in a circle.png')
 new_image = image.resize((200, 200))
 
-st.sidebar.image(new_image)
+# Centering the image using custom CSS
+st.sidebar.markdown(
+    """
+    <style>
+    .center-image {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    </style>
+    """, 
+    unsafe_allow_html=True
+)
+
+# Wrapping the image in a div to center it
+st.sidebar.markdown("<div class='center-image'><img src='data:image/png;base64,{}' class='img-fluid' /></div>".format(st.sidebar.image(new_image, use_column_width=False)), unsafe_allow_html=True)
+
+
+#st.sidebar.image(new_image)
 st.sidebar.markdown("<h1 style='text-align: center; color: white;font-size: 32px;'>Ramesh Kapare</h1>", unsafe_allow_html=True)
 st.sidebar.markdown("<h2 style='text-align: center; color: white;font-size: 25px;'>Niphad Farm</h2>", unsafe_allow_html=True)
 st.sidebar.markdown("<h2 style='text-align: center; color: #247370;font-size: 19px;'>Plot number 1</h2>", unsafe_allow_html=True)
