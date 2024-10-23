@@ -94,7 +94,7 @@ def highlight_random_dates(val):
     return ''
 # Apply styling to the DataFrame
 styled_df = df.style.applymap(highlight_random_dates)
-
+st.sidebar.write("Calendar to schedule farm visit:")
 # Display the styled DataFrame in the sidebar
 st.sidebar.dataframe(styled_df, hide_index=True, width=500)
 
