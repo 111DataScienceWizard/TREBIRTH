@@ -10,6 +10,7 @@ from PIL import Image
 import base64
 from io import BytesIO
 from google.cloud.firestore import FieldFilter
+import random
 
 
 st.set_page_config(layout="wide")
@@ -63,17 +64,21 @@ st.sidebar.markdown(
 st.sidebar.markdown("<h1 style='text-align: center; color: white;font-size: 32px;'>Ramesh Kapare</h1>", unsafe_allow_html=True)
 st.sidebar.markdown("<h2 style='text-align: center; color: white;font-size: 25px;'>Niphad Farm</h2>", unsafe_allow_html=True)
 st.sidebar.markdown("<h2 style='text-align: center; color: #247370;font-size: 19px;'>Plot number 1</h2>", unsafe_allow_html=True)
-
+st.markdown('##')
 # Calendar
 cal_rows = [['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']]
 cal = calendar.monthcalendar(2024, 3)
+
+# Select 5 random dates to highlight
+all_dates = [day for week in cal for day in week if day != 0]
+random_dates = random.sample(all_dates, 5)
 for week in cal:
-    cal_rows.append([str(day) if day != 0 else '' for day in week])
+    cal_rows.append([f"**{day}**" if day in random_dates else str(day) if day != 0 else '' for day in week])
 
 df = pd.DataFrame(cal_rows)
 df.columns = df.iloc[0]
 df = df[1:]
-st.sidebar.dataframe(df, hide_index=True, width=500)
+st.sidebar.markdown(df.to_html(index=False, escape=False), unsafe_allow_html=True)
 
 # Creating the layout with columns
 col1, col2 = st.columns([3, 2])
