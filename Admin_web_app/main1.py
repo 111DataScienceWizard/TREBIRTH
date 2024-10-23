@@ -89,7 +89,7 @@ df = df[1:]
 
 def highlight_random_dates(val):
     if val in random_dates:
-        return 'background-color: lightgreen; color: black; padding: 5px; border-radius: 10px;'
+        return 'background-color: lightblue; color: black; padding: 5px; font-weight: bold; border-radius: 10px;'
     return ''
 # Apply styling to the DataFrame
 styled_df = df.style.applymap(highlight_random_dates)
