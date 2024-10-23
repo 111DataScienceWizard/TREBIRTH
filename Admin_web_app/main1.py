@@ -114,7 +114,7 @@ with col2:
     # Image and Map
     st.markdown('##')
     st.markdown('##')
-
+    st.markdown('#')
     # Load and resize the image to fit within the container
     #image2 = Image.open("Admin_web_app/Frame_4_2.jpg")
     #new_image2 = image2.resize((600, 375))  # Resize the image to fit within the screen width
@@ -122,7 +122,7 @@ with col2:
     # Use st.image with adjusted width to prevent horizontal scrolling
     #st.image(new_image2, use_column_width=True)
     st.markdown("<h2 style='color: white; font-size: 18px;'>Actions to be taken:</h2>", unsafe_allow_html=True)
-    st.markdown('##')
+    st.markdown('#')
     st.image("Admin_web_app/Frame_4_2.jpg", use_column_width=True)
 
     st.markdown('##')
