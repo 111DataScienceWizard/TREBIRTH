@@ -69,15 +69,29 @@ st.markdown('##')
 cal_rows = [['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']]
 cal = calendar.monthcalendar(2024, 3)
 
-# Select 5 random dates to highlight
-all_dates = [day for week in cal for day in week if day != 0]
-random_dates = random.sample(all_dates, 5)
-for week in cal:
-    cal_rows.append([f"**{day}**" if day in random_dates else str(day) if day != 0 else '' for day in week])
+# Find valid days that are not Sunday
+valid_dates = [day for week in cal for day in week[:-1] if day != 0]  # Ignore Sundays (last element in each week)
 
+# Select 5 consecutive random dates, avoiding Sundays
+start_day = random.choice(valid_dates[:-4])  # Ensure we can pick 5 consecutive dates
+random_dates = [start_day + i for i in range(5) if (start_day + i) in valid_dates]
+
+# Style to highlight the selected random dates
+def highlight_day(day):
+    if day in random_dates:
+        return f"<span style='background-color: yellow; color: black; padding: 5px;'>{day}</span>"
+    return str(day)
+
+# Build calendar rows with highlighted dates
+for week in cal:
+    cal_rows.append([highlight_day(day) if day != 0 else '' for day in week])
+
+# Convert calendar rows to a DataFrame
 df = pd.DataFrame(cal_rows)
 df.columns = df.iloc[0]
 df = df[1:]
+
+# Use Markdown to show the dataframe with highlighted dates
 st.sidebar.markdown(df.to_html(index=False, escape=False), unsafe_allow_html=True)
 
 # Creating the layout with columns
