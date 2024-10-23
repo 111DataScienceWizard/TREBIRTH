@@ -121,8 +121,10 @@ with col2:
     
     # Use st.image with adjusted width to prevent horizontal scrolling
     #st.image(new_image2, use_column_width=True)
+    st.markdown("<h2 style='color: white;'>Actions to be taken:</h2>", unsafe_allow_html=True)
     st.image("Admin_web_app/Frame_4_2.jpg", use_column_width=True)
 
+    st.markdown("<h2 style='color: white;'>MAP:</h2>", unsafe_allow_html=True)
     chart_data = pd.DataFrame(
         np.random.randn(5, 1) / [60, 60] + [20.079966, 74.109314],
         columns=['lat', 'lon']
