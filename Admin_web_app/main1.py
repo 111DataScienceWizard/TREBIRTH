@@ -112,8 +112,20 @@ with col1:
 
 with col2:
     # Image and Map
-    st.markdown("#")
-    st.image("Admin_web_app/Frame_4_2.jpg", width=800)
+    st.markdown('##')
+    st.markdown('##')
+    st.markdown('##')
+    st.markdown('##')
+    st.markdown('##')
+    st.markdown('##')
+    
+    # Load and resize the image to fit within the container
+    image2 = Image.open("Admin_web_app/Frame_4_2.jpg")
+    new_image2 = image2.resize((600, 375))  # Resize the image to fit within the screen width
+    
+    # Use st.image with adjusted width to prevent horizontal scrolling
+    st.image(new_image2, use_column_width=True)
+    #st.image("Admin_web_app/Frame_4_2.jpg", width=800)
 
     chart_data = pd.DataFrame(
         np.random.randn(5, 1) / [60, 60] + [20.079966, 74.109314],
