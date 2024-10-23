@@ -7,6 +7,8 @@ import pandas as pd
 import pydeck as pdk
 import calendar
 from PIL import Image
+import base64
+from io import BytesIO
 from google.cloud.firestore import FieldFilter
 
 
@@ -45,24 +47,14 @@ no_healthy = Total_trees - no_inf
 image = Image.open('Admin_web_app/Farmer face in a circle.png')
 new_image = image.resize((200, 200))
 
-# Add CSS to center-align the image
-st.sidebar.markdown(
-    """
-    <style>
-    .centered-image {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    </style>
-    """, unsafe_allow_html=True
-)
-
-# Center-align the farmer's image in the sidebar
+buffer = BytesIO()
+new_image.save(buffer, format="PNG")
+img_str = base64.b64encode(buffer.getvalue()).decode()
+# Display the centered image and text in the sidebar
 st.sidebar.markdown(
     f"""
-    <div class='centered-image'>
-        <img src="data:image/png;base64,{st.sidebar.image(new_image)}" width="200" height="200">
+    <div style="text-align: center;">
+        <img src="data:image/png;base64,{img_str}" width="200" height="200" style="border-radius:50%;"/>
     </div>
     """, unsafe_allow_html=True
 )
