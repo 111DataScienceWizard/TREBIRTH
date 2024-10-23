@@ -89,13 +89,25 @@ df = df[1:]
 
 def highlight_random_dates(val):
     if val in random_dates:
-        return 'background-color: lightblue; color: darkblue; font-weight: bold;'  # Highlighting specific cells
+        return 'background-color: lightgreen; color: black; padding: 5px; border-radius: 10px;'
     return ''
 # Apply styling to the DataFrame
 styled_df = df.style.applymap(highlight_random_dates)
 
 # Display the styled DataFrame in the sidebar
 st.sidebar.dataframe(styled_df, hide_index=True, width=500)
+
+# Function to add vertical spacing
+def v_spacer(height, sb=False) -> None:
+    for _ in range(height):
+        if sb:
+            st.sidebar.write('\n')
+        else:
+            st.write('\n')
+
+# Example of using the v_spacer function to create space below the calendar
+v_spacer(2, sb=True)  # Adds 2 newlines worth of space in the sidebar
+
 # Creating the layout with columns
 col1, col2 = st.columns([3, 2])
 
