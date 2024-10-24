@@ -103,13 +103,14 @@ def plot_time_domain(preprocessed_scans, timestamps, infstats, device_names, sam
     fig = go.Figure()
 
     for i, preprocessed_scan in enumerate(preprocessed_scans):
+        device_name_in_parentheses = device_names[i][device_names[i].find('(') + 1:device_names[i].find(')')]
         color = 'green' if infstats[i] == 'Healthy' else 'red'
         time_seconds = np.arange(len(preprocessed_scan)) / sampling_rate
         fig.add_trace(go.Scatter(
             x=time_seconds,
             y=preprocessed_scan['Radar'],
             mode='lines',
-            name=f"{device_names[i]} - {timestamps[i].strftime('%Y-%m-%d %H:%M:%S')}",
+            name=f"{device_name_in_parentheses} - {timestamps[i].strftime('%Y-%m-%d %H:%M:%S')}",
             line=dict(color=color)
         ))
 
@@ -129,6 +130,7 @@ def plot_frequency_domain(preprocessed_scans, timestamps, infstats, device_names
     fig = go.Figure()
 
     for i, preprocessed_scan in enumerate(preprocessed_scans):
+        device_name_in_parentheses = device_names[i][device_names[i].find('(') + 1:device_names[i].find(')')]
         color = 'green' if infstats[i] == 'Healthy' else 'red'
         # Apply FFT on the preprocessed scan data
         frequencies = np.fft.fftfreq(len(preprocessed_scan), d=1/sampling_rate)
@@ -140,7 +142,7 @@ def plot_frequency_domain(preprocessed_scans, timestamps, infstats, device_names
             x=frequencies[:len(frequencies)//2],
             y=powers_db[:len(powers_db)//2],
             mode='lines',
-            name=f"{device_names[i]} - {timestamps[i].strftime('%Y-%m-%d %H:%M:%S')}",
+            name=f"{device_name_in_parentheses} - {timestamps[i].strftime('%Y-%m-%d %H:%M:%S')}",
             line=dict(color=color)
         ))
 
@@ -158,6 +160,7 @@ def plot_frequency_domain(preprocessed_scans, timestamps, infstats, device_names
 # Plot statistics for multiple scans using Plotly with InfStat-based coloring
 def plot_multiple_statistics(stats_dfs, timestamps, infstats, device_names):
     st.write("## Radar Column Statistics")
+    device_name_in_parentheses = device_names[i][device_names[i].find('(') + 1:device_names[i].find(')')]
     
     fig = go.Figure()
 
@@ -172,7 +175,7 @@ def plot_multiple_statistics(stats_dfs, timestamps, infstats, device_names):
         fig.add_trace(go.Bar(
             x=stats_measures,
             y=[stats_df[measure].values[0] for measure in stats_measures],  # Assuming one radar column
-            name=f'{device_names[i]} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}',
+            name=f'{device_name_in_parentheses} - {timestamps[i].strftime("%Y-%m-%d %H:%M:%S")}',
             marker_color=color,
             ))
 
