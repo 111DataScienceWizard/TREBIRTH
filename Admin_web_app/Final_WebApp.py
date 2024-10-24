@@ -160,7 +160,6 @@ def plot_frequency_domain(preprocessed_scans, timestamps, infstats, device_names
 # Plot statistics for multiple scans using Plotly with InfStat-based coloring
 def plot_multiple_statistics(stats_dfs, timestamps, infstats, device_names):
     st.write("## Radar Column Statistics")
-    device_name_in_parentheses = device_names[i][device_names[i].find('(') + 1:device_names[i].find(')')]
     
     fig = go.Figure()
 
@@ -168,6 +167,8 @@ def plot_multiple_statistics(stats_dfs, timestamps, infstats, device_names):
     
     for i, stats_df in enumerate(stats_dfs):
         # Determine color based on InfStat
+        device_name_in_parentheses = device_names[i][device_names[i].find('(') + 1:device_names[i].find(')')]
+    
         if i < len(infstats):
             color = 'green' if infstats[i] == 'Healthy' else 'red'
         
