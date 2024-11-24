@@ -14,10 +14,10 @@ from scipy import signal
 from scipy.stats import skew, kurtosis
 from preprocess import detrend, fq, stats_radar, columns_reports_unique
 from google.api_core.exceptions import ResourceExhausted, RetryError
-from filterss import (coefLPF1Hz, coefLPF2Hz, coefLPF3Hz, coefLPF4Hz, coefLPF5Hz, coefLPF6Hz, coefLPF7Hz, coefLPF8Hz, 
-                     coefLPF9Hz, coefLPF10Hz, coefLPF11Hz, coefLPF12Hz, coefLPF13Hz, coefLPF14Hz, coefLPF15Hz, 
-                     coefHPF1Hz, coefHPF2Hz, coefHPF3Hz, coefHPF4Hz, coefHPF5Hz, coefHPF6Hz, coefHPF7Hz, coefHPF8Hz, 
-                     coefHPF9Hz, coefHPF10Hz, coefHPF11Hz, coefHPF12Hz, coefHPF13Hz, coefHPF14Hz, coefHPF15Hz, 
+from filterss import (coefLPF1HZ, coefLPF2HZ, coefLPF3HZ, coefLPF4HZ, coefLPF5HZ, coefLPF6HZ, coefLPF7HZ, coefLPF8HZ, 
+coefLPF9HZ, coefLPF10HZ, coefLPF11HZ, coefLPF12HZ, coefLPF13HZ, coefLPF14HZ, coefLPF15HZ, 
+ coefHPF1HZ, coefHPF2HZ, coefHPF3HZ, coefHPF4HZ, coefHPF5HZ, coefHPF6HZ, coefHPF7HZ, coefHPF8HZ, 
+ coefHPF9HZ, coefHPF10HZ, coefHPF11HZ, coefHPF12HZ, coefHPF13HZ, coefHPF14HZ, coefHPF15HZ
                      )
 
 def stats_filtereddata(df, band):
