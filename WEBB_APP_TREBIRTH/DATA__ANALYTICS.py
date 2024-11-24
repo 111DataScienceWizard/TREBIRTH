@@ -211,7 +211,7 @@ else:
     df_combined = pd.concat([df_radar, df_ax, df_ay, df_az], axis=1)
     #df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
 
-    filtered_data_df = pd.DataFrame({col: process(coefLPF15Hz, df_combined[col].values) for col in df_combined.columns})
+    filtered_data_df = pd.DataFrame({col: process(coefLPF15HZ, df_combined[col].values) for col in df_combined.columns})
 
     # Detrend all the columns
     df_combined_detrended = df_combined.apply(detrend)
@@ -279,12 +279,12 @@ else:
 
     # Map selected filter type and frequency to the corresponding coefficients
     if filter_type == 'Low Pass Filter (LPF)':
-        filter_coef = globals()[f'coefLPF{frequency}Hz']
+        filter_coef = globals()[f'coefLPF{frequency}HZ']
     elif filter_type == 'High Pass Filter (HPF)':
-        filter_coef = globals()[f'coefHPF{frequency}Hz']
+        filter_coef = globals()[f'coefHPF{frequency}HZ']
     elif filter_type == 'Band Pass Filter (BPF)':
-        filter_coef_low = globals()[f'coefHPF{low_freq}Hz']
-        filter_coef_high = globals()[f'coefLPF{high_freq}Hz']
+        filter_coef_low = globals()[f'coefHPF{low_freq}HZ']
+        filter_coef_high = globals()[f'coefLPF{high_freq}HZ']
 
     # Apply the selected filter only to Radar and ADXL columns
     # List to hold all Radar and ADXL column names
