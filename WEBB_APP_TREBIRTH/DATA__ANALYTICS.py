@@ -211,7 +211,7 @@ else:
     df_combined = pd.concat([df_radar, df_ax, df_ay, df_az], axis=1)
     #df_combined = pd.concat([df_radar, df_adxl, df_ax, df_ay, df_az], axis=1)
 
-    filtered_data_df = pd.DataFrame({col: process(coefLPF50Hz, df_combined[col].values) for col in df_combined.columns})
+    filtered_data_df = pd.DataFrame({col: process(coefLPF15Hz, df_combined[col].values) for col in df_combined.columns})
 
     # Detrend all the columns
     df_combined_detrended = df_combined.apply(detrend)
@@ -273,9 +273,9 @@ else:
     filter_type = st.selectbox('Select Filter Type', ['Low Pass Filter (LPF)', 'High Pass Filter (HPF)', 'Band Pass Filter (BPF)'])
 
     if filter_type == 'Band Pass Filter (BPF)':
-        low_freq, high_freq = st.slider('Select Frequency Range (Hz)', 1, 50, (5, 10))
+        low_freq, high_freq = st.slider('Select Frequency Range (Hz)', 1, 15, (5, 10))
     else:
-        frequency = st.slider('Select Frequency (Hz)', 1, 50)
+        frequency = st.slider('Select Frequency (Hz)', 1, 15)
 
     # Map selected filter type and frequency to the corresponding coefficients
     if filter_type == 'Low Pass Filter (LPF)':
