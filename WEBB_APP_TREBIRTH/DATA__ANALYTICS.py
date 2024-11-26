@@ -58,7 +58,7 @@ def process(coef, in_signal):
   
 # Set page configuration
 st.set_page_config(layout="wide")
-st.title('Data Analytics')
+st.title('PCI Data Analytics')
 st.markdown(
     """
     <style>
