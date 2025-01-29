@@ -180,7 +180,7 @@ else:
     df_metadata = pd.DataFrame(metadata_list)
 
     # Select only the desired columns
-    desired_columns = ['TreeSec', 'TreeNo', 'InfStat', 'TreeID', 'RowNo', 'ScanNo', 'timestamp']
+    desired_columns = ['timestamp', 'Area', 'Damage visible', 'Infestation', 'Insect type', 'Pest details', 'Report Location', 'Report requested by', 'Scan Duration', 'Scan Location', 'Termatrac device position', 'Termatrac device was', 'Tests were carried out by', 'DeviceName']
     df_metadata_filtered = df_metadata[desired_columns]
 
     # Construct file name based on user inputs
