@@ -1,81 +1,12 @@
-import streamlit as st
-from google.cloud import firestore
-import pandas as pd
-from google.cloud.firestore import FieldFilter
-from io import BytesIO
-import matplotlib.pyplot as plt
-from datetime import datetime
-import numpy as np
-import time
-import zipfile
-import os
-import random
-from scipy import signal
-from scipy.stats import skew, kurtosis
-from preprocess import detrend, fq, stats_radar, columns_reports_unique
-from google.api_core.exceptions import ResourceExhausted, RetryError
-
-
-
-
-  
-# Set page configuration
-st.set_page_config(layout="wide")
-st.title('Data Analytics')
-st.markdown(
-    """
-    <style>
-    .reportview-container {
-        background-color: white;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-def exponential_backoff(retries):
-    base_delay = 1
-    max_delay = 60
-    delay = base_delay * (2 ** retries) + random.uniform(0, 1)
-    return min(delay, max_delay)
-
-def get_firestore_data(query):
-    retries = 0
-    max_retries = 10
-    while retries < max_retries:
-        try:
-            results = query.stream()
-            return list(results)
-        except ResourceExhausted as e:
-            st.warning(f"Quota exceeded, retrying... (attempt {retries + 1})")
-            time.sleep(exponential_backoff(retries))
-            retries += 1
-        except RetryError as e:
-            st.warning(f"Retry error: {e}, retrying... (attempt {retries + 1})")
-            time.sleep(exponential_backoff(retries))
-            retries += 1
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
-            break
-    raise Exception("Max retries exceeded")
-
 # Authenticate to Firestore with the JSON account key.
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
 
-# User input for Row No., Tree No., Scan No., and Label
-row_number = st.text_input('Enter Row number')
-tree_number = st.text_input('Enter Tree number')
-scan_number = st.text_input('Enter Scan number', 'All')
-bucket_number = st.text_input('Enter Bucket number', 'All')
-
-# Dropdown for InfStat label selection
-label_infstat = st.selectbox('Select Label', ['All', 'Infected', 'Healthy'], index=0)
+# Create a reference to the Firestore collection
+query = db.collection('demo_db')
 
 # Dropdown for selecting sheets in Excel
 selected_sheets = st.multiselect('Select Sheets', ['Raw Data', 'Detrended Data', 'Normalized Data', 'Detrended & Normalized Data', 'Metadata', 'Time Domain Features', 'Frequency Domain Features', 'Columns Comparison'], default=['Raw Data', 'Metadata'])
 
-# Create a reference to the Firestore collection
-query = db.collection('demo_day') 
 
 # Apply filters based on user input
 if row_number:
@@ -101,10 +32,6 @@ if not query_results:
 else:
     # Create empty lists to store data
     radar_data = []
-    #adxl_data = []
-    ax_data = []
-    ay_data = []
-    az_data = []
     metadata_list = []
 
     # Function to slice data
@@ -123,17 +50,7 @@ else:
                 metadata[key] = value.replace(tzinfo=None)
         metadata_list.append(metadata)
 
-    # Process each scan's data individually and concatenate later
-    #def process_data(data_list, prefix):
-        #processed_list = []
-        #for i, data in enumerate(data_list):
-            #df = pd.DataFrame(data).dropna()
-            #df.fillna(df.mean(), inplace=True)
-            #new_columns = [f'{prefix}{i}']
-            #df.columns = new_columns
-            #processed_list.append(df)
-        #return pd.concat(processed_list, axis=1)
-
+    
     def process_data(data_list, prefix):
         processed_list = []
         for i, data in enumerate(data_list):
@@ -224,85 +141,10 @@ else:
 
     # Download button for selected sheets and metadata
     st.download_button("Download Selected Sheets and Metadata", excel_data, file_name=f"{file_name}.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-excel')
-    #st.write("Columns in df_combined_detrended:", df_combined_detrended.columns)
   
-    # Adding filter selection components
-    filter_type = st.selectbox('Select Filter Type', ['Low Pass Filter (LPF)', 'High Pass Filter (HPF)', 'Band Pass Filter (BPF)'])
 
-    if filter_type == 'Band Pass Filter (BPF)':
-        low_freq, high_freq = st.slider('Select Frequency Range (Hz)', 1, 50, (5, 10))
-    else:
-        frequency = st.slider('Select Frequency (Hz)', 1, 50)
-
-    # Map selected filter type and frequency to the corresponding coefficients
-    if filter_type == 'Low Pass Filter (LPF)':
-        filter_coef = globals()[f'coefLPF{frequency}Hz']
-    elif filter_type == 'High Pass Filter (HPF)':
-        filter_coef = globals()[f'coefHPF{frequency}Hz']
-    elif filter_type == 'Band Pass Filter (BPF)':
-        filter_coef_low = globals()[f'coefHPF{low_freq}Hz']
-        filter_coef_high = globals()[f'coefLPF{high_freq}Hz']
-
-    # Apply the selected filter only to Radar and ADXL columns
-    # List to hold all Radar and ADXL column names
-    radar_columns = [f'Radar {i+1}' for i in range(30)]  # Assuming there are 10 scans
-    #adxl_columns = [f'ADXL {i}' for i in range(30)]  # Assuming there are 10 scans
-    available_radar_columns = [col for col in df_combined_detrended.columns if col.startswith('Radar')]
-
-    # Dictionary to hold the filtered data columns for Radar and ADXL
-    filtered_radar_columns = {}
-    #filtered_adxl_columns = {}
-
-    # Add data for each scan to the filtered columns dictionary
-    for i, radar_col in enumerate(available_radar_columns):
-        filtered_radar_columns[f'Radar {i+1}'] = df_combined_detrended[radar_col]
-        #filtered_adxl_columns[f'ADXL {i}'] = df_combined_detrended[f'ADXL {i}']
-
-    # Apply the process function on each column
-    if filter_type == 'Band Pass Filter (BPF)':
-        filtered_radar_data_low = pd.DataFrame({col: process(filter_coef_low, data.values) for col, data in filtered_radar_columns.items()})
-        filtered_radar_data = pd.DataFrame({col: process(filter_coef_high, data.values) for col, data in filtered_radar_data_low.items()})
-        #filtered_adxl_data_low = pd.DataFrame({col: process(filter_coef_low, data.values) for col, data in filtered_adxl_columns.items()})
-        #filtered_adxl_data = pd.DataFrame({col: process(filter_coef_high, data.values) for col, data in filtered_adxl_data_low.items()})
-    else:
-        filtered_radar_data = pd.DataFrame({col: process(filter_coef, data.values) for col, data in filtered_radar_columns.items()})
-        #filtered_adxl_data = pd.DataFrame({col: process(filter_coef, data.values) for col, data in filtered_adxl_columns.items()})
-
-filtered_data = pd.concat([filtered_radar_data], axis=1)
-#filtered_data = pd.concat([filtered_radar_data, filtered_adxl_data], axis=1)
-
-
-# Multi-select box to select desired sheets
-selected_sheets = st.multiselect('Select Sheets to Download', ['Filtered Data', 'Time Domain Features', 'Columns Comparison'])
-
-# Add a button to trigger the download
-if st.button("Download Selected Sheets"):
-    # Prepare the Excel file with selected sheets
-    filtered_excel_data = BytesIO()
-    with pd.ExcelWriter(filtered_excel_data, engine='xlsxwriter') as writer:
-        for sheet_name in selected_sheets:
-            # Write each selected sheet to the Excel file
-            if sheet_name == 'Filtered Data':
-                # Write filtered data to the sheet
-                filtered_data.to_excel(writer, sheet_name=sheet_name, index=False)
-            elif sheet_name == 'Time Domain Features':
-                # Apply the time domain features on the filtered data
-                time_domain_features_filtered = stats_radar(filtered_data)
-                # Write time domain features data to the sheet
-                time_domain_features_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
-            elif sheet_name == 'Columns Comparison':
-                # Apply the columns comparison on the filtered data
-                columns_comparison_filtered = columns_reports_unique(filtered_data)
-                # Write column comparison data to the sheet
-                columns_comparison_filtered.to_excel(writer, sheet_name=sheet_name, index=False)
-
-    # Set the pointer to the beginning of the file
-    filtered_excel_data.seek(0)
-
-    # Trigger the download of the Excel file
-    st.download_button("Download Filtered Data", filtered_excel_data, file_name=f"Filtered_{filter_type.replace(' ', '')}{frequency if filter_type != 'Band Pass Filter (BPF)' else f'{low_freq}to{high_freq}'}Hz.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key='download-filtered-excel')
-
-
+  
+          
 
 
 
