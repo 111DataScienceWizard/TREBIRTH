@@ -64,6 +64,48 @@ db = firestore.Client.from_service_account_json("Report_Generation_Web_App/testd
 
 query = db.collection('demo_db') 
 
+def fetch_data():
+    db = firestore.Client()
+    collection_ref = db.collection("demo_db")
+    docs = collection_ref.stream()
+    
+    locations = set()
+    companies = set()
+    scans_data = []
+    
+    for doc in docs:
+        data = doc.to_dict()
+        if "Report Location" in data and "Tests were carried out by" in data:
+            locations.add(data["Report Location"].strip())
+            companies.add(data["Tests were carried out by"].strip())
+            scans_data.append(data)
+    
+    return sorted(locations), sorted(companies), scans_data
+
+# Fetch data from Firestore
+locations, companies, scans_data = fetch_data()
+
+st.title("Scan Report Viewer")
+
+# Multi-select dropdowns
+selected_locations = st.multiselect("Select Report Location:", locations)
+selected_companies = st.multiselect("Select Company:", companies)
+
+# Filter and display results
+if selected_locations or selected_companies:
+    matched_users = set()
+    for scan in scans_data:
+        if (not selected_locations or scan["Report Location"].strip() in selected_locations) and \
+           (not selected_companies or scan["Tests were carried out by"].strip() in selected_companies):
+            matched_users.add(scan["Report requested by"].strip())
+
+    if matched_users:
+        st.write("### Report requested by:")
+        for user in sorted(matched_users):
+            st.write(user)
+    else:
+        st.write("No data found")
+
 
 
 
