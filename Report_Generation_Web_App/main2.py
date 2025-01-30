@@ -21,8 +21,10 @@ from google.api_core.exceptions import ResourceExhausted, RetryError
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Line
+from reportlab.pdfgen import canvas
 import tempfile
+from reportlab.lib.units import inch
 
 
 
@@ -104,9 +106,13 @@ def generate_pdf():
     
     doc = SimpleDocTemplate(pdf_path, pagesize=A4)
     styles = getSampleStyleSheet()
+
+    # Apply Times New Roman font
+    styles["Heading1"].fontName = 'Times-Roman'
+    styles["Normal"].fontName = 'Times-Roman'
     
     heading_style = ParagraphStyle(
-        "HeadingStyle", parent=styles["Heading1"], fontSize=16, textColor=colors.blue,
+        "HeadingStyle", parent=styles["Heading1"], fontSize=20, textColor=colors.blue,
         alignment=1, spaceAfter=10, underline=True, bold=True,
     )
     body_style = styles["Normal"]
@@ -136,14 +142,20 @@ def generate_pdf():
         requested_by = filtered_scans[0]["Report requested by"]
         report_date = filtered_scans[0]["scan_date"]
         
-        general_info = f"""Tests were carried out by: {test_by} <br/>
-        Date: {report_date} <br/>
-        Report for building at: {report_loc} <br/>
-        Report requested by: {requested_by} <br/>
-        Page 1/6"""
+        # Split the general information into multiple lines and add a Spacer after each line
+        general_info = [
+            f"Tests were carried out by: {test_by}",
+            f"Date: {report_date}",
+            f"Report for building at: {report_loc}",
+            f"Report requested by: {requested_by}"
+        ]
         
-        elements.append(Paragraph(general_info, body_style))
-        elements.append(Spacer(1, 10))
+        for info in general_info:
+            elements.append(Paragraph(info, body_style))
+            elements.append(Spacer(1, 12))  # Leave space between lines
+
+        # Page Break and continuing content for further pages
+        elements.append(PageBreak())
         
         area_scans = {}
         for scan in filtered_scans:
@@ -151,8 +163,10 @@ def generate_pdf():
             if area not in area_scans:
                 area_scans[area] = []
             area_scans[area].append(scan)
-        
+                
+        # Loop over the areas and scans and add them to the document
         page_num = 1
+        total_pages = len(area_scans)  # Calculate the total number of pages
         for i, (area, scans) in enumerate(area_scans.items(), start=1):
             elements.append(Paragraph(f"{i} {area.upper()}", heading_style))
             
@@ -177,7 +191,18 @@ def generate_pdf():
                 
                 if j % 3 == 0:
                     page_num += 1
-                    elements.append(Paragraph(f"Page {page_num}/6", body_style))
+                    elements.append(Spacer(1, 10))  # Leave space before page number
+                    # Add a line before the page number
+                    elements.append(Line(50, 80, 550, 80))  # X1, Y1, X2, Y2 for line
+                    # Add page number to the bottom left
+                    elements.append(Paragraph(f"pg.no: {page_num}/{total_pages}", body_style))
+                    elements.append(Spacer(1, 10))
+                    elements.append(PageBreak())  # Start a new page for the next set of scans
+    
+    # Final page line and page number
+    elements.append(Spacer(1, 10))  # Leave space before the line
+    elements.append(Line(50, 80, 550, 80))  # X1, Y1, X2, Y2 for line
+    elements.append(Paragraph(f"pg.no: {page_num}/{total_pages}", body_style))
     
     doc.build(elements)
     return pdf_path
