@@ -17,7 +17,6 @@ from collections import defaultdict
 import matplotlib.dates as mdates
 import plotly.express as px
 import plotly.graph_objects as go
-from preprocess import detrend, fq, stats_radar, columns_reports_unique
 from google.api_core.exceptions import ResourceExhausted, RetryError
 
 
