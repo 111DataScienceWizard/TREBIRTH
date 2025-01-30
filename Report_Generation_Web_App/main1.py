@@ -59,8 +59,7 @@ def get_firestore_data(query):
             break
     raise Exception("Max retries exceeded")
 
-db = firestore.Client.from_service_account_json("Report_Generation_Web_App/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
-
+db = firestore.Client.from_service_account_json("Report_Generation_Web_App/testdata1-20ec5-firebase-adminsdk-an9r6-d15c118c96.json")
 query = db.collection('demo_db') 
 
 def fetch_data():
