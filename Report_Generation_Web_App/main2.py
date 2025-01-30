@@ -21,8 +21,9 @@ from google.api_core.exceptions import ResourceExhausted, RetryError
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak, Line
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
 from reportlab.pdfgen import canvas
+from reportlab.graphics.shapes import Line
 import tempfile
 from reportlab.lib.units import inch
 
