@@ -248,7 +248,6 @@ def generate_pdf():
     
     # Final page line and page number
     elements.append(Spacer(1, 10))  # Leave space before the line
-    elements.append(Paragraph(f"pg.no: {page_num}/{total_pages}", body_style))
     
     doc.build(elements)
     return pdf_path
