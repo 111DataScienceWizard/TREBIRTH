@@ -214,14 +214,23 @@ def generate_pdf():
             elements.append(Paragraph(f"{i} {area.upper()}", heading_style))
             
             for j, scan in enumerate(scans, start=1):
+                RadarRaw = scan.get('RadarRaw', []),
                 pest_details = scan.get("Pest details", "N/A")
                 scan_location = scan.get("Scan Location", "N/A")
                 termatrac_status = scan.get("Termatrac device was", "N/A")
                 termatrac_position = scan.get("Termatrac device position", "N/A")
                 damage_visible = scan.get("Damage visible", "N/A")
                 scan_date = scan.get("scan_date", "Unknown Date")
+
+                # Preprocess the scan data
+                processed_data_list = preprocess_radar_data(filtered_scans['RadarRaw'])
+            
+                # Extract timestamps and InfStat
+                timestamp = filtered_scans['timestamp'].tolist()
+                device_name = filtered_scans['DeviceName'].tolist()
                 
                 scan_info = f"""<b>{i}.{j} Radar Scan</b> <br/>
+                plot_time_domain(preprocessed_scan, device_name, timestamp, scan_duration, sampling_rate=100)
                 {pest_details} <br/>
                 Scan Location: {scan_location} <br/>
                 Scan Date: {scan_date} <br/>
