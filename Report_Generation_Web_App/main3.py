@@ -98,7 +98,7 @@ def plot_time_domain(preprocessed_scan, device_name, timestamp, scan_duration, s
     ))
 
     fig.update_layout(
-        template='plotly_black',
+        template='plotly_white',
         xaxis_title="Time (s)",
         yaxis_title="Signal",
         legend_title="Scan",
