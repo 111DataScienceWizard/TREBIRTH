@@ -71,6 +71,11 @@ def get_firestore_data(query):
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
 query = db.collection('demo_db') 
 
+def convert_to_local_time(timestamp, timezone='Asia/Kolkata'):
+    local_tz = pytz.timezone(timezone)
+    # Convert to UTC and then localize to the given timezone
+    return timestamp.astimezone(local_tz)
+    
 def fetch_data():
     collection_ref = query
     docs = collection_ref.stream()
@@ -81,6 +86,12 @@ def fetch_data():
     
     for doc in docs:
         data = doc.to_dict()
+        metadata = {
+            'RadarRaw': data_dict.get('RadarRaw', []),
+            'timestamp': convert_to_local_time(data_dict.get('timestamp')),
+            'DeviceName': data_dict.get('Devicename', 'Unknown')
+        }
+        scans_data.append(metadata)
         if "Report Location" in data and "Tests were carried out by" in data:
             locations.add(data["Report Location"].strip())
             companies.add(data["Tests were carried out by"].strip())
@@ -214,7 +225,8 @@ if st.button("Generate PDF Report"):
         st.download_button(
             label="Download PDF",
             data=file,
-            file_name="Termatrac_Test_Report.pdf",
+            file_name="Trebirth_T
+            ermatrac_Test_Report.pdf",
             mime="application/pdf",
         )
 
