@@ -87,9 +87,9 @@ def fetch_data():
     for doc in docs:
         data = doc.to_dict()
         metadata = {
-            'RadarRaw': data_dict.get('RadarRaw', []),
-            'timestamp': convert_to_local_time(data_dict.get('timestamp')),
-            'DeviceName': data_dict.get('Devicename', 'Unknown')
+            'RadarRaw': data.get('RadarRaw', []),
+            'timestamp': convert_to_local_time(data.get('timestamp')),
+            'DeviceName': data.get('Devicename', 'Unknown')
         }
         scans_data.append(metadata)
         if "Report Location" in data and "Tests were carried out by" in data:
