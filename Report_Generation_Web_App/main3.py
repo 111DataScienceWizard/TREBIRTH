@@ -213,6 +213,7 @@ def generate_pdf():
             
             for j, scan in enumerate(scans, start=1):
                 elements.append(Paragraph(f"{i}.{j} Radar Scan", heading_style))
+                pest_details = scan.get("Pest details", "N/A")
                 
                 radar_raw = scan.get('RadarRaw', [])
                 if radar_raw:
