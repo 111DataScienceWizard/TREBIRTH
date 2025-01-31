@@ -98,24 +98,24 @@ def plot_time_domain(preprocessed_scan, device_name, timestamp, scan_duration, s
     ))
 
     fig.update_layout(
-        template='plotly_white',
+        template='plotly_black',
         xaxis_title="Time (s)",
         yaxis_title="Signal",
         legend_title="Scan",
-        font=dict(color="white"),
+        font=dict(color="black"),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)'
     )
-    st.plotly_chart(fig)
+    return fig
+    #st.plotly_chart(fig)
 
     # Print additional metadata below the graph
-    st.write(f"**Device Name:** {device_name}")
-    st.write(f"**Timestamp:** {timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
-    st.write(f"**Scan Duration:** {scan_duration} seconds")
+    #st.write(f"**Device Name:** {device_name}")
+    #st.write(f"**Timestamp:** {timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
+    #st.write(f"**Scan Duration:** {scan_duration} seconds")
   
 def fetch_data():
-    collection_ref = query
-    docs = collection_ref.stream()
+    docs = query.stream()
     
     locations = set()
     companies = set()
@@ -207,38 +207,32 @@ def generate_pdf():
                 area_scans[area] = []
             area_scans[area].append(scan)
                 
-        # Loop over the areas and scans and add them to the document
-        page_num = 1
-        total_pages = len(area_scans)  # Calculate the total number of pages
+        
         for i, (area, scans) in enumerate(area_scans.items(), start=1):
             elements.append(Paragraph(f"{i} {area.upper()}", heading_style))
             
             for j, scan in enumerate(scans, start=1):
-                RadarRaw = scan.get('RadarRaw', []),
-                pest_details = scan.get("Pest details", "N/A")
-                scan_location = scan.get("Scan Location", "N/A")
-                termatrac_status = scan.get("Termatrac device was", "N/A")
-                termatrac_position = scan.get("Termatrac device position", "N/A")
-                damage_visible = scan.get("Damage visible", "N/A")
-                scan_date = scan.get("scan_date", "Unknown Date")
-
-                # Preprocess the scan data
-                processed_data_list = preprocess_radar_data(filtered_scans['RadarRaw'])
-            
-                # Extract timestamps and InfStat
-                timestamp = filtered_scans['timestamp'].tolist()
-                device_name = filtered_scans['DeviceName'].tolist()
+                elements.append(Paragraph(f"{i}.{j} Radar Scan", heading_style))
                 
-                scan_info = f"""<b>{i}.{j} Radar Scan</b> <br/>
-                plot_time_domain(preprocessed_scan, device_name, timestamp, scan_duration, sampling_rate=100)
+                radar_raw = scan.get('RadarRaw', [])
+                if radar_raw:
+                    processed_scan = preprocess_radar_data(radar_raw)
+                    device_name = scan.get('DeviceName', 'Unknown Device')
+                    timestamp = scan.get('timestamp', datetime.now())
+                    scan_duration = scan.get("Scan Duration", "Unknown")
+                    
+                    fig = plot_time_domain(processed_scan, device_name, timestamp, scan_duration)
+                    st.plotly_chart(fig)  # Display the plot below the heading
+                
+                scan_details = f"""
                 {pest_details} <br/>
-                Scan Location: {scan_location} <br/>
-                Scan Date: {scan_date} <br/>
-                Termatrac device was: {termatrac_status} <br/>
-                Termatrac device position: {termatrac_position} <br/>
-                Damage Visible: {damage_visible}"""
-                
-                elements.append(Paragraph(scan_info, body_style))
+                Scan Location: {scan.get("Scan Location", "N/A")}<br/>
+                Scan Date: {scan.get("scan_date", "Unknown Date")}<br/>
+                Termatrac device was: {scan.get("Termatrac device was", "N/A")}<br/>
+                Termatrac device position: {scan.get("Termatrac device position", "N/A")}<br/>
+                Damage Visible: {scan.get("Damage visible", "N/A")}
+                """
+                elements.append(Paragraph(scan_details, body_style))
                 elements.append(Spacer(1, 10))
                 
                 if j % 3 == 0:
