@@ -225,8 +225,7 @@ if st.button("Generate PDF Report"):
         st.download_button(
             label="Download PDF",
             data=file,
-            file_name="Trebirth_T
-            ermatrac_Test_Report.pdf",
+            file_name="Trebirth_Termatrac_Test_Report.pdf",
             mime="application/pdf",
         )
 
