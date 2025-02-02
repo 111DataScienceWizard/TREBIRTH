@@ -25,6 +25,7 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Page
 from reportlab.pdfgen import canvas
 from reportlab.graphics.shapes import Line
 import tempfile
+import plotly.io as pio
 from reportlab.lib.units import inch
 
 
@@ -226,8 +227,16 @@ def generate_pdf():
                     timestamp = scan.get('timestamp', datetime.now())
                     scan_duration = scan.get("Scan Duration", "Unknown")
                     
-                    img_path = plot_time_domain(processed_scan, device_name, timestamp, scan_duration)
-                    # Display the plot below the heading
+                    # Generate the time domain plot
+                     fig = plot_time_domain(processed_scan, device_name, timestamp, scan_duration)
+                
+                    # Save the plot as an image
+                    img_path = f"{tempfile.gettempdir()}/time_domain_plot.png"
+                    pio.write_image(fig, img_path, format="png")
+
+                    # Add the image to the PDF
+                    elements.append(Image(img_path, width=400, height=300))
+                    elements.append(Spacer(1, 20))  # Space after image
                 
                 scan_details = f"""
                 {pest_details} <br/>
@@ -237,7 +246,6 @@ def generate_pdf():
                 Termatrac device position: {scan.get("Termatrac device position", "N/A")}<br/>
                 Damage Visible: {scan.get("Damage visible", "N/A")}
                 """
-                elements.append(Image(img_path, width=400, height=250)) 
                 elements.append(Paragraph(scan_details, body_style))
                 elements.append(Spacer(1, 10))
                 
