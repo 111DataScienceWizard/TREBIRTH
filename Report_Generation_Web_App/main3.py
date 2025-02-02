@@ -21,7 +21,7 @@ from google.api_core.exceptions import ResourceExhausted, RetryError
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak
 from reportlab.pdfgen import canvas
 from reportlab.graphics.shapes import Line
 import tempfile
@@ -106,7 +106,11 @@ def plot_time_domain(preprocessed_scan, device_name, timestamp, scan_duration, s
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)'
     )
-    return fig
+    # Save the figure as an image
+    temp_img_path = tempfile.NamedTemporaryFile(delete=False, suffix=".png").name
+    fig.write_image(temp_img_path)  # Convert to an image file
+    
+    return temp_img_path  # Return the image file path
     #st.plotly_chart(fig)
 
     # Print additional metadata below the graph
@@ -222,8 +226,8 @@ def generate_pdf():
                     timestamp = scan.get('timestamp', datetime.now())
                     scan_duration = scan.get("Scan Duration", "Unknown")
                     
-                    fig = plot_time_domain(processed_scan, device_name, timestamp, scan_duration)
-                    st.plotly_chart(fig)  # Display the plot below the heading
+                    img_path = plot_time_domain(processed_scan, device_name, timestamp, scan_duration)
+                    # Display the plot below the heading
                 
                 scan_details = f"""
                 {pest_details} <br/>
@@ -233,6 +237,7 @@ def generate_pdf():
                 Termatrac device position: {scan.get("Termatrac device position", "N/A")}<br/>
                 Damage Visible: {scan.get("Damage visible", "N/A")}
                 """
+                elements.append(Image(img_path, width=400, height=250)) 
                 elements.append(Paragraph(scan_details, body_style))
                 elements.append(Spacer(1, 10))
                 
@@ -250,6 +255,8 @@ def generate_pdf():
     elements.append(Spacer(1, 10))  # Leave space before the line
     
     doc.build(elements)
+    # Remove temporary image file after generating PDF
+    os.remove(img_path)
     return pdf_path
 
 if st.button("Generate PDF Report"):
