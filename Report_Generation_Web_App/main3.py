@@ -228,7 +228,7 @@ def generate_pdf():
                     scan_duration = scan.get("Scan Duration", "Unknown")
                     
                     # Generate the time domain plot
-                    fig = plot_time_domain(processed_scan, device_name, timestamp, scan_duration)
+                     fig = plot_time_domain(processed_scan, device_name, timestamp, scan_duration)
                 
                     # Save the plot as an image
                     img_path = f"{tempfile.gettempdir()}/time_domain_plot.png"
