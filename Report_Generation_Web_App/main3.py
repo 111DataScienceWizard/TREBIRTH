@@ -108,16 +108,16 @@ def plot_time_domain(preprocessed_scan, device_name, timestamp, scan_duration, s
         paper_bgcolor='rgba(0,0,0,0)'
     )
     # Save the figure as an image
-    temp_img_path = tempfile.NamedTemporaryFile(delete=False, suffix=".png").name
-    fig.write_image(temp_img_path)  # Convert to an image file
-    
-    return temp_img_path  # Return the image file path
+    return fig  # Convert to an image file
+    st.write(f"**Device Name:** {device_name}")
+    st.write(f"**Timestamp:** {timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
+    st.write(f"**Scan Duration:** {scan_duration} seconds")
+      # Return the image file path
     #st.plotly_chart(fig)
 
     # Print additional metadata below the graph
-    #st.write(f"**Device Name:** {device_name}")
-    #st.write(f"**Timestamp:** {timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
-    #st.write(f"**Scan Duration:** {scan_duration} seconds")
+    
+
   
 def fetch_data():
     docs = query.stream()
