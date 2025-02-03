@@ -86,7 +86,7 @@ def preprocess_radar_data(radar_raw):
 
 # Function to plot time domain radar data
 def plot_time_domain(preprocessed_scan, device_name, timestamp, scan_duration, sampling_rate=100):
-    st.write("## Time Domain")
+    #st.write("## Time Domain")
     fig = go.Figure()
     
     time_seconds = np.arange(len(preprocessed_scan)) / sampling_rate
