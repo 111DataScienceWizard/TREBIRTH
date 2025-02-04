@@ -18,7 +18,7 @@ import matplotlib.dates as mdates
 import plotly.express as px
 import plotly.graph_objects as go
 from google.api_core.exceptions import ResourceExhausted, RetryError
-from reportlab.lib.pagesizes import A3
+from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak
@@ -153,7 +153,7 @@ def generate_pdf():
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmpfile:
         pdf_path = tmpfile.name
     
-    doc = SimpleDocTemplate(pdf_path, pagesize=A3)
+    doc = SimpleDocTemplate(pdf_path, pagesize=A4)
     styles = getSampleStyleSheet()
 
     # Apply Times New Roman font
@@ -163,12 +163,12 @@ def generate_pdf():
     styles["Normal"].fontName = 'ARIAL'
     
     heading_style_centered = ParagraphStyle(
-        "HeadingStyleCentered", parent=styles["Heading1"], fontSize=28, textColor=colors.darkblue,
+        "HeadingStyleCentered", parent=styles["Heading1"], fontSize=26, textColor=colors.darkblue,
         alignment=1, spaceAfter=10, underline=True, bold=True,
     )
 
     heading_style_left = ParagraphStyle(
-        "HeadingStyleLeft", parent=styles["Heading1"], fontSize=28, textColor=colors.darkblue,
+        "HeadingStyleLeft", parent=styles["Heading1"], fontSize=26, textColor=colors.darkblue,
         alignment=0, spaceAfter=10, underline=True, bold=True,  # alignment=0 for left alignment
     )
     body_style = styles["Normal"]
@@ -177,13 +177,13 @@ def generate_pdf():
     elements = []
     elements.append(Paragraph("TERMATRAC TEST REPORT", heading_style_centered))
     elements.append(Paragraph("SUPPLEMENT TO TIMBER PEST REPORT", heading_style_centered))
-    elements.append(Spacer(1, 13))
+    elements.append(Spacer(1, 16))
     
     desc = """This Trebirth test report is a supplementary report only, which MUST be read in conjunction with 
     the full timber pest report. This report cannot be relied upon without the full timber pest report and is 
     only a record of the test findings."""
     elements.append(Paragraph(desc, body_style))
-    elements.append(Spacer(1, 13))
+    elements.append(Spacer(1, 16))
     
     filtered_scans = [scan for scan in scans_data if 
         (not selected_locations or scan["Report Location"].strip() in selected_locations) and
@@ -208,7 +208,7 @@ def generate_pdf():
         
         for info in general_info:
             elements.append(Paragraph(info, body_style))
-            elements.append(Spacer(1, 12))  # Leave space between lines
+            elements.append(Spacer(1, 16))  # Leave space between lines
 
         # Page Break and continuing content for further pages
         elements.append(PageBreak())
