@@ -21,7 +21,7 @@ from google.api_core.exceptions import ResourceExhausted, RetryError
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak, Table
 from reportlab.pdfgen import canvas
 from reportlab.graphics.shapes import Line
 import tempfile
@@ -207,28 +207,22 @@ def generate_pdf():
         report_date = filtered_scans[0]["scan_date"]
         
         # Split the general information into multiple lines and add a Spacer after each line
-        general_info = [
-            ("Tests were carried out by:", test_by),
-            ("Date:", report_date),
-            ("Report for building at:", report_loc),
-            ("Report requested by:", requested_by)
+       # Use Table for alignment
+        data = [
+            ["Tests were carried out by:", test_by],
+            ["Date:", report_date],
+            ["Report for building at:", report_loc],
+            ["Report requested by:", requested_by]
         ]
         
-        data = []
-        for info in general_info:
-            data.append([info[0], info[1]])
-
-        table = Table(data, colWidths=[200, 300])
-        table.setStyle(TableStyle([
-            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-            ('FONT', (0, 0), (-1, -1), 'Helvetica', 12),
-            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
-            ('TOPPADDING', (0, 0), (-1, -1), 12),
-        ]))
+        table_style = [('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                       ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
+                       ('LINEBELOW', (0, 0), (-1, -1), 1, colors.black)]
+        
+        table = Table(data, colWidths=[200, 250])
+        table.setStyle(table_style)
         elements.append(table)
-        elements.append(Spacer(1, 16))  # Leave space between lines 
-
+        elements.append(Spacer(1, 16))  # Space after the table
         # Page Break and continuing content for further pages
         elements.append(PageBreak())
         
@@ -264,6 +258,14 @@ def generate_pdf():
                     # Add the image to the PDF
                     elements.append(Image(img_path, width=400, height=300))
                     elements.append(Spacer(1, 20))  # Space after image
+
+                    # Add additional device info below the graph
+                    elements.append(Paragraph(f"**Device Name:** {device_name}", body_style))
+                    elements.append(Spacer(1, 10))
+                    elements.append(Paragraph(f"**Timestamp:** {timestamp.strftime('%Y-%m-%d %H:%M:%S')}", body_style))
+                    elements.append(Spacer(1, 10))
+                    elements.append(Paragraph(f"**Scan Duration:** {scan_duration} seconds", body_style))
+                    elements.append(Spacer(1, 20))
                 
                 scan_details = f"""
                 {pest_details} <br/>
