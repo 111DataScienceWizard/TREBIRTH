@@ -171,18 +171,18 @@ def generate_pdf():
         alignment=0, spaceAfter=10, underline=True, bold=True,  # alignment=0 for left alignment
     )
     body_style = styles["Normal"]
-    body_style.fontSize = 12
+    body_style.fontSize = 16
     
     elements = []
     elements.append(Paragraph("TERMATRAC TEST REPORT", heading_style_centered))
     elements.append(Paragraph("SUPPLEMENT TO TIMBER PEST REPORT", heading_style_centered))
-    elements.append(Spacer(1, 10))
+    elements.append(Spacer(1, 13))
     
     desc = """This Trebirth test report is a supplementary report only, which MUST be read in conjunction with 
     the full timber pest report. This report cannot be relied upon without the full timber pest report and is 
     only a record of the test findings."""
     elements.append(Paragraph(desc, body_style))
-    elements.append(Spacer(1, 10))
+    elements.append(Spacer(1, 13))
     
     filtered_scans = [scan for scan in scans_data if 
         (not selected_locations or scan["Report Location"].strip() in selected_locations) and
@@ -199,10 +199,10 @@ def generate_pdf():
         
         # Split the general information into multiple lines and add a Spacer after each line
         general_info = [
-            f"Tests were carried out by: {test_by}",
-            f"Date: {report_date}",
-            f"Report for building at: {report_loc}",
-            f"Report requested by: {requested_by}"
+            f"Tests were carried out by:   {test_by}",
+            f"Date:                        {report_date}",
+            f"Report for building at:      {report_loc}",
+            f"Report requested by:         {requested_by}"
         ]
         
         for info in general_info:
@@ -247,11 +247,11 @@ def generate_pdf():
                 
                 scan_details = f"""
                 {pest_details} <br/>
-                Scan Location: {scan.get("Scan Location", "N/A")}<br/>
-                Scan Date: {scan.get("scan_date", "Unknown Date")}<br/>
-                Termatrac device was: {scan.get("Termatrac device was", "N/A")}<br/>
-                Termatrac device position: {scan.get("Termatrac device position", "N/A")}<br/>
-                Damage Visible: {scan.get("Damage visible", "N/A")}
+                Scan Location:               {scan.get("Scan Location", "N/A")}<br/>
+                Scan Date:                   {scan.get("scan_date", "Unknown Date")}<br/>
+                Termatrac device was:        {scan.get("Termatrac device was", "N/A")}<br/>
+                Termatrac device position:   {scan.get("Termatrac device position", "N/A")}<br/>
+                Damage Visible:              {scan.get("Damage visible", "N/A")}
                 """
                 elements.append(Paragraph(scan_details, body_style))
                 elements.append(Spacer(1, 10))
