@@ -157,8 +157,8 @@ def generate_pdf():
     styles = getSampleStyleSheet()
 
     # Apply Times New Roman font
-    styles["Heading1"].fontName = 'Helvetica'
-    styles["Normal"].fontName = 'Helvetica'
+    styles["Heading1"].fontName = 'Arial'
+    styles["Normal"].fontName = 'Arial'
     
     heading_style = ParagraphStyle(
         "HeadingStyle", parent=styles["Heading1"], fontSize=28, textColor=colors.darkblue,
