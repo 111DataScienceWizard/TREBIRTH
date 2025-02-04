@@ -182,8 +182,10 @@ def generate_pdf():
     desc = """This Trebirth test report is a supplementary report only, which MUST be read in conjunction with 
     the full timber pest report. This report cannot be relied upon without the full timber pest report and is 
     only a record of the test findings."""
-    elements.append(Paragraph(desc, body_style))
-    elements.append(Spacer(1, 16))
+    for line in desc.split('\n'):
+    elements.append(Paragraph(line, body_style))  # Add each line as a new paragraph
+    elements.append(Spacer(1, 16))  # Leave space between lines
+   
     
     filtered_scans = [scan for scan in scans_data if 
         (not selected_locations or scan["Report Location"].strip() in selected_locations) and
