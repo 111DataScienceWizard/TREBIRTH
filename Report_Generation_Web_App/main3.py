@@ -208,15 +208,26 @@ def generate_pdf():
         
         # Split the general information into multiple lines and add a Spacer after each line
         general_info = [
-            f"Tests were carried out by:   {test_by}",
-            f"Date:                        {report_date}",
-            f"Report for building at:      {report_loc}",
-            f"Report requested by:         {requested_by}"
+            ("Tests were carried out by:", test_by),
+            ("Date:", report_date),
+            ("Report for building at:", report_loc),
+            ("Report requested by:", requested_by)
         ]
         
+        data = []
         for info in general_info:
-            elements.append(Paragraph(info, body_style))
-            elements.append(Spacer(1, 16))  # Leave space between lines
+            data.append([info[0], info[1]])
+
+        table = Table(data, colWidths=[200, 300])
+        table.setStyle(TableStyle([
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONT', (0, 0), (-1, -1), 'Helvetica', 12),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 12),
+            ('TOPPADDING', (0, 0), (-1, -1), 12),
+        ]))
+        elements.append(table)
+        elements.append(Spacer(1, 16))  # Leave space between lines 
 
         # Page Break and continuing content for further pages
         elements.append(PageBreak())
