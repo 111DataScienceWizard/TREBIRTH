@@ -262,11 +262,11 @@ def generate_pdf():
                 
                 scan_details = f"""
                 {pest_details} <br/>
-                </b>Scan Location:</b>               {scan.get("Scan Location", "N/A")}<br/>
-                </b>Scan Date:</b>                   {scan.get("scan_date", "Unknown Date")}<br/>
-                </b>Termatrac device was:</b>        {scan.get("Termatrac device was", "N/A")}<br/>
-                </b>Termatrac device position:</b>   {scan.get("Termatrac device position", "N/A")}<br/>
-                </b>Damage Visible:</b>              {scan.get("Damage visible", "N/A")}
+                <b>Scan Location:</b>               {scan.get("Scan Location", "N/A")}<br/>
+                <b>Scan Date:</b>                   {scan.get("scan_date", "Unknown Date")}<br/>
+                <b>Termatrac device was:</b>        {scan.get("Termatrac device was", "N/A")}<br/>
+                <b>Termatrac device position:</b>   {scan.get("Termatrac device position", "N/A")}<br/>
+                <b>Damage Visible:</b>              {scan.get("Damage visible", "N/A")}
                 """
                 for line in scan_details.split('<br/>'):
                     elements.append(Paragraph(line.strip(), body_style))  # Add each line as a new paragraph
