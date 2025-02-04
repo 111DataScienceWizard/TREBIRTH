@@ -158,8 +158,9 @@ def generate_pdf():
 
     # Apply Times New Roman font
     pdfmetrics.registerFont(TTFont('ARLRDBD', 'Report_Generation_Web_App/ARLRDBD.TTF'))
+    pdfmetrics.registerFont(TTFont('ARIAL', 'Report_Generation_Web_App/ARIAL.TTF'))
     styles["Heading1"].fontName = 'ARLRDBD'
-    styles["Normal"].fontName = 'ARLRDBD'
+    styles["Normal"].fontName = 'ARIAL'
     
     heading_style_centered = ParagraphStyle(
         "HeadingStyleCentered", parent=styles["Heading1"], fontSize=28, textColor=colors.darkblue,
