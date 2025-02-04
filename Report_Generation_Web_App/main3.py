@@ -18,7 +18,7 @@ import matplotlib.dates as mdates
 import plotly.express as px
 import plotly.graph_objects as go
 from google.api_core.exceptions import ResourceExhausted, RetryError
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A3
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak
@@ -153,7 +153,7 @@ def generate_pdf():
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmpfile:
         pdf_path = tmpfile.name
     
-    doc = SimpleDocTemplate(pdf_path, pagesize=A4)
+    doc = SimpleDocTemplate(pdf_path, pagesize=A3)
     styles = getSampleStyleSheet()
 
     # Apply Times New Roman font
@@ -161,16 +161,21 @@ def generate_pdf():
     styles["Heading1"].fontName = 'ARLRDBD'
     styles["Normal"].fontName = 'ARLRDBD'
     
-    heading_style = ParagraphStyle(
-        "HeadingStyle", parent=styles["Heading1"], fontSize=28, textColor=colors.darkblue,
+    heading_style_centered = ParagraphStyle(
+        "HeadingStyleCentered", parent=styles["Heading1"], fontSize=28, textColor=colors.darkblue,
         alignment=1, spaceAfter=10, underline=True, bold=True,
+    )
+
+    heading_style_left = ParagraphStyle(
+        "HeadingStyleLeft", parent=styles["Heading1"], fontSize=28, textColor=colors.darkblue,
+        alignment=0, spaceAfter=10, underline=True, bold=True,  # alignment=0 for left alignment
     )
     body_style = styles["Normal"]
     body_style.fontSize = 12
     
     elements = []
-    elements.append(Paragraph("TERMATRAC TEST REPORT", heading_style))
-    elements.append(Paragraph("SUPPLEMENT TO TIMBER PEST REPORT", heading_style))
+    elements.append(Paragraph("TERMATRAC TEST REPORT", heading_style_centered))
+    elements.append(Paragraph("SUPPLEMENT TO TIMBER PEST REPORT", heading_style_centered))
     elements.append(Spacer(1, 10))
     
     desc = """This Trebirth test report is a supplementary report only, which MUST be read in conjunction with 
@@ -216,10 +221,10 @@ def generate_pdf():
                 
         
         for i, (area, scans) in enumerate(area_scans.items(), start=1):
-            elements.append(Paragraph(f"{i} {area.upper()}", heading_style))
+            elements.append(Paragraph(f"{i} {area.upper()}", heading_style_left))
             
             for j, scan in enumerate(scans, start=1):
-                elements.append(Paragraph(f"{i}.{j} Radar Scan", heading_style))
+                elements.append(Paragraph(f"{i}.{j} Radar Scan", heading_style_left))
                 pest_details = scan.get("Pest details", "N/A")
                 
                 radar_raw = scan.get('RadarRaw', [])
