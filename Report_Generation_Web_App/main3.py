@@ -179,12 +179,13 @@ def generate_pdf():
     elements.append(Paragraph("SUPPLEMENT TO TIMBER PEST REPORT", heading_style_centered))
     elements.append(Spacer(1, 16))
     
-    desc = """This Trebirth test report is a supplementary report only, which MUST be read in conjunction with 
-    the full timber pest report. This report cannot be relied upon without the full timber pest report and is 
+    desc = """This Trebirth test report is a supplementary report only, which 
+    MUST be read in conjunction with the full timber pest report. 
+    This report cannot be relied upon without the full timber pest report and is 
     only a record of the test findings."""
-    for line in desc.split('\n'):
-        elements.append(Paragraph(line, body_style))  # Add each line as a new paragraph
-        elements.append(Spacer(1, 16))  # Leave space between lines
+    
+    elements.append(Paragraph(desc, body_style))  # Add each line as a new paragraph
+    elements.append(Spacer(1, 16))  # Leave space between lines
    
     
     filtered_scans = [scan for scan in scans_data if 
@@ -256,8 +257,9 @@ def generate_pdf():
                 Termatrac device position:   {scan.get("Termatrac device position", "N/A")}<br/>
                 Damage Visible:              {scan.get("Damage visible", "N/A")}
                 """
-                elements.append(Paragraph(scan_details, body_style))
-                elements.append(Spacer(1, 10))
+                for line in scan_details.split('<br/>'):
+                    elements.append(Paragraph(line.strip(), body_style))  # Add each line as a new paragraph
+                    elements.append(Spacer(1, 16))  # Leave space between lines
                 
                 if j % 3 == 0:
                     page_num += 1
