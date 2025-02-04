@@ -207,23 +207,16 @@ def generate_pdf():
         report_date = filtered_scans[0]["scan_date"]
         
         # Split the general information into multiple lines and add a Spacer after each line
-       # Use Table for alignment
-        data = [
-            ["Tests were carried out by:", test_by],
-            ["Date:", report_date],
-            ["Report for building at:", report_loc],
-            ["Report requested by:", requested_by]
+        general_info = [
+                f"<b>Tests were carried out by:</b>   {test_by}",
+                f"<b>Date:</b>                        {report_date}",
+                f"<b>Report for building at:</b>      {report_loc}",
+                f"<b>Report requested by:</b>         {requested_by}"
         ]
         
-        table_style = [('ALIGN', (0, 0), (-1, -1), 'LEFT'),
-                       ('ALIGN', (1, 0), (1, -1), 'RIGHT'),
-                       ('LINEBELOW', (0, 0), (-1, -1), 1, colors.black)]
-        
-        table = Table(data, colWidths=[200, 250])
-        table.setStyle(table_style)
-        elements.append(table)
-        elements.append(Spacer(1, 16))  # Space after the table
-        # Page Break and continuing content for further pages
+        for info in general_info:
+            elements.append(Paragraph(info, body_style))
+            elements.append(Spacer(1, 16))  # Leave space between lines
         elements.append(PageBreak())
         
         area_scans = {}
@@ -260,20 +253,20 @@ def generate_pdf():
                     elements.append(Spacer(1, 20))  # Space after image
 
                     # Add additional device info below the graph
-                    elements.append(Paragraph(f"**Device Name:** {device_name}", body_style))
+                    elements.append(Paragraph(f"Device Name: {device_name}", body_style))
                     elements.append(Spacer(1, 10))
-                    elements.append(Paragraph(f"**Timestamp:** {timestamp.strftime('%Y-%m-%d %H:%M:%S')}", body_style))
+                    elements.append(Paragraph(f"Timestamp: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}", body_style))
                     elements.append(Spacer(1, 10))
-                    elements.append(Paragraph(f"**Scan Duration:** {scan_duration} seconds", body_style))
+                    elements.append(Paragraph(f"Scan Duration: {scan_duration} seconds", body_style))
                     elements.append(Spacer(1, 20))
                 
                 scan_details = f"""
                 {pest_details} <br/>
-                Scan Location:               {scan.get("Scan Location", "N/A")}<br/>
-                Scan Date:                   {scan.get("scan_date", "Unknown Date")}<br/>
-                Termatrac device was:        {scan.get("Termatrac device was", "N/A")}<br/>
-                Termatrac device position:   {scan.get("Termatrac device position", "N/A")}<br/>
-                Damage Visible:              {scan.get("Damage visible", "N/A")}
+                </b>Scan Location:</b>               {scan.get("Scan Location", "N/A")}<br/>
+                </b>Scan Date:</b>                   {scan.get("scan_date", "Unknown Date")}<br/>
+                </b>Termatrac device was:</b>        {scan.get("Termatrac device was", "N/A")}<br/>
+                </b>Termatrac device position:</b>   {scan.get("Termatrac device position", "N/A")}<br/>
+                </b>Damage Visible:</b>              {scan.get("Damage visible", "N/A")}
                 """
                 for line in scan_details.split('<br/>'):
                     elements.append(Paragraph(line.strip(), body_style))  # Add each line as a new paragraph
