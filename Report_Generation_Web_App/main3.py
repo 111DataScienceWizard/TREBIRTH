@@ -172,7 +172,7 @@ def generate_pdf():
         alignment=0, spaceAfter=10, underline=True, bold=True,  # alignment=0 for left alignment
     )
     body_style = styles["Normal"]
-    body_style.fontSize = 16
+    body_style.fontSize = 12
     bold_style = ParagraphStyle("BoldStyle", parent=body_style, fontSize=16, fontName="ARLRDBD")
 
     
@@ -192,7 +192,7 @@ def generate_pdf():
     elements.append(Spacer(1, 10))
     desc3 = """report and isonly a record of the test findings."""
     elements.append(Paragraph(desc3, body_style))  # Add each line as a new paragraph
-    elements.append(Spacer(1, 16))  # Leave space between lines
+    elements.append(Spacer(1, 19))  # Leave space between lines
    
     
     filtered_scans = [scan for scan in scans_data if 
