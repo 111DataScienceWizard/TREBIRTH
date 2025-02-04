@@ -171,8 +171,8 @@ def generate_pdf():
         "HeadingStyleLeft", parent=styles["Heading1"], fontSize=26, textColor=colors.darkblue,
         alignment=0, spaceAfter=10, underline=True, bold=True,  # alignment=0 for left alignment
     )
-    #body_style = styles["Normal"]
-    #body_style.fontSize = 16
+    body_style = styles["Normal"]
+    body_style.fontSize = 16
     bold_style = ParagraphStyle("BoldStyle", parent=body_style, fontSize=16)
 
     
