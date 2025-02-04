@@ -171,8 +171,10 @@ def generate_pdf():
         "HeadingStyleLeft", parent=styles["Heading1"], fontSize=26, textColor=colors.darkblue,
         alignment=0, spaceAfter=10, underline=True, bold=True,  # alignment=0 for left alignment
     )
-    body_style = styles["Normal"]
-    body_style.fontSize = 16
+    #body_style = styles["Normal"]
+    #body_style.fontSize = 16
+    bold_style = ParagraphStyle("BoldStyle", parent=body_style, fontSize=16)
+
     
     elements = []
     elements.append(Paragraph("TERMATRAC TEST REPORT", heading_style_centered))
@@ -213,7 +215,7 @@ def generate_pdf():
                 f"<b>Report for building at:</b>      {report_loc}",
                 f"<b>Report requested by:</b>         {requested_by}"
         ]
-        
+
         for info in general_info:
             elements.append(Paragraph(info, body_style))
             elements.append(Spacer(1, 16))  # Leave space between lines
