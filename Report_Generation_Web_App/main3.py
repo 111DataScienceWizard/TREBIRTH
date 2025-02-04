@@ -157,9 +157,8 @@ def generate_pdf():
     styles = getSampleStyleSheet()
 
     # Apply Times New Roman font
-    pdfmetrics.registerFont(TTFont('Calibri', 'calibri.ttf'))
-    styles["Heading1"].fontName = 'Calibri'
-    styles["Normal"].fontName = 'Calibri'
+    styles["Heading1"].fontName = 'Helvetica'
+    styles["Normal"].fontName = 'Helvetica'
     
     heading_style = ParagraphStyle(
         "HeadingStyle", parent=styles["Heading1"], fontSize=28, textColor=colors.darkblue,
