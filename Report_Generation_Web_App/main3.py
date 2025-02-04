@@ -157,7 +157,7 @@ def generate_pdf():
     styles = getSampleStyleSheet()
 
     # Apply Times New Roman font
-    pdfmetrics.registerFont(TTFont('ARLRDBD', 'ARLRDBD.TTF'))
+    pdfmetrics.registerFont(TTFont('ARLRDBD', 'Report_Generation_Web_App/ARLRDBD.TTF'))
     styles["Heading1"].fontName = 'ARLRDBD'
     styles["Normal"].fontName = 'ARLRDBD'
     
