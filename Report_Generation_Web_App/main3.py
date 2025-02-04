@@ -27,6 +27,9 @@ from reportlab.graphics.shapes import Line
 import tempfile
 import plotly.io as pio
 from reportlab.lib.units import inch
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+
 
 
 
