@@ -185,10 +185,10 @@ def generate_pdf():
     desc1 = """MUST be read in conjunction with the full timber pest report.""" 
     elements.append(Paragraph(desc1, body_style))  # Add each line as a new paragraph
     elements.append(Spacer(1, 16))
-    desc2 = """This report cannot be relied upon without the full timber pest report and is"""
+    desc2 = """This report cannot be relied upon without the full timber pest"""
     elements.append(Paragraph(desc2, body_style))  # Add each line as a new paragraph
     elements.append(Spacer(1, 16))
-    desc3 = """only a record of the test findings."""
+    desc3 = """report and isonly a record of the test findings."""
     elements.append(Paragraph(desc3, body_style))  # Add each line as a new paragraph
     elements.append(Spacer(1, 16))  # Leave space between lines
    
