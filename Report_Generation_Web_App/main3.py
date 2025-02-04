@@ -109,9 +109,7 @@ def plot_time_domain(preprocessed_scan, device_name, timestamp, scan_duration, s
     )
     # Save the figure as an image
     return fig  # Convert to an image file
-    st.write(f"**Device Name:** {device_name}")
-    st.write(f"**Timestamp:** {timestamp.strftime('%Y-%m-%d %H:%M:%S')}")
-    st.write(f"**Scan Duration:** {scan_duration} seconds")
+    
       # Return the image file path
     #st.plotly_chart(fig)
 
@@ -156,11 +154,12 @@ def generate_pdf():
     styles = getSampleStyleSheet()
 
     # Apply Times New Roman font
-    styles["Heading1"].fontName = 'Times-Roman'
-    styles["Normal"].fontName = 'Times-Roman'
+    pdfmetrics.registerFont(TTFont('Calibri', 'calibri.ttf'))
+    styles["Heading1"].fontName = 'Calibri'
+    styles["Normal"].fontName = 'Calibri'
     
     heading_style = ParagraphStyle(
-        "HeadingStyle", parent=styles["Heading1"], fontSize=20, textColor=colors.blue,
+        "HeadingStyle", parent=styles["Heading1"], fontSize=28, textColor=colors.darkblue,
         alignment=1, spaceAfter=10, underline=True, bold=True,
     )
     body_style = styles["Normal"]
