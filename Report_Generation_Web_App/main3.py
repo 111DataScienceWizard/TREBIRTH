@@ -179,12 +179,17 @@ def generate_pdf():
     elements.append(Paragraph("SUPPLEMENT TO TIMBER PEST REPORT", heading_style_centered))
     elements.append(Spacer(1, 16))
     
-    desc = """This Trebirth test report is a supplementary report only, which 
-    MUST be read in conjunction with the full timber pest report. 
-    This report cannot be relied upon without the full timber pest report and is 
-    only a record of the test findings."""
-    
+    desc = """This Trebirth test report is a supplementary report only, which""" 
     elements.append(Paragraph(desc, body_style))  # Add each line as a new paragraph
+    elements.append(Spacer(1, 16))
+    desc1 = """MUST be read in conjunction with the full timber pest report.""" 
+    elements.append(Paragraph(desc1, body_style))  # Add each line as a new paragraph
+    elements.append(Spacer(1, 16))
+    desc2 = """This report cannot be relied upon without the full timber pest report and is"""
+    elements.append(Paragraph(desc2, body_style))  # Add each line as a new paragraph
+    elements.append(Spacer(1, 16))
+    desc3 = """only a record of the test findings."""
+    elements.append(Paragraph(desc3, body_style))  # Add each line as a new paragraph
     elements.append(Spacer(1, 16))  # Leave space between lines
    
     
