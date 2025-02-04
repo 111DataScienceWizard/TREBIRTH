@@ -173,7 +173,7 @@ def generate_pdf():
     )
     body_style = styles["Normal"]
     body_style.fontSize = 16
-    bold_style = ParagraphStyle("BoldStyle", parent=body_style, fontSize=16)
+    bold_style = ParagraphStyle("BoldStyle", parent=body_style, fontSize=16, fontName="ARLRDBD")
 
     
     elements = []
@@ -210,14 +210,14 @@ def generate_pdf():
         
         # Split the general information into multiple lines and add a Spacer after each line
         general_info = [
-                f"<b>Tests were carried out by:</b>   {test_by}",
-                f"<b>Date:</b>                        {report_date}",
-                f"<b>Report for building at:</b>      {report_loc}",
-                f"<b>Report requested by:</b>         {requested_by}"
+                f"Tests were carried out by:   {test_by}",
+                f"Date:                        {report_date}",
+                f"Report for building at:      {report_loc}",
+                f"Report requested by:         {requested_by}"
         ]
 
         for info in general_info:
-            elements.append(Paragraph(info, body_style))
+            elements.append(Paragraph(info, bold_style))
             elements.append(Spacer(1, 16))  # Leave space between lines
         elements.append(PageBreak())
         
@@ -255,23 +255,23 @@ def generate_pdf():
                     elements.append(Spacer(1, 20))  # Space after image
 
                     # Add additional device info below the graph
-                    elements.append(Paragraph(f"<b>Device Name:</b> {device_name}", body_style))
+                    elements.append(Paragraph(f"Device Name: {device_name}", bold_style))
                     elements.append(Spacer(1, 10))
-                    elements.append(Paragraph(f"<b>Timestamp:</b> {timestamp.strftime('%Y-%m-%d %H:%M:%S')}", body_style))
+                    elements.append(Paragraph(f"Timestamp: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}", bold_style))
                     elements.append(Spacer(1, 10))
-                    elements.append(Paragraph(f"<b>Scan Duration:</b> {scan_duration} seconds", body_style))
+                    elements.append(Paragraph(f"Scan Duration: {scan_duration} seconds", bold_style))
                     elements.append(Spacer(1, 20))
                 
                 scan_details = f"""
                 {pest_details} <br/>
-                <b>Scan Location:</b>               {scan.get("Scan Location", "N/A")}<br/>
-                <b>Scan Date:</b>                   {scan.get("scan_date", "Unknown Date")}<br/>
-                <b>Termatrac device was:</b>        {scan.get("Termatrac device was", "N/A")}<br/>
-                <b>Termatrac device position:</b>   {scan.get("Termatrac device position", "N/A")}<br/>
-                <b>Damage Visible:</b>              {scan.get("Damage visible", "N/A")}
+                Scan Location:               {scan.get("Scan Location", "N/A")}<br/>
+                Scan Date:                   {scan.get("scan_date", "Unknown Date")}<br/>
+                Termatrac device was:        {scan.get("Termatrac device was", "N/A")}<br/>
+                Termatrac device position:   {scan.get("Termatrac device position", "N/A")}<br/>
+                Damage Visible:              {scan.get("Damage visible", "N/A")}
                 """
                 for line in scan_details.split('<br/>'):
-                    elements.append(Paragraph(line.strip(), body_style))  # Add each line as a new paragraph
+                    elements.append(Paragraph(line.strip(), bold_style))  # Add each line as a new paragraph
                     elements.append(Spacer(1, 16))  # Leave space between lines
                 
                 if j % 3 == 0:
