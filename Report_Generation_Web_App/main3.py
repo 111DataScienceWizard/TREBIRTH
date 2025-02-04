@@ -255,11 +255,11 @@ def generate_pdf():
                     elements.append(Spacer(1, 20))  # Space after image
 
                     # Add additional device info below the graph
-                    elements.append(Paragraph(f"Device Name: {device_name}", bold_style))
+                    elements.append(Paragraph(f"Device Name: {device_name}", body_style))
                     elements.append(Spacer(1, 10))
-                    elements.append(Paragraph(f"Timestamp: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}", bold_style))
+                    elements.append(Paragraph(f"Timestamp: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}", body_style))
                     elements.append(Spacer(1, 10))
-                    elements.append(Paragraph(f"Scan Duration: {scan_duration} seconds", bold_style))
+                    elements.append(Paragraph(f"Scan Duration: {scan_duration} seconds", body_style))
                     elements.append(Spacer(1, 20))
                 
                 scan_details = f"""
