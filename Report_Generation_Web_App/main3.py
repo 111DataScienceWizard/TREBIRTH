@@ -256,11 +256,11 @@ def generate_pdf():
 
                     # Add additional device info below the graph
                     elements.append(Paragraph(f"Device Name: {device_name}", body_style))
-                    elements.append(Spacer(1, 10))
+                    elements.append(Spacer(1, 3))
                     elements.append(Paragraph(f"Timestamp: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}", body_style))
-                    elements.append(Spacer(1, 10))
+                    elements.append(Spacer(1, 3))
                     elements.append(Paragraph(f"Scan Duration: {scan_duration} seconds", body_style))
-                    elements.append(Spacer(1, 20))
+                    elements.append(Spacer(1, 3))
                 
                 scan_details = f"""
                 {pest_details} <br/>
@@ -272,7 +272,7 @@ def generate_pdf():
                 """
                 for line in scan_details.split('<br/>'):
                     elements.append(Paragraph(line.strip(), bold_style))  # Add each line as a new paragraph
-                    elements.append(Spacer(1, 16))  # Leave space between lines
+                    elements.append(Spacer(1, 10))  # Leave space between lines
                 
                 if j % 3 == 0:
                     page_num += 1
