@@ -163,7 +163,7 @@ def generate_pdf():
     styles["Normal"].fontName = 'ARIAL'
     
     heading_style_centered = ParagraphStyle(
-        "HeadingStyleCentered", parent=styles["Heading1"], fontSize=26, textColor=colors.darkblue,
+        "HeadingStyleCentered", parent=styles["Heading1"], fontSize=20, textColor=colors.darkblue,
         alignment=1, spaceAfter=10, underline=True, bold=True,
     )
 
@@ -178,7 +178,7 @@ def generate_pdf():
     
     elements = []
     elements.append(Paragraph("TERMATRAC TEST REPORT", heading_style_centered))
-    #elements.append(Paragraph("SUPPLEMENT TO TIMBER PEST REPORT", heading_style_centered))
+    elements.append(Paragraph("SUPPLEMENT TO TIMBER PEST REPORT", heading_style_centered))
     elements.append(Spacer(1, 16))
     
     desc = """This Trebirth test report is a supplementary report only, which MUST be read in""" 
