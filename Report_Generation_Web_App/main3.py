@@ -260,7 +260,7 @@ def generate_pdf():
                     elements.append(Paragraph(f"Timestamp: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}", body_style))
                     elements.append(Spacer(1, 3))
                     elements.append(Paragraph(f"Scan Duration: {scan_duration} seconds", body_style))
-                    elements.append(Spacer(1, 3))
+                    elements.append(Spacer(1, 6))
                 
                 scan_details = f"""
                 {pest_details} <br/>
@@ -272,7 +272,7 @@ def generate_pdf():
                 """
                 for line in scan_details.split('<br/>'):
                     elements.append(Paragraph(line.strip(), bold_style))  # Add each line as a new paragraph
-                    elements.append(Spacer(1, 10))  # Leave space between lines
+                    elements.append(Spacer(1, 3))  # Leave space between lines
                 
                 if j % 3 == 0:
                     page_num += 1
