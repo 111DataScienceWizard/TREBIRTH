@@ -168,9 +168,15 @@ def generate_pdf():
     )
 
     heading_style_left = ParagraphStyle(
-        "HeadingStyleLeft", parent=styles["Heading1"], fontSize=26, textColor=colors.darkblue,
+        "HeadingStyleLeft", parent=styles["Heading1"], fontSize=20, textColor=colors.darkblue,
         alignment=0, spaceAfter=10, underline=True, bold=True,  # alignment=0 for left alignment
     )
+
+    heading_style_sub = ParagraphStyle(
+        "HeadingStyleLeft", parent=styles["Heading1"], fontSize=16, textColor=colors.black,
+        alignment=0, spaceAfter=10, underline=True, bold=True,  # alignment=0 for left alignment
+    )
+    
     body_style = styles["Normal"]
     body_style.fontSize = 12
     bold_style = ParagraphStyle("BoldStyle", parent=body_style, fontSize=12, fontName="ARLRDBD")
@@ -233,7 +239,7 @@ def generate_pdf():
             elements.append(Paragraph(f"{i} {area.upper()}", heading_style_left))
             
             for j, scan in enumerate(scans, start=1):
-                elements.append(Paragraph(f"{i}.{j} Radar Scan", heading_style_left))
+                elements.append(Paragraph(f"{i}.{j} Radar Scan", heading_style_sub))
                 pest_details = scan.get("Pest details", "N/A")
                 
                 radar_raw = scan.get('RadarRaw', [])
