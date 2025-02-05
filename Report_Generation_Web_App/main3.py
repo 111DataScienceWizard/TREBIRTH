@@ -276,6 +276,7 @@ def generate_pdf():
                 Termatrac device position:   {scan.get("Termatrac device position", "N/A")}<br/>
                 Damage Visible:              {scan.get("Damage visible", "N/A")}
                 """
+                elements.append(Spacer(1, 16))
                 for line in scan_details.split('<br/>'):
                     elements.append(Paragraph(line.strip(), bold_style))  # Add each line as a new paragraph
                     elements.append(Spacer(1, 3))  # Leave space between lines
