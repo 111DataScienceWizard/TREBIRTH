@@ -51,7 +51,6 @@ def login_page():
             st.session_state["authenticated"] = True
             st.session_state["username"] = username
             st.experimental_rerun()
-            st.switch_page("main_app")
         else:
             st.error("Invalid credentials")
             
@@ -60,6 +59,7 @@ def main_app():
     if not st.session_state["authenticated"]:
         st.warning("Please log in first.")
         st.switch_page("login_page")
+        return
     """Main application code goes here."""
     st.title("Farm Analytics")
     st.write(f"Welcome, {st.session_state.username}!")
