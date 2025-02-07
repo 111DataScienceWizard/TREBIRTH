@@ -47,7 +47,7 @@ def login_page():
     if st.button("Login"):
         if username == "admin" and password == "password":  # Replace with actual authentication logic
             st.session_state["authenticated"] = True
-            st.switch_page("dropdown_page")
+            st.switch_page("main_app")
         else:
             st.error("Invalid credentials")
             
