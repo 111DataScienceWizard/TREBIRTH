@@ -224,13 +224,12 @@ def generate_pdf():
         report_date = filtered_scans[0]["scan_date"]
         
         # Split the general information into multiple lines and add a Spacer after each line
-        general_info = [
-                f"Tests were carried out by:   {test_by}",
-                f"Date:                        {report_date}",
-                f"Report for building at:      {report_loc}",
-                f"Report requested by:         {requested_by}"
-        ]
-
+        general_info = f"""
+        Tests were carried out by:         {test_by}  
+        Date:                                         {report_date}  
+        Report for building at:              {report_loc}  
+        Report requested by:                {requested_by}  
+        """
         for info in general_info:
             elements.append(Paragraph(info, bold_style))
             elements.append(Spacer(1, 20))  # Leave space between lines
