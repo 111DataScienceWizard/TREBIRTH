@@ -60,9 +60,7 @@ def main_app():
     if not st.session_state["authenticated"]:
         st.warning("Please log in first.")
         st.switch_page("login_page")
-
    
-    st.title("Farm Analytics")
     st.write(f"Welcome, {st.session_state.username}!")
     # Your existing web app code starts here...
 #st.title('Test Analysis Report')
