@@ -50,7 +50,7 @@ def login_page():
         if username == "admin" and password == "password":  # Replace with actual authentication logic
             st.session_state["authenticated"] = True
             st.session_state["username"] = username
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.error("Invalid credentials")
             
