@@ -338,7 +338,7 @@ if st.button("Generate PDF Report"):
 
 # Run the appropriate page
 if not st.session_state["authenticated"]:
-    check_login()
+    login_page()
 else:
     main_app()
 
