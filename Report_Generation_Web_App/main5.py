@@ -31,6 +31,7 @@ from reportlab.lib.units import inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
+st.set_page_config(layout="wide")
 # Initialize Firestore
 
 cred_path = "Report_Generation_Web_App/testdata1-20ec5-firebase-adminsdk-an9r6-d15c118c96.json"
@@ -60,7 +61,7 @@ def main_app():
         st.warning("Please log in first.")
         st.switch_page("login_page")
 
-    st.set_page_config(layout="wide")
+   
     st.title("Farm Analytics")
     st.write(f"Welcome, {st.session_state.username}!")
     # Your existing web app code starts here...
