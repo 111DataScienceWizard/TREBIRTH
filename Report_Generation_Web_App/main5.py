@@ -47,7 +47,7 @@ def login_page():
     username = st.text_input("Username")
     password = st.text_input("Password", type="password")
     if st.button("Login"):
-        if username == "admin" and password == "password":  # Replace with actual authentication logic
+        if username == "MUKUND" and password == "Muk2025$$":  # Replace with actual authentication logic
             st.session_state["authenticated"] = True
             st.session_state["username"] = username
             st.rerun()
