@@ -59,7 +59,6 @@ def main_app():
     if not st.session_state["authenticated"]:
         st.warning("Please log in first.")
         st.switch_page("login_page")
-        return
     """Main application code goes here."""
     st.title("Farm Analytics")
     st.write(f"Welcome, {st.session_state.username}!")
@@ -328,7 +327,7 @@ def generate_pdf():
     # Remove temporary image file after generating PDF
     os.remove(img_path)
     return pdf_path
-
+    return
 if st.button("Generate PDF Report"):
     pdf_file = generate_pdf()
     
