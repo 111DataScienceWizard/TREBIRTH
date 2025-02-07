@@ -57,4 +57,4 @@ login()
 
 # Redirect to main page after successful login
 if st.session_state["authenticated"]:
-    st.switch_page("main5.py")
+    st.switch_page("Report_Generation_Web_App/main5.py")
