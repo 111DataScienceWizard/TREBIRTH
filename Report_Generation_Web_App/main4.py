@@ -48,7 +48,7 @@ def login():
             st.session_state["authenticated"] = True
             st.session_state["username"] = username
             st.success("Login successful! Redirecting...")
-            st.experimental_rerun()  # Refresh the page to apply authentication state
+            st.rerun()  # Refresh the page to apply authentication state
         else:
             st.error("Invalid credentials")
 
