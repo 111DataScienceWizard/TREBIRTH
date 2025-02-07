@@ -32,48 +32,28 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 
 st.set_page_config(layout="wide")
+# Redirect to login page if not authenticated
+if "authenticated" not in st.session_state or not st.session_state["authenticated"]:
+    st.warning("Please log in first.")
+    st.switch_page("login.py")
+
+st.write(f"Welcome, {st.session_state.username}!")
+
 # Initialize Firestore
-
 cred_path = "Report_Generation_Web_App/testdata1-20ec5-firebase-adminsdk-an9r6-d15c118c96.json"
-st.session_state.db = firestore.Client.from_service_account_json(cred_path)
-
-# Page Routing
-if "authenticated" not in st.session_state:
-    st.session_state["authenticated"] = False
-if "username" not in st.session_state:
-    st.session_state["username"] = None  # Ensure username is initialized
-    
-def login_page():
-    st.title("Login Page")
-    username = st.text_input("Username")
-    password = st.text_input("Password", type="password")
-    if st.button("Login"):
-        if username == "MUKUND" and password == "Muk2025$$":  # Replace with actual authentication logic
-            st.session_state["authenticated"] = True
-            st.session_state["username"] = username
-            st.rerun()
-        else:
-            st.error("Invalid credentials")
-            
-
-def main_app():
-    if not st.session_state["authenticated"]:
-        st.warning("Please log in first.")
-        st.switch_page("login_page")
-   
-    st.write(f"Welcome, {st.session_state.username}!")
+db = firestore.Client.from_service_account_json(cred_path)
     # Your existing web app code starts here...
 #st.title('Test Analysis Report')
-    st.markdown(
-        """
-        <style>
-        .reportview-container {
-            background-color: white;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+st.markdown(
+    """
+    <style>
+    .reportview-container {
+        background-color: white;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 
 def exponential_backoff(retries):
     base_delay = 1
@@ -338,9 +318,5 @@ if st.button("Generate PDF Report"):
             mime="application/pdf",
         )
 
-# Run the appropriate page
-if not st.session_state["authenticated"]:
-    login_page()
-else:
-    main_app()
+
 
