@@ -35,7 +35,7 @@ st.set_page_config(layout="wide")
 # Redirect to login page if not authenticated
 if "authenticated" not in st.session_state or not st.session_state["authenticated"]:
     st.warning("Please log in first.")
-    st.switch_page("main4")
+    st.switch_page("main4.py")
 
 st.write(f"Welcome, {st.session_state.username}!")
 
