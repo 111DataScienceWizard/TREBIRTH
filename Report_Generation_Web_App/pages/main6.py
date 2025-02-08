@@ -21,7 +21,7 @@ from google.api_core.exceptions import ResourceExhausted, RetryError
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak, Table
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak, Table, TableStyle
 from reportlab.pdfgen import canvas
 from reportlab.graphics.shapes import Line
 import tempfile
@@ -283,7 +283,6 @@ def generate_pdf():
                         ["Termatrac device position:", filtered_scans[0].get("Termatrac device position", "N/A")],
                         ["Damage Visible:", filtered_scans[0].get("Damage visible", "N/A")],
                     ]
-
                     table = Table(data, colWidths=[2.5 * inch, 3.5 * inch])
                     table.setStyle(TableStyle([
                         ('FONTNAME', (0, 0), (-1, -1), 'ARLRDBD'),
