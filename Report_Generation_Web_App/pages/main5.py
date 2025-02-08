@@ -187,7 +187,9 @@ def generate_pdf():
     )
     
     body_style = styles["Normal"]
-    body_style.fontSize = 8
+    body_style.fontSize = 12
+    bodyy_style = styles["Normal"]
+    bodyy_style.fontSize = 8
     bold_style = ParagraphStyle("BoldStyle", parent=body_style, fontSize=12, fontName="ARLRDBD")
 
     
@@ -280,11 +282,11 @@ def generate_pdf():
                     elements.append(Spacer(1, 20))  # Space after image
 
                     # Add additional device info below the graph
-                    elements.append(Paragraph(f"Device Name: {device_name}", body_style))
+                    elements.append(Paragraph(f"Device Name: {device_name}", bodyy_style))
                     elements.append(Spacer(1, 3))
-                    elements.append(Paragraph(f"Timestamp: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}", body_style))
+                    elements.append(Paragraph(f"Timestamp: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}", bodyy_style))
                     elements.append(Spacer(1, 3))
-                    elements.append(Paragraph(f"Scan Duration: {scan_duration} seconds", body_style))
+                    elements.append(Paragraph(f"Scan Duration: {scan_duration} seconds", bodyy_style))
                     elements.append(Spacer(1, 6))
                 
                     data = [
