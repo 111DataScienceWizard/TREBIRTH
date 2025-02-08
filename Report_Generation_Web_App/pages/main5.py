@@ -21,7 +21,7 @@ from google.api_core.exceptions import ResourceExhausted, RetryError
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak, Table
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, PageBreak, Table, TableStyle
 from reportlab.pdfgen import canvas
 from reportlab.graphics.shapes import Line
 import tempfile
@@ -196,19 +196,6 @@ def generate_pdf():
     elements.append(Paragraph("SUPPLEMENT TO TIMBER PEST REPORT", heading_style_centered))
     elements.append(Spacer(1, 16))
     
-    #desc = """This Trebirth test report is a supplementary report only, which MUST be read in""" 
-    #elements.append(Paragraph(desc, body_style))  # Add each line as a new paragraph
-    #elements.append(Spacer(1, 6))
-    #desc1 = """conjunction with the full timber pest report. This report cannot be relied upon""" 
-    #elements.append(Paragraph(desc1, body_style))  # Add each line as a new paragraph
-    #elements.append(Spacer(1, 6))
-    #desc2 = """without the full timber pest report and isonly a record of the test findings."""
-    #elements.append(Paragraph(desc2, body_style))  # Add each line as a new paragraph
-    #elements.append(Spacer(1, 20))
-    
-    #desc3 = """report and isonly a record of the test findings."""
-    #elements.append(Paragraph(desc3, body_style))  # Add each line as a new paragraph
-    #elements.append(Spacer(1, 19))  # Leave space between lines
     desc_lines = [
         "This Trebirth test report is a supplementary report only, which MUST be read in",
         "conjunction with the full timber pest report. This report cannot be relied upon",
@@ -257,7 +244,8 @@ def generate_pdf():
         ]))
 
         elements.append(table)
-        
+        elements.append(PageBreak())
+
         area_scans = {}
         for scan in filtered_scans:
             area = scan.get("Area", "Unknown Area")
@@ -299,17 +287,24 @@ def generate_pdf():
                     elements.append(Paragraph(f"Scan Duration: {scan_duration} seconds", body_style))
                     elements.append(Spacer(1, 6))
                 
-                scan_details = f"""
-                {pest_details} <br/>
-                Scan Location:               {scan.get("Scan Location", "N/A")}<br/>
-                Scan Date:                   {scan.get("scan_date", "Unknown Date")}<br/>
-                Termatrac device was:        {scan.get("Termatrac device was", "N/A")}<br/>
-                Termatrac device position:   {scan.get("Termatrac device position", "N/A")}<br/>
-                Damage Visible:              {scan.get("Damage visible", "N/A")}
-                """
-                for line in scan_details.split('<br/>'):
-                    elements.append(Paragraph(line.strip(), bold_style))  # Add each line as a new paragraph
-                    elements.append(Spacer(1, 3))  # Leave space between lines
+                    data = [
+                        ["Scan Location:", filtered_scans[0].get("Scan Location", "N/A")],
+                        ["Scan Date:", filtered_scans[0].get("scan_date", "Unknown Date")],
+                        ["Termatrac device was:", filtered_scans[0].get("Termatrac device was", "N/A")],
+                        ["Termatrac device position:", filtered_scans[0].get("Termatrac device position", "N/A")],
+                        ["Damage Visible:", filtered_scans[0].get("Damage visible", "N/A")],
+                    ]
+                    table = Table(data, colWidths=[2.5 * inch, 3.5 * inch])
+                    table.setStyle(TableStyle([
+                        ('FONTNAME', (0, 0), (-1, -1), 'ARLRDBD'),
+                        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+                        ('ALIGN', (1, 0), (-1, -1), 'LEFT'),
+                        ('FONTNAME', (1, 0), (-1, -1), 'ARIAL'),
+                        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+                    ]))
+
+                    elements.append(table)
+                    elements.append(Spacer(1, 20))
                 
                 if j % 3 == 0:
                     page_num += 1
@@ -339,6 +334,4 @@ if st.button("Generate PDF Report"):
             file_name="Trebirth_Termatrac_Test_Report.pdf",
             mime="application/pdf",
         )
-
-
 
