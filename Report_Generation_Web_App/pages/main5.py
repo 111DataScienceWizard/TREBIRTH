@@ -119,25 +119,6 @@ def plot_time_domain(preprocessed_scan, device_name, timestamp, scan_duration, s
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)'
     )
-
-    # Apply CSS for border and padding
-    st.markdown(
-        """
-        <style>
-        .time-domain-container {
-            border: 2px solid black;
-            padding: 15px;
-            border-radius: 10px;
-            background-color: white;
-        }
-        </style>
-        """, unsafe_allow_html=True
-    )
-
-    # Wrap the plot in a container div
-    st.markdown('<div class="time-domain-container">', unsafe_allow_html=True)
-    st.plotly_chart(fig, use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
     # Save the figure as an image
     return fig  # Convert to an image file
     
