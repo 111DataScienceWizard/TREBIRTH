@@ -187,7 +187,7 @@ def generate_pdf():
     )
     
     body_style = styles["Normal"]
-    body_style.fontSize = 12
+    body_style.fontSize = 8
     bold_style = ParagraphStyle("BoldStyle", parent=body_style, fontSize=12, fontName="ARLRDBD")
 
     
