@@ -276,25 +276,25 @@ def generate_pdf():
                     elements.append(Paragraph(f"Scan Duration: {scan_duration} seconds", body_style))
                     elements.append(Spacer(1, 6))
                 
-                 data = [
-                     ["Scan Location:", filtered_scans[0].get("Scan Location", "N/A")],
-                     ["Scan Date:", filtered_scans[0].get("scan_date", "Unknown Date")],
-                     ["Termatrac device was:", filtered_scans[0].get("Termatrac device was", "N/A")],
-                     ["Termatrac device position:", filtered_scans[0].get("Termatrac device position", "N/A")],
-                     ["Damage Visible:", filtered_scans[0].get("Damage visible", "N/A")],
-                 ]
+                    data = [
+                        ["Scan Location:", filtered_scans[0].get("Scan Location", "N/A")],
+                        ["Scan Date:", filtered_scans[0].get("scan_date", "Unknown Date")],
+                        ["Termatrac device was:", filtered_scans[0].get("Termatrac device was", "N/A")],
+                        ["Termatrac device position:", filtered_scans[0].get("Termatrac device position", "N/A")],
+                        ["Damage Visible:", filtered_scans[0].get("Damage visible", "N/A")],
+                    ]
 
-                 table = Table(data, colWidths=[2.5 * inch, 3.5 * inch])
-                 table.setStyle(TableStyle([
-                     ('FONTNAME', (0, 0), (-1, -1), 'ARLRDBD'),
-                     ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-                     ('ALIGN', (1, 0), (-1, -1), 'LEFT'),
-                     ('FONTNAME', (1, 0), (-1, -1), 'ARIAL'),
-                     ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
-                 ]))
+                    table = Table(data, colWidths=[2.5 * inch, 3.5 * inch])
+                    table.setStyle(TableStyle([
+                        ('FONTNAME', (0, 0), (-1, -1), 'ARLRDBD'),
+                        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+                        ('ALIGN', (1, 0), (-1, -1), 'LEFT'),
+                        ('FONTNAME', (1, 0), (-1, -1), 'ARIAL'),
+                        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+                    ]))
 
-                 elements.append(table)
-                 elements.append(Spacer(1, 20))
+                    elements.append(table)
+                    elements.append(Spacer(1, 20))
                 
                 if j % 3 == 0:
                     page_num += 1
