@@ -196,18 +196,30 @@ def generate_pdf():
     elements.append(Paragraph("SUPPLEMENT TO TIMBER PEST REPORT", heading_style_centered))
     elements.append(Spacer(1, 16))
     
-    desc = """This Trebirth test report is a supplementary report only, which MUST be read in""" 
-    elements.append(Paragraph(desc, body_style))  # Add each line as a new paragraph
-    elements.append(Spacer(1, 6))
-    desc1 = """conjunction with the full timber pest report. This report cannot be relied upon""" 
-    elements.append(Paragraph(desc1, body_style))  # Add each line as a new paragraph
-    elements.append(Spacer(1, 6))
-    desc2 = """without the full timber pest report and isonly a record of the test findings."""
-    elements.append(Paragraph(desc2, body_style))  # Add each line as a new paragraph
-    elements.append(Spacer(1, 20))
+    #desc = """This Trebirth test report is a supplementary report only, which MUST be read in""" 
+    #elements.append(Paragraph(desc, body_style))  # Add each line as a new paragraph
+    #elements.append(Spacer(1, 6))
+    #desc1 = """conjunction with the full timber pest report. This report cannot be relied upon""" 
+    #elements.append(Paragraph(desc1, body_style))  # Add each line as a new paragraph
+    #elements.append(Spacer(1, 6))
+    #desc2 = """without the full timber pest report and isonly a record of the test findings."""
+    #elements.append(Paragraph(desc2, body_style))  # Add each line as a new paragraph
+    #elements.append(Spacer(1, 20))
+    
     #desc3 = """report and isonly a record of the test findings."""
     #elements.append(Paragraph(desc3, body_style))  # Add each line as a new paragraph
     #elements.append(Spacer(1, 19))  # Leave space between lines
+    desc_lines = [
+        "This Trebirth test report is a supplementary report only, which MUST be read in",
+        "conjunction with the full timber pest report. This report cannot be relied upon",
+        "without the full timber pest report and is only a record of the test findings."
+    ]
+    
+    for line in desc_lines:
+        elements.append(Paragraph(line, body_style))
+        elements.append(Spacer(1, 6))
+
+    elements.append(Spacer(1, 20))  # Extra space before table
    
     
     filtered_scans = [scan for scan in scans_data if 
@@ -224,16 +236,27 @@ def generate_pdf():
         report_date = filtered_scans[0]["scan_date"]
         
         # Split the general information into multiple lines and add a Spacer after each line
-        general_info = [
-            f"<b>Tests were carried out by:</b> {test_by}",
-            f"<b>Date:</b> {report_date}",
-            f"<b>Report for building at:</b> {report_loc}",
-            f"<b>Report requested by:</b> {requested_by}"
+        # Table Data (Properly Aligned)
+        data = [
+            ["Tests were carried out by:", test_by],
+            ["Date:", report_date],
+            ["Report for building at:", report_loc],
+            ["Report requested by:", requested_by]
         ]
-        for info in general_info:
-            elements.append(Paragraph(info, bold_style))
-            elements.append(Spacer(1, 20))  # Leave space between lines
-        elements.append(PageBreak())
+
+        # Create the table
+        table = Table(data, colWidths=[2.5 * inch, 3.5 * inch])
+        table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, -1), 'ARIAL'),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('TEXTCOLOR', (0, 0), (0, -1), colors.black),
+            ('TEXTCOLOR', (1, 0), (1, -1), colors.darkblue),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black)
+        ]))
+
+        elements.append(table)
         
         area_scans = {}
         for scan in filtered_scans:
