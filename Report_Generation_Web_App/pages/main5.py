@@ -285,7 +285,7 @@ def generate_pdf():
                     elements.append(Paragraph(f"Timestamp: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}", body_style))
                     elements.append(Spacer(1, 3))
                     elements.append(Paragraph(f"Scan Duration: {scan_duration} seconds", body_style))
-                    elements.append(Spacer(1, 6))
+                    elements.append(Spacer(1, 8))
                 
                     data = [
                         ["Scan Location:", filtered_scans[0].get("Scan Location", "N/A")],
