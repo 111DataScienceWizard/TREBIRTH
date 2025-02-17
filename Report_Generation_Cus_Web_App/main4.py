@@ -66,4 +66,4 @@ login()
 
 # Redirect to main page after successful login
 if st.session_state["authenticated"]:
-    st.switch_page("pages/main5.py")
+    st.switch_page("pages/ main5.py")
