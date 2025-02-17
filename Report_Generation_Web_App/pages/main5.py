@@ -117,7 +117,21 @@ def plot_time_domain(preprocessed_scan, device_name, timestamp, scan_duration, s
         legend_title="Scan",
         font=dict(color="black"),
         plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
+        paper_bgcolor='rgba(0,0,0,0)',
+        margin=dict(l=100, r=100, t=100, b=100),  # Add space for the border
+        shapes=[dict(
+            type='rect',
+            x0=0,
+            y0=0,
+            x1=1,
+            y1=1,
+            xref='paper',
+            yref='paper',
+            line=dict(
+                color="black",  # Border color
+                width=2  # Border width
+            )
+        )]
     )
     # Save the figure as an image
     return fig  # Convert to an image file
