@@ -130,7 +130,7 @@ def plot_time_domain(preprocessed_scan, device_name, timestamp, scan_duration, s
     
 
   
-def fetch_data():
+def fetch_data(company_name):
     docs = query.stream()
     
     locations = set()
@@ -138,7 +138,7 @@ def fetch_data():
     
     for doc in docs:
         data = doc.to_dict()
-        if "Report Location" in data:
+        if "Report Location" in data and data["Tests were carried out by"].strip() == company_name:
             locations.add(data["Report Location"].strip())
 
             timestamp = data.get("timestamp")
@@ -148,7 +148,7 @@ def fetch_data():
 
     return sorted(locations), scans_data
 
-locations, scans_data = fetch_data()
+locations, scans_data = fetch_data(company_name)
 
 st.title(f"{company_name} Scan Report Viewer")
 
