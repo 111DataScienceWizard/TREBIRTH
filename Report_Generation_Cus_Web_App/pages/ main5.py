@@ -37,7 +37,8 @@ if "authenticated" not in st.session_state or not st.session_state["authenticate
     st.warning("Please log in first.")
     st.switch_page("main4.py")
 
-st.write(f"Welcome, {st.session_state.username}!")
+company_name = st.session_state["company"]
+st.write(f"Welcome, {company_name}!")
 
 # Initialize Firestore
 cred_path = "Report_Generation_Web_App/testdata1-20ec5-firebase-adminsdk-an9r6-d15c118c96.json"
@@ -82,7 +83,7 @@ def get_firestore_data(query):
     raise Exception("Max retries exceeded")
 
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
-query = db.collection('demo_db') 
+query = db.collection('demo_db').where("Tests were carried out by", "==", company_name) 
 
 def convert_to_local_time(timestamp, timezone='Asia/Kolkata'):
     local_tz = pytz.timezone(timezone)
@@ -133,30 +134,26 @@ def fetch_data():
     docs = query.stream()
     
     locations = set()
-    companies = set()
     scans_data = []
     
     for doc in docs:
         data = doc.to_dict()
-        if "Report Location" in data and "Tests were carried out by" in data:
+        if "Report Location" in data:
             locations.add(data["Report Location"].strip())
-            companies.add(data["Tests were carried out by"].strip())
-            
-            # Extracting date from timestamp
+
             timestamp = data.get("timestamp")
             scan_date = datetime.utcfromtimestamp(timestamp.timestamp()).strftime('%Y-%m-%d') if timestamp else "Unknown Date"
-            
-            data["scan_date"] = scan_date  # Add extracted date to data
+            data["scan_date"] = scan_date  
             scans_data.append(data)
-    
-    return sorted(locations), sorted(companies), scans_data
 
-locations, companies, scans_data = fetch_data()
+    return sorted(locations), scans_data
 
-st.title("Scan Report Viewer")
+locations, scans_data = fetch_data()
+
+st.title(f"{company_name} Scan Report Viewer")
 
 selected_locations = st.multiselect("Select Report Location:", locations)
-selected_companies = st.multiselect("Select Company:", companies)
+
 
 def generate_pdf():
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmpfile:
