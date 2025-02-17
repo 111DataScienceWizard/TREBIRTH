@@ -44,7 +44,7 @@ company_credentials = {
     "Ilabs": "I2025$$",
     "PCI": "P2025$$",
     "Vlabs": "V2025$$",
-    "TREBIRTH": "T202544"
+    "Trebirth": "T202544"
 }
 
 def login():
