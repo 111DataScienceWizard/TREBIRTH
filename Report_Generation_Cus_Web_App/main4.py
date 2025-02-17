@@ -35,22 +35,31 @@ st.set_page_config(page_title="Login", layout="wide")
 # Initialize authentication state
 if "authenticated" not in st.session_state:
     st.session_state["authenticated"] = False
-if "username" not in st.session_state:
-    st.session_state["username"] = None
+if "company" not in st.session_state:
+    st.session_state["company"] = None
+
+# Define company login credentials
+company_credentials = {
+    "Hlabs": "H2025$$",
+    "Ilabs": "I2025$$",
+    "PCI": "P2025$$",
+    "Vlabs": "V2025$$",
+    "TREBIRTH": "T202544"
+}
 
 def login():
     st.title("Login Page")
-    username = st.text_input("Username")
+    company = st.text_input("Company Name")
     password = st.text_input("Password", type="password")
-    
+
     if st.button("Login"):
-        if username == "MUKUND" and password == "Muk2025$$":  # Replace with actual credentials
+        if company in company_credentials and company_credentials[company] == password:
             st.session_state["authenticated"] = True
-            st.session_state["username"] = username
-            st.success("Login successful! Redirecting...")
-            st.rerun()  # Refresh the page to apply authentication state
+            st.session_state["company"] = company  # Store company name
+            st.success(f"Login successful! Welcome, {company}. Redirecting...")
+            st.rerun()
         else:
-            st.error("Invalid credentials")
+            st.error("Invalid company name or password")
 
 # Run the login function
 login()
