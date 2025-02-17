@@ -118,7 +118,7 @@ def plot_time_domain(preprocessed_scan, device_name, timestamp, scan_duration, s
         legend_title="Scan",
         font=dict(color="black"),
         plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
+        paper_bgcolor='rgba(0,0,0,0)',
         margin=dict(l=50, r=50, t=50, b=50),  # Add space for the border
         shapes=[dict(
             type='rect',
