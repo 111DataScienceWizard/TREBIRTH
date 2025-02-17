@@ -138,9 +138,14 @@ def fetch_data(company_name):
     
     for doc in docs:
         data = doc.to_dict()
-        if "Report Location" in data and data["Tests were carried out by"].strip() == company_name:
-            locations.add(data["Report Location"].strip())
+        company = data.get("Tests were carried out by", "").strip()
 
+        if company == company_name:  # Check if the company matches the logged-in user
+            location = data.get("Report Location", "").strip()
+            if location:
+                locations.add(location)  # Add only locations linked to the company
+
+            # Convert timestamp to scan_date
             timestamp = data.get("timestamp")
             scan_date = datetime.utcfromtimestamp(timestamp.timestamp()).strftime('%Y-%m-%d') if timestamp else "Unknown Date"
             data["scan_date"] = scan_date  
