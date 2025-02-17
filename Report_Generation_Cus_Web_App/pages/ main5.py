@@ -208,7 +208,7 @@ def generate_pdf():
     
     filtered_scans = [scan for scan in scans_data if 
         (not selected_locations or scan["Report Location"].strip() in selected_locations) and
-        (not selected_companies or scan["Tests were carried out by"].strip() in selected_companies) and
+        #(not selected_companies or scan["Tests were carried out by"].strip() in selected_companies) and
         scan["Tests were carried out by"].strip() == company_name
     ]
     
