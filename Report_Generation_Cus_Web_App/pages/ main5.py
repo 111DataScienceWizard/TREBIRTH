@@ -294,7 +294,7 @@ def generate_pdf():
 
                     # Add the image to the PDF
                     elements.append(Image(img_path, width=400, height=300))
-                    elements.append(Spacer(1, 20))  # Space after image
+                    elements.append(Spacer(1, 12))  # Space after image
 
                     # Add additional device info below the graph
                     elements.append(Paragraph(f"Device Name: {device_name}", body_style))
