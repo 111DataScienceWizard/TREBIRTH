@@ -83,7 +83,7 @@ def get_firestore_data(query):
     raise Exception("Max retries exceeded")
 
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
-query = db.collection('demo_db').where("Tests were carried out by", "==", company_name)
+query = db.collection('demo_db')
 
 def convert_to_local_time(timestamp, timezone='Asia/Kolkata'):
     local_tz = pytz.timezone(timezone)
@@ -208,7 +208,8 @@ def generate_pdf():
     
     filtered_scans = [scan for scan in scans_data if 
         (not selected_locations or scan["Report Location"].strip() in selected_locations) and
-        (not selected_companies or scan["Tests were carried out by"].strip() in selected_companies)
+        (not selected_companies or scan["Tests were carried out by"].strip() in selected_companies) and
+        scan["Tests were carried out by"].strip() == company_name
     ]
     
     if not filtered_scans:
