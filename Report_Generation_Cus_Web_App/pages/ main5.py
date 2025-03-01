@@ -218,7 +218,7 @@ for i, (apt, incharge) in enumerate(apartments_info.items()):
     # --- Button to Download Data for Selected Apartments ---
 if st.button("Download Selected Apartment Scans"):
         # Further filter scans based on selected apartments
-    ]final_scans = [
+    final_scans = [
         scan for scan in filtered_scans
         if scan.get("Apartment", "").strip() in selected_apartments
     ]
