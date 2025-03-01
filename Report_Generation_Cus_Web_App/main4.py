@@ -40,10 +40,10 @@ if "company" not in st.session_state:
 
 # Define company login credentials
 company_credentials = {
-    "Hlabs": "H2025$$",
-    "Ilabs": "I2025$$",
-    "PCI": "P2025$$",
-    "Vlabs": "V2025$$",
+    #"Hlabs": "H2025$$",
+    #"Ilabs": "I2025$$",
+    #"PCI": "P2025$$",
+    #"Vlabs": "V2025$$",
     "Trebirth": "T2025$$"
 }
 
