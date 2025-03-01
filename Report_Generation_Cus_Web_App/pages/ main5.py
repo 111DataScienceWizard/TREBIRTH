@@ -161,7 +161,8 @@ def fetch_data(company_name):
 
             # Convert timestamp to scan_date
             timestamp = data.get("timestamp")
-            scan_date = datetime.utcfromtimestamp(timestamp.timestamp()).strftime('%Y-%m-%d') if timestamp else "Unknown Date"
+            #scan_date = datetime.utcfromtimestamp(timestamp.timestamp()).strftime('%Y-%m-%d') if timestamp else "Unknown Date"
+            scan_date = timestamp
             data["scan_date"] = scan_date  
             scans_data.append(data)
 
