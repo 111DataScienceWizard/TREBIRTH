@@ -152,10 +152,10 @@ def fetch_data(company_name):
     
     for doc in docs:
         data = doc.to_dict()
-        company = data.get("Tests were carried out by", "").strip()
+        company = data.get("CompanyName", "").strip()
 
         if company == company_name:  # Check if the company matches the logged-in user
-            location = data.get("Report Location", "").strip()
+            location = data.get("City", "").strip()
             if location:
                 locations.add(location)  # Add only locations linked to the company
 
@@ -226,17 +226,17 @@ def generate_pdf():
    
     
     filtered_scans = [scan for scan in scans_data if 
-        (not selected_locations or scan["Report Location"].strip() in selected_locations) and
+        (not selected_locations or scan["City"].strip() in selected_locations) and
         #(not selected_companies or scan["Tests were carried out by"].strip() in selected_companies) and
-        scan["Tests were carried out by"].strip() == company_name
+        scan["CompanyName"].strip() == company_name
     ]
     
     if not filtered_scans:
         elements.append(Paragraph("No data found.", body_style))
     else:
-        test_by = filtered_scans[0]["Tests were carried out by"]
-        report_loc = filtered_scans[0]["Report Location"]
-        requested_by = filtered_scans[0]["Report requested by"]
+        test_by = filtered_scans[0]["CompanyName"]
+        report_loc = filtered_scans[0]["City"]
+        requested_by = filtered_scans[0]["ReportRequestedBy"]
         report_date = filtered_scans[0]["scan_date"]
         
         # Split the general information into multiple lines and add a Spacer after each line
@@ -265,7 +265,7 @@ def generate_pdf():
 
         area_scans = {}
         for scan in filtered_scans:
-            area = scan.get("Area", "Unknown Area")
+            area = scan.get("Room", "Unknown Area")
             if area not in area_scans:
                 area_scans[area] = []
             area_scans[area].append(scan)
@@ -276,14 +276,14 @@ def generate_pdf():
             
             for j, scan in enumerate(scans, start=1):
                 elements.append(Paragraph(f"{i}.{j} Radar Scan", heading_style_sub))
-                pest_details = scan.get("Pest details", "N/A")
+                pest_details = scan.get("PestDetails", "N/A")
                 
                 radar_raw = scan.get('RadarRaw', [])
                 if radar_raw:
                     processed_scan = preprocess_radar_data(radar_raw)
-                    device_name = scan.get('DeviceName', 'Unknown Device')
+                    device_name = scan.get('Devicename', 'Unknown Device')
                     timestamp = scan.get('timestamp', datetime.now())
-                    scan_duration = scan.get("Scan Duration", "Unknown")
+                    scan_duration = scan.get("ScanDuration", "Unknown")
                     
                     # Generate the time domain plot
                     fig = plot_time_domain(processed_scan, device_name, timestamp, scan_duration)
@@ -305,11 +305,11 @@ def generate_pdf():
                     elements.append(Spacer(1, 12))
                 
                     data = [
-                        ["Scan Location:", filtered_scans[0].get("Scan Location", "N/A")],
+                        ["Scan Location:", filtered_scans[0].get("Room", "N/A")],
                         ["Scan Date:", filtered_scans[0].get("scan_date", "Unknown Date")],
-                        ["Termatrac device was:", filtered_scans[0].get("Termatrac device was", "N/A")],
-                        ["Termatrac device position:", filtered_scans[0].get("Termatrac device position", "N/A")],
-                        ["Damage Visible:", filtered_scans[0].get("Damage visible", "N/A")],
+                        ["Termatrac device was:", filtered_scans[0].get("Positioned", "N/A")],
+                        ["Termatrac device position:", filtered_scans[0].get("Compass", "N/A")],
+                        ["Damage Visible:", filtered_scans[0].get("DamageVisible", "N/A")],
                     ]
                     table = Table(data, colWidths=[2.5 * inch, 3.5 * inch])
                     table.setStyle(TableStyle([
