@@ -160,9 +160,8 @@ def fetch_data(company_name):
                 locations.add(location)  # Add only locations linked to the company
 
             # Convert timestamp to scan_date
-            timestamp = data.get("timestamp")
-            #scan_date = datetime.utcfromtimestamp(timestamp.timestamp()).strftime('%Y-%m-%d') if timestamp else "Unknown Date"
-            scan_date = timestamp
+            timestamp_str = data.get("timestamp")
+            scan_date = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S").strftime('%Y-%m-%d') if timestamp_str else "Unknown Date"
             data["scan_date"] = scan_date  
             scans_data.append(data)
 
