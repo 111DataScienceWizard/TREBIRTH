@@ -184,7 +184,6 @@ for loc in selected_locations:
     if loc in city_to_areas:
         filtered_areas.update(city_to_areas[loc])
 
-Area dropdown (only shows areas of the selected locations)
 selected_Areas = st.multiselect("Select Report Area:", sorted(filtered_areas))
 
 def generate_pdf():
