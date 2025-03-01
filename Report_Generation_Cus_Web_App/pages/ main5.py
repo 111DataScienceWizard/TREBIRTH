@@ -107,7 +107,7 @@ def plot_time_domain(preprocessed_scan, device_name, timestamp, scan_duration, s
         x=time_seconds,
         y=preprocessed_scan['Radar'],
         mode='lines',
-        name=f"{device_name} - {timestamp.strftime('%Y-%m-%d %H:%M:%S')}",
+        name=f"{device_name} - Unknown Timestamp",
         line=dict(color='blue')
     ))
 
