@@ -141,16 +141,14 @@ def plot_time_domain(preprocessed_scan, device_name, timestamp, scan_duration, s
     #st.plotly_chart(fig)
 
     # Print additional metadata below the graph
-    
-
   
 def fetch_data(company_name):
     docs = query.stream()
-    
+
     locations = set()
-    Areas = set()
+    city_to_areas = {}  # Dictionary to map cities to their respective areas
     scans_data = []
-    
+
     for doc in docs:
         data = doc.to_dict()
         company = data.get("CompanyName", "").strip()
@@ -158,26 +156,36 @@ def fetch_data(company_name):
         if company == company_name:  # Check if the company matches the logged-in user
             location = data.get("City", "").strip()
             if location:
-                locations.add(location)  # Add only locations linked to the company
+                locations.add(location)
+
                 Area = data.get("Area", "").strip()
                 if Area:
-                    Areas.add(Area)
+                    if location not in city_to_areas:
+                        city_to_areas[location] = set()
+                    city_to_areas[location].add(Area)
 
             # Convert timestamp to scan_date
             timestamp_str = data.get("timestamp")
             scan_date = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S").strftime('%Y-%m-%d') if timestamp_str else "Unknown Date"
-            data["scan_date"] = scan_date  
+            data["scan_date"] = scan_date
             scans_data.append(data)
 
-    return sorted(locations), sorted(Areas), scans_data
+    return sorted(locations), city_to_areas, scans_data
 
-locations, Areas, scans_data = fetch_data(company_name)
+locations, city_to_areas, scans_data = fetch_data(company_name)
+
 
 st.title(f"{company_name} Scan Report Viewer")
 
 selected_locations = st.multiselect("Select Report Location:", locations)
-selected_Areas = st.multiselect("select Report Area:", Areas)
 
+filtered_areas = set()
+for loc in selected_locations:
+    if loc in city_to_areas:
+        filtered_areas.update(city_to_areas[loc])
+
+Area dropdown (only shows areas of the selected locations)
+selected_Areas = st.multiselect("Select Report Area:", sorted(filtered_areas))
 
 def generate_pdf():
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmpfile:
