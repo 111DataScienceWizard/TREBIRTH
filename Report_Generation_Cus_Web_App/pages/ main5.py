@@ -209,30 +209,30 @@ else:
 
     st.markdown("### Select Apartment(s) for Download:")
 selected_apartments = []
-    cols = st.columns(3)  # Display in a 3-column layout
-    for i, (apt, incharge) in enumerate(apartments_info.items()):
+cols = st.columns(3)  # Display in a 3-column layout
+for i, (apt, incharge) in enumerate(apartments_info.items()):
         # Checkbox label shows apartment name and incharge info
-        if cols[i % 3].checkbox(f"{apt}\nIncharge: {incharge}", key=apt):
-            selected_apartments.append(apt)
+    if cols[i % 3].checkbox(f"{apt}\nIncharge: {incharge}", key=apt):
+        selected_apartments.append(apt)
 
     # --- Button to Download Data for Selected Apartments ---
-    if st.button("Download Selected Apartment Scans"):
+if st.button("Download Selected Apartment Scans"):
         # Further filter scans based on selected apartments
-        final_scans = [
-            scan for scan in filtered_scans
-            if scan.get("Apartment", "").strip() in selected_apartments
-        ]
-        if final_scans:
-            df = pd.DataFrame(final_scans)
-            csv = df.to_csv(index=False).encode('utf-8')
-            st.download_button(
-                label="Download data as CSV",
-                data=csv,
-                file_name="selected_apartment_scans.csv",
-                mime="text/csv"
-            )
-        else:
-            st.write("No scans available for the selected apartments.")
+    ]final_scans = [
+        scan for scan in filtered_scans
+        if scan.get("Apartment", "").strip() in selected_apartments
+    ]
+    if final_scans:
+        df = pd.DataFrame(final_scans)
+        csv = df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="Download data as CSV",
+            data=csv,
+            file_name="selected_apartment_scans.csv",
+            mime="text/csv"
+        )
+    else:
+        st.write("No scans available for the selected apartments.")
 
 
 
