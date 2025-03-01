@@ -322,19 +322,6 @@ def generate_pdf():
 
                     elements.append(table)
                     elements.append(Spacer(1, 20))
-                
-                if j % 3 == 0:
-                    page_num += 1
-                    elements.append(Spacer(1, 10))  # Leave space before page number
-                    # Add a line before the page number
-                    elements.append(Line(50, 80, 550, 80))  # X1, Y1, X2, Y2 for line
-                    # Add page number to the bottom left
-                    elements.append(Paragraph(f"pg.no: {page_num}/{total_pages}", body_style))
-                    elements.append(Spacer(1, 10))
-                    elements.append(PageBreak())  # Start a new page for the next set of scans
-    
-    # Final page line and page number
-    elements.append(Spacer(1, 10))  # Leave space before the line
     
     doc.build(elements)
     # Remove temporary image file after generating PDF
