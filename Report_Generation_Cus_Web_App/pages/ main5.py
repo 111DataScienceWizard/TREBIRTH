@@ -161,7 +161,7 @@ def fetch_data(company_name):
                 locations.add(location)  # Add only locations linked to the company
                 Area = data.get("Area", "").strip()
                 if Area:
-                    Area.add(Area)
+                    Areas.add(Area)
 
             # Convert timestamp to scan_date
             timestamp_str = data.get("timestamp")
