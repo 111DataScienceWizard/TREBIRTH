@@ -301,7 +301,7 @@ def generate_pdf():
                     elements.append(Spacer(1, 3))
                     elements.append(Paragraph(f"Timestamp: {datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')}", body_style))
                     elements.append(Spacer(1, 3))
-                    elements.append(Paragraph(f"Scan Duration: {scan_duration} seconds", body_style))
+                    elements.append(Paragraph(f"Scan Duration: {scan_duration}", body_style))
                     elements.append(Spacer(1, 12))
                 
                     data = [
