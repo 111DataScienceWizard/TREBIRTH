@@ -282,6 +282,8 @@ def generate_pdf():
                 if radar_raw:
                     processed_scan = preprocess_radar_data(radar_raw)
                     device_name = scan.get('Devicename', 'Unknown Device')
+                    Sampling_rate = scan.get("SamplingRate", "Unknown Device")
+                    Battery = scan.get("Battery", "Unknown")
                     timestamp = scan.get('timestamp', datetime.now())
                     scan_duration = scan.get("ScanDuration", "Unknown")
                     
@@ -300,6 +302,10 @@ def generate_pdf():
                     elements.append(Paragraph(f"Device Name: {device_name}", body_style))
                     elements.append(Spacer(1, 3))
                     elements.append(Paragraph(f"Timestamp: {datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')}", body_style))
+                    elements.append(Spacer(1, 3))
+                    elements.append(Paragraph(f"Sampling Rate: {Sampling_rate}", body_style))
+                    elements.append(Spacer(1, 3))
+                    elements.append(Paragraph(f"Battery: {Battery}", body_style))
                     elements.append(Spacer(1, 3))
                     elements.append(Paragraph(f"Scan Duration: {scan_duration}", body_style))
                     elements.append(Spacer(1, 12))
