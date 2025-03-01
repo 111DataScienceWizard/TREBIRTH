@@ -185,14 +185,9 @@ for loc in selected_locations:
         filtered_areas.update(city_to_areas[loc])
 
 selected_Areas = st.multiselect("Select Report Area:", sorted(filtered_areas))
-filtered_scans = [scan for scan in scans_data if 
-        (not selected_locations or scan["City"].strip() in selected_locations) and
-        (not selected_Areas or scan["Area"].strip() in selected_Areas) and
-        scan["CompanyName"].strip() == company_name
-    ]
-
-    if not filtered_scans:
-        elements.append(Paragraph("No data found.", body_style))
+selected_date =st.date_input("Seelect scan date:")
+selected_date_str = selected_date.strftime("%Y-%m-%d") if selected_date else None
+        
 filtered_scans = [
     scan for scan in scans_data 
     if (not selected_locations or scan["City"].strip() in selected_locations)
