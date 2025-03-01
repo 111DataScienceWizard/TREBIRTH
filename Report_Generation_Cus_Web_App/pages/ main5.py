@@ -185,6 +185,61 @@ for loc in selected_locations:
         filtered_areas.update(city_to_areas[loc])
 
 selected_Areas = st.multiselect("Select Report Area:", sorted(filtered_areas))
+filtered_scans = [scan for scan in scans_data if 
+        (not selected_locations or scan["City"].strip() in selected_locations) and
+        (not selected_Areas or scan["Area"].strip() in selected_Areas) and
+        scan["CompanyName"].strip() == company_name
+    ]
+
+    if not filtered_scans:
+        elements.append(Paragraph("No data found.", body_style))
+filtered_scans = [
+    scan for scan in scans_data 
+    if (not selected_locations or scan["City"].strip() in selected_locations)
+    and (not selected_Areas or scan["Area"].strip() in selected_Areas)
+    and (not selected_date_str or scan.get("scan_date", "Unknown Date") == selected_date_str)
+    and scan["CompanyName"].strip() == company_name
+]
+
+if not filtered_scans:
+    st.write("No data found.")
+else:
+    # --- Extract Unique Apartments with Incharge Info ---
+    apartments_info = {}
+    for scan in filtered_scans:
+        apartment = scan.get("Apartment", "").strip()
+        incharge = scan.get("Incharge", "").strip()
+        if apartment:
+            apartments_info[apartment] = incharge
+
+    st.markdown("### Select Apartment(s) for Download:")
+selected_apartments = []
+    cols = st.columns(3)  # Display in a 3-column layout
+    for i, (apt, incharge) in enumerate(apartments_info.items()):
+        # Checkbox label shows apartment name and incharge info
+        if cols[i % 3].checkbox(f"{apt}\nIncharge: {incharge}", key=apt):
+            selected_apartments.append(apt)
+
+    # --- Button to Download Data for Selected Apartments ---
+    if st.button("Download Selected Apartment Scans"):
+        # Further filter scans based on selected apartments
+        final_scans = [
+            scan for scan in filtered_scans
+            if scan.get("Apartment", "").strip() in selected_apartments
+        ]
+        if final_scans:
+            df = pd.DataFrame(final_scans)
+            csv = df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="Download data as CSV",
+                data=csv,
+                file_name="selected_apartment_scans.csv",
+                mime="text/csv"
+            )
+        else:
+            st.write("No scans available for the selected apartments.")
+
+
 
 def generate_pdf():
     with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmpfile:
