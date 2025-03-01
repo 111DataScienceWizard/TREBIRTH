@@ -148,6 +148,7 @@ def fetch_data(company_name):
     docs = query.stream()
     
     locations = set()
+    Areas = set()
     scans_data = []
     
     for doc in docs:
@@ -158,6 +159,9 @@ def fetch_data(company_name):
             location = data.get("City", "").strip()
             if location:
                 locations.add(location)  # Add only locations linked to the company
+                Area = data.get("Area", "").strip()
+                if Area:
+                    Area.add(Area)
 
             # Convert timestamp to scan_date
             timestamp_str = data.get("timestamp")
@@ -165,13 +169,14 @@ def fetch_data(company_name):
             data["scan_date"] = scan_date  
             scans_data.append(data)
 
-    return sorted(locations), scans_data
+    return sorted(locations), sorted(Areas), scans_data
 
-locations, scans_data = fetch_data(company_name)
+locations, Areas, scans_data = fetch_data(company_name)
 
 st.title(f"{company_name} Scan Report Viewer")
 
 selected_locations = st.multiselect("Select Report Location:", locations)
+selected_Areas = st.multiselect("select Report Area:", Areas)
 
 
 def generate_pdf():
@@ -227,7 +232,7 @@ def generate_pdf():
     
     filtered_scans = [scan for scan in scans_data if 
         (not selected_locations or scan["City"].strip() in selected_locations) and
-        #(not selected_companies or scan["Tests were carried out by"].strip() in selected_companies) and
+        (not selected_Areas or scan["Area"].strip() in selected_Areas) and
         scan["CompanyName"].strip() == company_name
     ]
     
