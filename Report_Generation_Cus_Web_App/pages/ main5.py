@@ -195,12 +195,12 @@ filtered_scans = [
     and (not selected_date_str or scan.get("scan_date", "Unknown Date") == selected_date_str)
     and scan["CompanyName"].strip() == company_name
 ]
-
+apartments_info = {}
 if not filtered_scans:
     st.write("No data found.")
 else:
     # --- Extract Unique Apartments with Incharge Info ---
-    apartments_info = {}
+    #apartments_info = {}
     for scan in filtered_scans:
         apartment = scan.get("Apartment", "").strip()
         incharge = scan.get("Incharge", "").strip()
