@@ -83,7 +83,7 @@ def get_firestore_data(query):
     raise Exception("Max retries exceeded")
 
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
-query = db.collection('homescan')
+query = db.collection('homescan2')
 
 def convert_to_local_time(timestamp, timezone='Asia/Kolkata'):
     local_tz = pytz.timezone(timezone)
