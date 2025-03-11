@@ -83,7 +83,7 @@ def get_firestore_data(query):
     raise Exception("Max retries exceeded")
 
 db = firestore.Client.from_service_account_json("WEBB_APP_TREBIRTH/testdata1-20ec5-firebase-adminsdk-an9r6-a87cacba1d.json")
-query = db.collection('homescan2')
+query = db.collection('homescan')
 
 def convert_to_local_time(timestamp, timezone='Asia/Kolkata'):
     local_tz = pytz.timezone(timezone)
@@ -195,12 +195,12 @@ filtered_scans = [
     and (not selected_date_str or scan.get("scan_date", "Unknown Date") == selected_date_str)
     and scan["CompanyName"].strip() == company_name
 ]
-apartments_info = {}
+
 if not filtered_scans:
     st.write("No data found.")
 else:
     # --- Extract Unique Apartments with Incharge Info ---
-    #apartments_info = {}
+    apartments_info = {}
     for scan in filtered_scans:
         apartment = scan.get("Apartment", "").strip()
         incharge = scan.get("Incharge", "").strip()
@@ -409,4 +409,3 @@ if st.button("Generate PDF Report"):
             file_name="Trebirth_Termatrac_Test_Report.pdf",
             mime="application/pdf",
         )
-
