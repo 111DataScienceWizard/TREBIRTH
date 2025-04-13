@@ -1,0 +1,52 @@
+S1-3 TypeScript
+
+============================script.ts
+
+function manipulateString()
+{
+    const word = (<HTMLInputElement>document.getElementById("sentenceInput")).value;
+
+    if(!word){
+        document.getElementById("errorMessage").innerText = "Please enter a sentence!";
+        return;
+    }
+
+    const reverseWord = word.split("").reverse().join("");
+
+    document.getElementById("sp1").innerHTML = `Original: ${word}`;
+    document.getElementById("sp2").innerHTML = `Uppercase: ${word.toUpperCase()}`
+    document.getElementById("sp3").innerHTML = `Lowercase: ${word.toLocaleLowerCase()}`
+    document.getElementById("sp4").innerHTML = `Reversed: ${reverseWord}`
+}
+
+============================indexhtml
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word Manipulation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+   
+    <div class="container">
+        <h1>Word Manipulation</h1>
+
+        <label for="sentenceInput">Enter a sentence:</label>
+        <input type="text" id="sentenceInput" />
+        <button onclick="manipulateString()">Manipulate String</button>
+
+        <div id="output">
+            <span id="errorMessage" class="red"></span><br>
+            <span id="sp1"></span><br>
+            <span id="sp2"></span><br>
+            <span id="sp3"></span><br>
+            <span id="sp4"></span>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
