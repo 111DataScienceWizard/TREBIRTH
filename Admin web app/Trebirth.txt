@@ -23,9 +23,6 @@ Pipeline_ReTrain.ipynb
 https://colab.research.google.com/drive/1n3FZhieWsQ3h2f_1CwVizXQq7VgaENIR
 
 ReTrain.ipynb
-https://colab.research.google.com/drive/1H26HWrug1fQaOWowNDvYlyXhG5KJI8aX
-
-ReTrain.ipynb
 http://colab.research.google.com/drive/14aoJpHqDHZMBVuzhMC4xPbifGuAMVBdR
 
 Pipeline_ReTrain.ipynb
