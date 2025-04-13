@@ -1,1 +1,59 @@
 
+Google collab Links:
+
+TFLite_Keras_model_in_Binary_Classification
+https://colab.research.google.com/drive/1ILpS8fvGjVQ1O3ZNxtmjq2fuDK7KkpB0
+
+preprocessing, training, converting to onxx.ipynb
+https://colab.research.google.com/drive/1Sl0ARTHfqGwQSVHdVmybRL43nzzNL-2k
+
+Binary_Classification_SKLearn_models_pipeline
+https://colab.research.google.com/drive/1k7vLAtYJ3RRID5d8ND1ibUwLdbe3cMNc
+
+Training New Model.ipynb
+https://colab.research.google.com/drive/1PjlcIzVqD8StbDXqzDdzD3wN8-oKgMyJ
+
+Training New Model.ipynb
+https://colab.research.google.com/drive/1uOwu1sQPXNtsMp9YgUcJFrRR_ueA7zuC
+
+Pipeline_ReTrain.ipynb
+https://colab.research.google.com/drive/1kJb0I39xq57jCdkYDrt8cAQccU3UxGZi
+
+Pipeline_ReTrain.ipynb
+https://colab.research.google.com/drive/1n3FZhieWsQ3h2f_1CwVizXQq7VgaENIR
+
+ReTrain.ipynb
+https://colab.research.google.com/drive/1H26HWrug1fQaOWowNDvYlyXhG5KJI8aX
+
+ReTrain.ipynb
+http://colab.research.google.com/drive/14aoJpHqDHZMBVuzhMC4xPbifGuAMVBdR
+
+Pipeline_ReTrain.ipynb
+https://colab.research.google.com/drive/1UfIdu39C0tlNmPBzbK6VUxJnsV9kfoG9
+
+ReTrain ORT model.ipynb
+https://colab.research.google.com/drive/1J2vLO3OAZi-zQDtR3eAY728hsSVEQibc
+
+Pipeline_ReTrain.ipynb
+http://colab.research.google.com/drive/1af-VvT6vtNEMB9_xsfdNyrc_dJzX928l
+
+stats pipeline.ipynb
+https://colab.research.google.com/drive/1xuGFHxdFLrDCtvuNHyqjltcQ1hYOwNFO
+
+MultiClass_Classification_SKLearn_models_in_pipeline
+https://colab.research.google.com/drive/1xNDhqofyWQ0gXv44U1_hfTarPDMi7fHy
+
+CNN.ipynb
+https://colab.research.google.com/drive/1SJhKug0p9d-u-mU4iPfmgz8IRkPs6zIe
+
+SVM.ipynb
+https://colab.research.google.com/drive/1IBK-qenIfu5xUmTdzt34EucZwafQGvYK
+
+kymatio SVM.ipynb
+https://colab.research.google.com/drive/1_FbsK4vP2KlgkywTQPZMipfxKL1mWDxE
+
+TFLite_Keras_model_in_MultiClass_Classification
+https://colab.research.google.com/drive/1RrzIS84ygV89LCcD7stGWIH_pu4EnnAs
+
+Scake.ipynb
+https://colab.research.google.com/drive/1W11jojbVCIUOIc4MWj4dFqru_A1rsYmp
